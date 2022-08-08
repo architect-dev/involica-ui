@@ -9,7 +9,6 @@ import { useCurrentSummitPalette } from "state/hooks";
 import Logo from "./components/Logo";
 import NavLinks from "./components/NavLinks";
 import SummitWinnings from "./components/SummitWinnings";
-import { NavSecondRow } from "./components/NavSecondRow";
 
 const Wrapper = styled.div`
   position: relative;
@@ -17,9 +16,10 @@ const Wrapper = styled.div`
 `;
 
 const StyledNav = styled.nav<{ showMenu: boolean }>`
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
+  right: 0;
   transition: top 0.2s;
   display: flex;
   justify-content: space-between;
@@ -31,8 +31,9 @@ const StyledNav = styled.nav<{ showMenu: boolean }>`
   height: ${MENU_HEIGHT}px;
   z-index: 20;
   transform: translate3d(0, 0, 0);
-  background-color: ${({ theme }) => theme.colors.background};
   flex-direction: row;
+  max-width: 800px;
+  margin: auto;
 `;
 
 
@@ -75,7 +76,6 @@ const Menu: React.FC<NavProps> = ({
   logout,
   isDark,
   toggleTheme,
-  summitPriceUsd,
   links,
   children,
 }) => {
@@ -83,20 +83,17 @@ const Menu: React.FC<NavProps> = ({
 
   return (
     <Wrapper>
-      <StyledNav showMenu id='popup-root'>
+      <StyledNav showMenu>
           <Flex height='100%' alignItems='center' justifyContent='center' gap='10px'>
             <Logo isDark={isDark} href="/" summitPalette={summitPalette}/>
             <NavLinks links={links} mobileNav={false}/>
           </Flex>
           <Flex alignItems='center' justifyContent='center' gap='10px'>
-            <SummitWinnings/>
-            <SummitPrice summitPriceUsd={summitPriceUsd} />
             <UserBlock account={account} login={login} logout={logout} isDark={isDark} toggleTheme={toggleTheme} />
           </Flex>
       </StyledNav>
       <BodyWrapper>
         <Inner showMenu>
-          <NavSecondRow/>
           {children}
         </Inner>
         <MobileOnlyFooter>

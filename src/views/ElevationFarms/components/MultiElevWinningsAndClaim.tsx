@@ -9,7 +9,6 @@ import { SummitPalette } from 'config/constants'
 import SummitButton from 'uikit/components/Button/SummitButton'
 import { useFarmsUserDataLoaded } from 'state/hooksNew'
 import ElevationWinnings from './ElevationWinnings'
-import ManageWinningsModal from '../../../uikit/widgets/Modals/ManageWinningsModal'
 
 
 const StyledMobileColumnFlex = styled(MobileColumnFlex)`
@@ -34,18 +33,6 @@ const MultiElevWinningsAndClaim: React.FC = () => {
   const userDataLoaded = useFarmsUserDataLoaded()
   const nothingToClaim = totalClaimable.isEqualTo(0)
   const [elevToBreakdown, setElevToBreakdown] = useState<string | undefined>(undefined)
-
-  const [onPresentFreezeWinningsModal] = useModal(
-    <ManageWinningsModal/>
-  )
-
-  const handlePresentFreezeWinningsModal = useCallback(
-    () => {
-      if (nothingToClaim) return
-      onPresentFreezeWinningsModal()
-    },
-    [nothingToClaim, onPresentFreezeWinningsModal]
-  )
 
   return (
     <Flex width='100%' alignItems='center' justifyContent='center' flexDirection='column' mb='18px'>
@@ -86,7 +73,6 @@ const MultiElevWinningsAndClaim: React.FC = () => {
           summitPalette={SummitPalette.GOLD}
           disabled={nothingToClaim}
           width='200px'
-          onClick={handlePresentFreezeWinningsModal}
         >
           FREEZE WINNINGS
         </SummitButton>

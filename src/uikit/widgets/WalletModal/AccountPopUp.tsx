@@ -10,7 +10,6 @@ import { linearGradient } from 'polished'
 import styled from 'styled-components'
 import Divider from 'uikit/components/Divider'
 import DarkModeToggle from '../Menu/components/DarkModeToggle'
-import ChainSelector from './ChainSelector'
 import { CHAIN_ID } from 'utils'
 import { ChainIcon } from 'uikit/components/Svg'
 
@@ -60,7 +59,7 @@ const AccountPopUp: React.FC<Props> = ({ account, isDark, toggleTheme, logout, o
   )
 
   return (
-    <Flex flexDirection='column' alignItems='center' justifyContent='center' gap='24px' minWidth='300px'>
+    <Flex flexDirection='column' alignItems='center' justifyContent='center' gap='18px' minWidth='300px'>
       <Flex width='100%' alignItems='center' justifyContent='space-between'>
         <Text bold monospace>ACCOUNT</Text>
         <SummitButton
@@ -107,13 +106,6 @@ const AccountPopUp: React.FC<Props> = ({ account, isDark, toggleTheme, logout, o
           <CopyToClipboard toCopy={account}/>
         </Flex>
 
-      </Flex>
-
-      <Divider/>
-
-      <Flex width='100%' alignItems='center' justifyContent='space-between'>
-        <Text bold monospace>Select Chain</Text>
-        <ChainSelector/>
       </Flex>
 
       <Divider/>

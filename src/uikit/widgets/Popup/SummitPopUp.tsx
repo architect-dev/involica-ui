@@ -42,7 +42,7 @@ const SummitPopUp: React.FC<Props> = ({ button, position, contentPadding, popUpC
             closeOnEscape
             ref={ref}
             offsetY={0}
-            offsetX={10}
+            offsetX={0}
             open={open}
             arrow={false}
             onClose={callOnDismiss}

@@ -10,7 +10,6 @@ import { HighlightedText } from 'uikit/components/Text'
 import { SummitButton } from 'uikit/components/Button'
 import { Link } from 'react-router-dom'
 import { useModal } from 'uikit/widgets/Modal'
-import ManageWinningsModal from 'uikit/widgets/Modals/ManageWinningsModal'
 
 const InnerCard = styled.div`
   border-radius: 4px;
@@ -53,19 +52,6 @@ const SummitWinningsPopUp: React.FC<Props> = ({ onDismiss }) => {
   const rawPendingSummitWinnings = getFormattedBigNumber(pendingSummitWinnings)
   const nothingToClaim = pendingSummitWinnings.isEqualTo(0)
   const rawFrozenSummit = getFormattedBigNumber(frozenSummit)
-
-
-  const [onPresentFreezeWinningsModal] = useModal(
-    <ManageWinningsModal/>
-  )
-
-  const handlePresentFreezeWinningsModal = useCallback(
-    () => {
-      if (nothingToClaim) return
-      onPresentFreezeWinningsModal()
-    },
-    [nothingToClaim, onPresentFreezeWinningsModal]
-  )
 
   return (
     <Flex flexDirection='column' alignItems='center' justifyContent='center' gap='12px'>
@@ -143,7 +129,6 @@ const SummitWinningsPopUp: React.FC<Props> = ({ onDismiss }) => {
             width='100%'
             padding='0px'
             summitPalette={SummitPalette.GOLD}
-            onClick={handlePresentFreezeWinningsModal}
           >
             <Text monospace small bold color='white'>FREEZE WINNINGS</Text>
           </SummitButton>

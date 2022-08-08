@@ -8,7 +8,6 @@ import { SummitPalette } from 'config/constants'
 import { Flex } from 'uikit/components/Box'
 import Divider from 'uikit/components/Divider'
 import DarkModeToggle from '../Menu/components/DarkModeToggle'
-import ChainSelector from './ChainSelector'
 
 const PopUpWrapper = styled.div`
   display: flex;
@@ -16,7 +15,7 @@ const PopUpWrapper = styled.div`
   align-items: center;
   justify-content: center;
   max-width: 300px;
-  gap: 24px;
+  gap: 18px;
 `
 
 interface Props {
@@ -39,13 +38,6 @@ const ConnectPopUp: React.FC<Props> = ({ login, isDark, toggleTheme, onDismiss =
           mb={index < config.length - 1 ? '8px' : '0'}
         />
       ))}
-    </Flex>
-
-    <Divider/>
-
-    <Flex width='100%' alignItems='center' justifyContent='space-between'>
-      <Text bold monospace>Chain</Text>
-      <ChainSelector/>
     </Flex>
 
     <Divider/>
