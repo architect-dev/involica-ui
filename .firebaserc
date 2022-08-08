@@ -1,0 +1,20 @@
+{
+  "projects": {
+    "default": "involica-beta"
+  },
+  "targets": {
+    "summit-beta": {
+      "hosting": {
+        "ftm": [
+          "involica-ftm"
+        ],
+        "beta": [
+          "involica-beta"
+        ],
+        "polygon": [
+          "involica-polygon"
+        ]
+      }
+    }
+  }
+}
