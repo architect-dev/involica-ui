@@ -4,11 +4,7 @@ import Flex from "../../components/Box/Flex";
 import UserBlock from "./components/UserBlock";
 import { NavProps } from "./types";
 import { MENU_HEIGHT } from "./config";
-import SummitPrice from "./components/SummitPrice";
-import { useCurrentSummitPalette } from "state/hooks";
-import Logo from "./components/Logo";
 import NavLinks from "./components/NavLinks";
-import SummitWinnings from "./components/SummitWinnings";
 
 const Wrapper = styled.div`
   position: relative;
@@ -50,26 +46,6 @@ const Inner = styled.div<{ showMenu: boolean }>`
   max-width: 100%;
 `;
 
-const MobileOnlyFooter = styled.div`
-  position: fixed;
-  height: 100%;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  justify-content: center;
-  height: 56px;
-  background-color: ${({ theme }) => theme.colors.background};
-  box-shadow: 0px 0px 4px ${({ theme }) => theme.colors.textShadow};
-
-
-  ${({ theme }) => theme.mediaQueries.nav} {
-    display: none;
-  }
-`
-
 const Menu: React.FC<NavProps> = ({
   account,
   login,
@@ -79,28 +55,21 @@ const Menu: React.FC<NavProps> = ({
   links,
   children,
 }) => {
-  const summitPalette = useCurrentSummitPalette()
 
   return (
     <Wrapper>
       <StyledNav showMenu>
-          <Flex height='100%' alignItems='center' justifyContent='center' gap='10px'>
-            <Logo isDark={isDark} href="/" summitPalette={summitPalette}/>
-            <NavLinks links={links} mobileNav={false}/>
-          </Flex>
-          <Flex alignItems='center' justifyContent='center' gap='10px'>
-            <UserBlock account={account} login={login} logout={logout} isDark={isDark} toggleTheme={toggleTheme} />
-          </Flex>
+        <Flex height='100%' alignItems='center' justifyContent='center' gap='10px'>
+          <NavLinks links={links} mobileNav={false}/>
+        </Flex>
+        <Flex alignItems='center' justifyContent='center' gap='10px'>
+          <UserBlock account={account} login={login} logout={logout} isDark={isDark} toggleTheme={toggleTheme} />
+        </Flex>
       </StyledNav>
       <BodyWrapper>
         <Inner showMenu>
           {children}
         </Inner>
-        <MobileOnlyFooter>
-          <Flex height='100%'>
-            <NavLinks links={links} mobileNav/>
-          </Flex>
-        </MobileOnlyFooter>
       </BodyWrapper>
     </Wrapper>
   );

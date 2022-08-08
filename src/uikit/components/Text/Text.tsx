@@ -29,8 +29,7 @@ export const Text = styled.div<TextProps>`
   font-style: ${({ italic }) => (italic ? 'italic' : 'default')};
   text-decoration: ${({ underline }) => (underline ? 'underline' : 'default')};
   line-height: 1.5;
-  font-family: ${({ monospace }) => (monospace ? 'Courier Prime, monospace' : 'inherit')};
-  letter-spacing: 0.5px;
+  font-family: monospace;
   ${({ textTransform }) => textTransform && `text-transform: ${textTransform};`}
   ${space}
   ${typography}

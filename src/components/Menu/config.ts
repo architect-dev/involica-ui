@@ -1,39 +1,22 @@
 import { MenuEntry } from 'uikit'
-import { Elevation } from 'config/constants/types'
 
 export const getMenuItems = (): MenuEntry[] => [
-
   {
-    label: 'FARM',
-    href: `/elevations`,
+    label: 'HOME',
+    href: `/`,
     external: false,
-    elevation: Elevation.OASIS,
-    keyPaths: ['elevations', 'oasis', 'plains', 'mesa', 'summit']
+    keyPaths: ['']
   },
   {
-    label: 'GLACIER',
-    href: '/glacier',
-    palette: 'GLACIER',
+    label: 'STATS',
+    href: '/stats',
     external: false,
-    keyPaths: ['glacier']
-  },
-  {
-    label: 'EVEREST',
-    href: '/everest',
-    external: false,
-    keyPaths: ['everest'],
-  },
-  {
-    label: 'EXPEDITION',
-    href: `/expedition`,
-    external: false,
-    elevation: Elevation.EXPEDITION,
-    keyPaths: ['expedition'],
+    keyPaths: ['stats']
   },
   {
     label: 'DOCS',
-    href: 'https://docs.summitdefi.com',
-    external: true,
-    keyPaths: ['help'],
+    href: '/docs',
+    external: false,
+    keyPaths: ['docs'],
   }
 ].filter((entry) => entry != null)

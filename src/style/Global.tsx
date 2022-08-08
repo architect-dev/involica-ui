@@ -9,7 +9,7 @@ declare module 'styled-components' {
 
 const GlobalStyle = createGlobalStyle`
   * {
-    font-family: 'Montserrat', sans-serif;
+    font-family: monospace;
   }
   html {
     overflow-x: hidden;

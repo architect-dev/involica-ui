@@ -23,13 +23,6 @@ const UserBlockFlex = styled.div`
   ${pressableMixin}
 `
 
-const DesktopOnlyText = styled(Text)`
-  display: none;
-  ${({ theme }) => theme.mediaQueries.nav} {
-    display: block;
-  }
-`
-
 const AccountDot = styled.div<{ connected: boolean }>`
   position: relative;
   width: 36px;
@@ -101,7 +94,7 @@ const UserBlock: React.FC<Props> = ({ account, isDark, toggleTheme, login, logou
           <AccountDot connected={account != null}>
             { account != null && <StyledChainIcon white chain={chain}/> }
           </AccountDot>
-          <DesktopOnlyText bold monospace>{account ? `${accountEllipsis}${pendingTxs.length > 0 ? ` | ${pendingTxs.length} TX` : ''}` : 'CONNECT'}</DesktopOnlyText>
+          <Text bold monospace>{account ? `${accountEllipsis}${pendingTxs.length > 0 ? ` | ${pendingTxs.length} TX` : ''}` : 'CONNECT'}</Text>
         </UserBlockFlex>
       }
       popUpContent={

@@ -17,7 +17,6 @@ export interface InputProps {
 }
 
 const Input: React.FC<InputProps> = ({
-  summitPalette,
   tokenSymbol,
   endAdornment,
   onChange,
@@ -33,7 +32,6 @@ const Input: React.FC<InputProps> = ({
       <InputWrapper>
         <StyledInput
           disabled={disabled || isLocked}
-          summitPalette={summitPalette}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
@@ -107,7 +105,6 @@ export const StyledInput = styled.input<{ summitPalette?: ElevOrPalette }>`
   padding: 0;
   outline: none;
   color: ${({ theme }) => theme.colors.text};
-  text-shadow: 1px 1px 2px ${({ theme, summitPalette }) => theme.colors[summitPalette]};
 `
 
 export default Input

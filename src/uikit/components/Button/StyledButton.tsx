@@ -1,3 +1,4 @@
+import { transparentize } from 'polished'
 import styled, { css, DefaultTheme } from 'styled-components'
 import { space, layout, variant } from 'styled-system'
 import { pressableMixin } from 'uikit/util/styledMixins'
@@ -66,24 +67,18 @@ const StyledButton = styled.button<BaseButtonProps>`
     theme,
     disabled,
     hoverStyles: css`
-      box-shadow: 2px 2px 4px ${theme.colors.textShadow};
-      .secondary-inset {
-        box-shadow: 2px 2px 4px inset ${theme.colors.textShadow};
+      filter: none;
+      > * {
+        text-decoration: underline;
       }
     `
   })}
 
   &:hover:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled):not(:active) {
-    /* opacity: 0.65; */
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
 
   &:active:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled) {
-    /* opacity: 0.85; */
-    box-shadow: none;
-    .secondary-inset {
-      box-shadow: none;
-    }
   }
 
   ${getDisabledStyles}

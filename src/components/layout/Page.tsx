@@ -3,6 +3,7 @@ import Container from './Container'
 
 const Page = styled(Container)`
   min-height: calc(100vh - 64px);
+  max-width: 800px;
   padding-top: 44px;
   padding-bottom: 128px;
   padding-left: 8px;

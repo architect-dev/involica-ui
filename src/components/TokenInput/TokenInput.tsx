@@ -18,7 +18,6 @@ interface TokenInputProps extends InputProps {
 }
 
 const TokenInput: React.FC<TokenInputProps> = ({
-  summitPalette = SummitPalette.BASE,
   balanceText = 'Balance',
   max,
   symbol,
@@ -45,14 +44,13 @@ const TokenInput: React.FC<TokenInputProps> = ({
       </StyledMaxText>
       <TextInput
         disabled={disabled}
-        summitPalette={summitPalette}
         tokenSymbol={symbol}
         isLocked={isLocked}
         endAdornment={
           <StyledTokenAdornmentWrapper>
             <StyledSpacer />
             <div>
-              <SummitButton summitPalette={summitPalette} disabled={disabled || isLocked} padding="12px" onClick={onSelectMax}>
+              <SummitButton disabled={disabled || isLocked} padding="12px" onClick={onSelectMax}>
                 MAX
               </SummitButton>
             </div>
@@ -72,6 +70,7 @@ const TokenInput: React.FC<TokenInputProps> = ({
 const StyledTokenInput = styled.div`
   position: relative;
   width: 100%;
+  max-width: 300px;
 `
 
 const StyledSpacer = styled.div`

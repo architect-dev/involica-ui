@@ -47,11 +47,8 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
     disabled,
     secondary = false,
     children,
-    summitPalette,
     onClick,
     freezeSummitButton,
-    insetColor,
-    InsetComponent = null,
     ...rest
   } = props
   const internalProps = external ? getExternalLinkProps() : {}
@@ -76,7 +73,6 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
       $isLoading={isLoading}
       $isLocked={isLocked}
       className={classNames.join(' ')}
-      $summitPalette={summitPalette}
       $secondary={secondary}
       disabled={isDisabled || isLocked}
       onClick={handleClick}
@@ -85,7 +81,6 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
       {...rest}
     >
       <>
-        { secondary && (InsetComponent != null ? InsetComponent : <SecondaryInset className='secondary-inset' insetColor={insetColor}/>) }
         {isValidElement(startIcon) &&
           cloneElement(startIcon, {
             mr: '0.5rem',
