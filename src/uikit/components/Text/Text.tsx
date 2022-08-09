@@ -8,14 +8,15 @@ export interface ThemedProps extends TextProps {
   theme: DefaultTheme
 }
 
-const getColor = ({ color, gold, theme }: ThemedProps) => {
+const getColor = ({ color, gold, red, theme }: ThemedProps) => {
+  if (red) return theme.colors.red
   if (gold) return theme.colors.textGold
   // return theme.colors[color]
   return getThemeValue(`colors.${color}`, color)(theme)
 }
 
 const getFontSize = ({ fontSize, small }: TextProps) => {
-  return small ? '13px' : fontSize || '14px'
+  return small ? '12px' : fontSize || '14px'
 }
 
 export const breakTextBr = (breakableText: string): Array<string | JSX.Element> => {

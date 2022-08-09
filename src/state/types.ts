@@ -201,15 +201,45 @@ export interface EverestState {
   userData?: EverestUserData
 }
 
+export interface TokenData {
+  symbol: string
+  address: string
+  wallet: BigNumber
+  allowance: BigNumber
+  price: BigNumber
+}
+
+export interface Token {
+  address: string
+  symbol: string
+  price?: BigNumber
+  wallet?: BigNumber
+  allowance?: BigNumber
+}
+
+export interface PositionOut {
+  token: string
+  weight: number
+  route: string[]
+  maxSlippage: number
+}
+
+export interface Position {
+  user: string
+  tokenIn: string
+  outs: PositionOut
+  amountDCA: BigNumber
+  intervalDCA: BigNumber
+  lastDCA: BigNumber
+  maxGasPrice: BigNumber
+  taskId: string
+  finalizationReason: string
+}
+
 // Global state
 export interface State {
-  farms: FarmsState
-  prices: PriceState
-  expedition: ExpeditionState
-  summitEcosystem: SummitEcosystemState
-  tokens: TokensState
-  glacier: GlacierState
-  everest: EverestState
+  position: Position
+  tokens: Token[]
 }
 
 

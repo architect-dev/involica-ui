@@ -15,6 +15,7 @@ interface TokenInputProps extends InputProps {
   feeBP?: number
   disabled?: boolean
   isLocked?: boolean
+  invalid?: boolean
 }
 
 const TokenInput: React.FC<TokenInputProps> = ({
@@ -28,6 +29,7 @@ const TokenInput: React.FC<TokenInputProps> = ({
   feeBP = 0,
   disabled = false,
   isLocked = false,
+  invalid = false,
 }) => {
 
   const feeToTake = useMemo(
@@ -59,9 +61,10 @@ const TokenInput: React.FC<TokenInputProps> = ({
         onChange={onChange}
         placeholder="0"
         value={value}
+        invalid={invalid}
       />
       {feeBP > 0 ? (
-        <StyledFeeText monospace color={feeToTake > 0 ? 'red' : null}>{feeText}: {feeToTake.toFixed(4)}</StyledFeeText>
+        <StyledFeeText monospace red={feeToTake > 0}>{feeText}: {feeToTake.toFixed(4)}</StyledFeeText>
       ) : null}
     </StyledTokenInput>
   )
@@ -82,9 +85,9 @@ const StyledTokenAdornmentWrapper = styled.div`
   display: flex;
 `
 
-const StyledMaxText = styled(Text)`
+const StyledMaxText = styled(Text)<{ red?: boolean }>`
   align-items: center;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme, red }) => red ? theme.colors.red : theme.colors.text};
   display: flex;
   font-style: italic;
   margin-right: 16px;
@@ -95,11 +98,10 @@ const StyledMaxText = styled(Text)`
   justify-content: flex-start;
 `
 
-const StyledFeeText = styled(StyledMaxText)<{ color: string | null }>`
+const StyledFeeText = styled(StyledMaxText)`
   position: absolute;
   left: 0px;
   bottom: -30px;
-  color: ${({ theme, color }) => color != null ? color : theme.colors.text};
 `
 
 export default TokenInput

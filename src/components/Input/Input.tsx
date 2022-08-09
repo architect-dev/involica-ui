@@ -14,6 +14,7 @@ export interface InputProps {
   summitPalette?: ElevOrPalette
   disabled?: boolean
   isLocked?: boolean
+  invalid?: boolean
 }
 
 const Input: React.FC<InputProps> = ({
@@ -25,6 +26,7 @@ const Input: React.FC<InputProps> = ({
   value,
   disabled = false,
   isLocked = false,
+  invalid = false,
 }) => {
   return (
     <StyledInputWrapper disabled={disabled} isLocked={isLocked}>
@@ -35,8 +37,9 @@ const Input: React.FC<InputProps> = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          invalid={invalid}
         />
-        {!!tokenSymbol && <SymbolText fontSize='12px' monospace>{tokenSymbol}</SymbolText>}
+        {!!tokenSymbol && <SymbolText fontSize='12px' monospace red={invalid}>{tokenSymbol}</SymbolText>}
       </InputWrapper>
       {!!endAdornment && endAdornment}
       {isLocked && <StyledLock width="28px" />}
@@ -92,7 +95,7 @@ const SymbolText = styled(HighlightedText)`
   text-shadow: none;
 `
 
-export const StyledInput = styled.input<{ summitPalette?: ElevOrPalette }>`
+export const StyledInput = styled.input<{ summitPalette?: ElevOrPalette, invalid?: boolean }>`
   width: 100%;
   background: none;
   border: 0;
@@ -104,7 +107,7 @@ export const StyledInput = styled.input<{ summitPalette?: ElevOrPalette }>`
   margin: 0;
   padding: 0;
   outline: none;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme, invalid }) => invalid ? theme.colors.red : theme.colors.text};
 `
 
 export default Input

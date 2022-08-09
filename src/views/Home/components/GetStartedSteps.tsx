@@ -6,6 +6,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { SummitButton, Text } from 'uikit'
 import { pressableMixin } from 'uikit/util/styledMixins'
+import { AddFundsStep } from '../steps/AddFunds'
 
 const HoverableText = styled(Text)<{ active: boolean }>`
   ${pressableMixin}
@@ -50,28 +51,7 @@ export const GetStartedSteps: React.FC = () => {
   return (
     <>
       <TextButton index={1} text="Add Funds" setExpanded={setExpanded} expanded={expanded === 1} />
-      <StepContent
-        expanded={expanded === 1}
-        collapsedContent={<Text>Funds: <b>20.0 FTM ($6.32)</b></Text>}
-        expandedContent={[
-          <Text>
-            Deposit <b>{getNativeTokenSymbol()}</b> to cover the cost of your DCA transactions.
-            <br />
-            You can remove these funds at any point.
-            <br />
-            (20 FTM should be more than enough)
-          </Text>,
-          <TokenInput
-            symbol={getNativeTokenSymbol()}
-            onChange={console.log}
-            value='20'
-            max='365.6754'
-          />,
-          <SummitButton>
-            ADD FUNDS
-          </SummitButton>
-        ]}
-      />
+      <AddFundsStep expanded={expanded === 1}/>
       <TextButton index={2} text="Build your Portfolio" setExpanded={setExpanded} expanded={expanded === 2} />
       <StepContent
         expanded={expanded === 2}

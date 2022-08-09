@@ -28,7 +28,7 @@ const Home: React.FC = () => {
         <StyledHighlightedText fontSize="32px" letterSpacing="16px">
           INVOLICA
         </StyledHighlightedText>
-        <Text textAlign='left'>
+        <Text textAlign='left' italic small>
           DCA into a full portfolio,
           <br/>
           hedge against bear market volitility,

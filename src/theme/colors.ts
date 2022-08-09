@@ -28,6 +28,7 @@ export const brandColors = {
   GLACIER: '#39749e',
 
   textGold: '#EE9F3D',
+  red: '#cc0000',
 }
 
 export const lightColors: Colors = {

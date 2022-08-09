@@ -2,13 +2,7 @@
 import React from 'react'
 import { ElevOrPalette } from 'config/constants/types'
 import styled from 'styled-components'
-import getThemeValue from 'uikit/util/getThemeValue'
-import { Text, ThemedProps } from './Text'
-
-const getColor = ({ color, gold, theme }: ThemedProps) => {
-  if (gold) return theme.colors.textGold
-  return getThemeValue(`colors.${color}`, color)(theme)
-}
+import { Text } from './Text'
 
 export const HighlightedText = styled(Text)<{
   summitPalette?: ElevOrPalette
@@ -24,7 +18,6 @@ export const HighlightedText = styled(Text)<{
   font-weight: bold;
   font-style: italic;
   text-align: center;
-  color: ${getColor};
   font-size: ${({ header, fontSize }) => fontSize || (header ? '22' : '16')}px !important;
   text-shadow: ${({ theme, summitPalette }) => {
     if (theme.isDark) return 'none'

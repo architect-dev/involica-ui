@@ -77,6 +77,8 @@ export type Colors = {
   ROLLOVER: string
   BASE: string
   EVEREST: string
+  
+  red: string
 }
 
 export type ZIndices = {
