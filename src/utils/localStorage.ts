@@ -1,4 +1,3 @@
-import { Elevation } from "config/constants"
 import { CHAIN_ID } from "config/constants/networks"
 import { parseJSON } from "./helpers"
 
@@ -28,7 +27,6 @@ export enum LocalStorageKey {
 interface LocalStorageProps {
     key: LocalStorageKey
     value?: any
-    elevation?: Elevation
     withChain?: boolean
     withAccount?: boolean
     readDefault?: any
@@ -38,11 +36,10 @@ export const getLocalStorageAccount = () => {
     return parseJSON(localStorage.getItem(LocalStorageKey.ACTIVE_ACCOUNT), null)
 }
 
-const getFullKey = ({ key, elevation = null, withChain = false, withAccount = false}: LocalStorageProps) => {
+const getFullKey = ({ key, withChain = false, withAccount = false}: LocalStorageProps) => {
     return [
         withChain ? CHAIN_ID : null,
         withAccount ? getLocalStorageAccount() : null,
-        elevation != null ? elevation : null,
         key
     ]
         .filter((keyComp) => keyComp != null)

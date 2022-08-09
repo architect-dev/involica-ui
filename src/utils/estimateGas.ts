@@ -1,6 +1,5 @@
-import { Contract, Overrides } from '@ethersproject/contracts'
+import { Contract, PayableOverrides } from '@ethersproject/contracts'
 import { TransactionResponse } from '@ethersproject/providers'
-import { RevertReasonMap } from 'config/constants/types'
 
 /**
  * Estimate the gas needed to call a function, and add a 10% margin
@@ -39,9 +38,7 @@ export class RevertError extends Error {
 
 
 export const extractRevertMsg = (err) => {
-    const rawRevertMessage = err.data?.message?.split('execution reverted: ')[1] || err.message || 'Unknown Error'
-    const mappedRevertMessage = RevertReasonMap[rawRevertMessage.split(' ').join('_')]
-    return mappedRevertMessage != null ? mappedRevertMessage : rawRevertMessage
+    return err.data?.message?.split('execution reverted: ')[1] || err.message || 'Unknown Error'
 }
 
 /**
@@ -56,7 +53,7 @@ export const callWithEstimateGas = async (
     contract: Contract,
     methodName: string,
     methodArgs: any[] = [],
-    overrides: Overrides = {},
+    overrides: PayableOverrides = {},
     gasMarginPer10000 = 1000,
 ): Promise<TransactionResponse> => {
     const gasEstimation = estimateGas(contract, methodName, methodArgs, gasMarginPer10000)
