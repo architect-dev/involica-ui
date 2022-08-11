@@ -161,3 +161,17 @@ const EverestLockDurationSlider: React.FC<Props> = ({ minLockDuration = 0, exist
 }
 
 export default EverestLockDurationSlider
+
+function lockDurationSliderPerc(existingLockDuration: number): number {
+    throw new Error('Function not implemented.')
+}
+
+
+function lockDurationSliderMarks(minLockDuration: number, existingLockDuration: number): Record<string, JSX.Element> {
+    throw new Error('Function not implemented.')
+}
+
+
+function sliderPercLockDuration(clampedPerc: number): any {
+    throw new Error('Function not implemented.')
+}

@@ -80,6 +80,12 @@
       },
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "inPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "address[]",
         "name": "outTokens",
         "type": "address[]"
@@ -337,11 +343,6 @@
             "type": "uint256"
           },
           {
-            "internalType": "address[]",
-            "name": "route",
-            "type": "address[]"
-          },
-          {
             "internalType": "uint256",
             "name": "maxSlippage",
             "type": "uint256"
@@ -484,6 +485,16 @@
         "type": "address"
       },
       {
+        "internalType": "uint256",
+        "name": "tokenInPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[][]",
+        "name": "swapsRoutes",
+        "type": "address[][]"
+      },
+      {
         "internalType": "uint256[]",
         "name": "swapsAmountOutMin",
         "type": "uint256[]"
@@ -534,6 +545,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "fetchUniRouter",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -556,6 +580,11 @@
             "type": "address"
           },
           {
+            "internalType": "address[]",
+            "name": "tokenInPriceRoute",
+            "type": "address[]"
+          },
+          {
             "components": [
               {
                 "internalType": "address",
@@ -566,11 +595,6 @@
                 "internalType": "uint256",
                 "name": "weight",
                 "type": "uint256"
-              },
-              {
-                "internalType": "address[]",
-                "name": "route",
-                "type": "address[]"
               },
               {
                 "internalType": "uint256",
@@ -673,6 +697,11 @@
                 "internalType": "address",
                 "name": "tokenIn",
                 "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "tokenInPrice",
+                "type": "uint256"
               },
               {
                 "internalType": "address",
@@ -973,11 +1002,6 @@
             "internalType": "uint256",
             "name": "weight",
             "type": "uint256"
-          },
-          {
-            "internalType": "address[]",
-            "name": "route",
-            "type": "address[]"
           },
           {
             "internalType": "uint256",

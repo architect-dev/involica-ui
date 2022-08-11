@@ -24,7 +24,7 @@ interface EcosystemMutators {
 export interface Token {
   symbol: string
   address: string
-  price: BigNumber
+  price: number
   decimals: number
 }
 export interface PublicData {
@@ -38,7 +38,6 @@ interface PublicDataMutators {
 export interface PositionOut {
   token: string
   weight: number
-  route: string[]
   maxSlippage: number
 }
 export interface Position {

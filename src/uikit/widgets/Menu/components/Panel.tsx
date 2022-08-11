@@ -4,12 +4,10 @@ import PanelBody from './PanelBody'
 import PanelFooter from './PanelFooter'
 import { SIDEBAR_WIDTH_FULL } from '../config'
 import { MenuEntry, PanelProps, PushedProps } from '../types'
-import SummitPrice from './SummitPrice'
 
 interface Props extends PanelProps, PushedProps {
   isMobile: boolean
   additionals: MenuEntry[]
-  summitPriceUsd: number
 }
 
 const StyledPanel = styled.div<{ isPushed: boolean }>`
@@ -35,21 +33,11 @@ const StyledPanel = styled.div<{ isPushed: boolean }>`
   }
 `
 
-const MobileExcludedHeaderElements = styled.div`
-  display: flex;
-  ${({ theme }) => theme.mediaQueries.invNav} {
-    display: none;
-  }
-`
-
 const Panel: React.FC<Props> = (props) => {
-  const { isPushed, summitPriceUsd } = props
+  const { isPushed } = props
   return (
     <StyledPanel isPushed={isPushed}>
       <PanelBody {...props} />
-      <MobileExcludedHeaderElements>
-        <SummitPrice summitPriceUsd={summitPriceUsd} />
-      </MobileExcludedHeaderElements>
       <PanelFooter {...props} />
     </StyledPanel>
   )

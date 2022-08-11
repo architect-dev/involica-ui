@@ -44,19 +44,26 @@
     "name": "fetchTokensData",
     "outputs": [
       {
-        "internalType": "address[]",
-        "name": "tokens",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "prices",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "address[][]",
-        "name": "routes",
-        "type": "address[][]"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "decimals",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "price",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct InvolicaFetcher.TokenData[]",
+        "name": "tokensData",
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -95,6 +102,11 @@
             "type": "address"
           },
           {
+            "internalType": "address[]",
+            "name": "tokenInPriceRoute",
+            "type": "address[]"
+          },
+          {
             "components": [
               {
                 "internalType": "address",
@@ -105,11 +117,6 @@
                 "internalType": "uint256",
                 "name": "weight",
                 "type": "uint256"
-              },
-              {
-                "internalType": "address[]",
-                "name": "route",
-                "type": "address[]"
               },
               {
                 "internalType": "uint256",
@@ -192,6 +199,11 @@
         "internalType": "struct IInvolica.UserTokenData[]",
         "name": "userTokensData",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "swapsAmountOutMin",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",

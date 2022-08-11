@@ -9,6 +9,7 @@ import styled from 'styled-components'
 import { ToastListener } from 'contexts/ToastsContext'
 import Background from 'components/Background'
 import { useFetchPublicData, useFetchUserData } from 'state/hooks'
+import useEagerConnect from 'hooks/useEagerConnect'
 
 const Home = lazy(() => import('./views/Home'))
 const NotFound = lazy(() => import('./views/NotFound'))
@@ -34,6 +35,7 @@ const UserHook = () => {
 }
 
 const App: React.FC = () => {
+  useEagerConnect()
 
   return (
     <StyledRouter>

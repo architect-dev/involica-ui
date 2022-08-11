@@ -42,17 +42,34 @@ export interface ParseFieldConfig {
   nestedFields?: Record<string, ParseFieldConfig>
 }
 
-const parseField = (value: any, type: ParseFieldType, customParse?: (any) => any) => {
+const multicallAndParse = async (abi: any[], calls: Call[], parseFields: Record<string, ParseFieldConfig>) => {
+  return (await multicall(abi, calls)).map((item) => parseFieldRecord(item, parseFields))
+}
+
+const parseFieldRecord = (value: any, fields: Record<string, ParseFieldConfig>) => {
+  const itemData = {}
+  Object.entries(fields).forEach(([field, { type, stateField, customParse, nestedFields }]) => {
+    itemData[stateField || field] = parseField(value[field], type, customParse, nestedFields)
+  })
+  return itemData
+}
+
+const parseField = (
+  value: any,
+  type: ParseFieldType,
+  customParse: ((any) => any) | undefined,
+  nestedFields: Record<string, ParseFieldConfig> | undefined,
+) => {
   switch (type) {
     case ParseFieldType.custom:
       return customParse(value)
 
-    case ParseFieldType.nested:
-      console.log('parse nested', value)
-      return value
-    case ParseFieldType.nestedArr:
-      console.log('parse nested array', value)
-      return value
+    case ParseFieldType.nested: {
+      return parseFieldRecord(value, nestedFields)
+    }
+    case ParseFieldType.nestedArr: {
+      return value.map((nValue) => parseFieldRecord(nValue, nestedFields))
+    }
 
     case ParseFieldType.bignumber:
       return new BigNumber(value._hex).toJSON()
@@ -69,25 +86,9 @@ const parseField = (value: any, type: ParseFieldType, customParse?: (any) => any
     case ParseFieldType.addressArr:
     case ParseFieldType.string:
       return value
-    default: return null
+    default:
+      return null
   }
-}
-
-const parseMulticallRes = (res: any, fields: Record<string, ParseFieldConfig>) => {
-  return res.map((resItem) => {
-    const itemData = {}
-    Object.entries(fields).forEach(([field, { type, stateField, customParse }]) => {
-      itemData[stateField || field] = parseField(resItem[field], type, customParse)
-    })
-    return itemData
-  })
-}
-
-const multicallAndParse = async (abi: any[], calls: Call[], parseFields: Record<string, ParseFieldConfig>) => {
-  return parseMulticallRes(
-    await multicall(abi, calls),
-    parseFields
-  )
 }
 
 export default multicallAndParse

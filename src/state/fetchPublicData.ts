@@ -4,8 +4,15 @@ import multicallAndParse from 'utils/multicall'
 import { Token } from './types'
 
 const tokensFields: Record<string, ParseFieldConfig> = {
-  tokens: { type: ParseFieldType.addressArr },
-  prices: { type: ParseFieldType.bignumberArr },
+  tokensData: {
+    stateField: 'tokens',
+    type: ParseFieldType.nestedArr,
+    nestedFields: {
+      token: { type: ParseFieldType.address },
+      decimals: { type: ParseFieldType.number },
+      price: { type: ParseFieldType.bignumber },
+    },
+  },
 }
 
 const fetchPublicData = async (): Promise<Token[]> => {
@@ -17,7 +24,14 @@ const fetchPublicData = async (): Promise<Token[]> => {
     },
   ]
 
-  return multicallAndParse(FetcherABI, calls, tokensFields)
+  const { tokens } = (await multicallAndParse(FetcherABI, calls, tokensFields))[0]
+
+  return tokens.map(
+    (token): Token => ({
+      ...token,
+      symbol: 'TEST',
+    }),
+  )
 }
 
 export default fetchPublicData

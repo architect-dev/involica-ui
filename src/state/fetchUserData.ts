@@ -12,11 +12,10 @@ const userDataFields: Record<string, ParseFieldConfig> = {
       user: { type: ParseFieldType.address },
       tokenIn: { type: ParseFieldType.address },
       outs: {
-        type: ParseFieldType.nested,
+        type: ParseFieldType.nestedArr,
         nestedFields: {
           token: { type: ParseFieldType.address },
           weight: { type: ParseFieldType.number },
-          route: { type: ParseFieldType.addressArr },
           maxSlippage: { type: ParseFieldType.bignumber },
         },
       },
