@@ -13,11 +13,10 @@ import { ConnectorNames, connectorLocalStorageKey } from 'uikit'
 import { connectorsByName } from 'utils/web3React'
 import { setupNetwork } from 'utils/wallet'
 import useToast from 'hooks/useToast'
-import { useDispatch } from 'react-redux'
-import { clearActiveAccount } from 'state/summitEcosystem'
+import { useInvolicaStore } from 'state/zustand'
 
 const useAuth = () => {
-    const dispatch = useDispatch()
+    const clearActiveAccount = useInvolicaStore((state) => state.clearActiveAccount)
     const { activate, deactivate } = useWeb3React()
     const { toastError } = useToast()
 
@@ -58,9 +57,9 @@ const useAuth = () => {
 
     const logout = useCallback(() => {
         deactivate()
-        dispatch(clearActiveAccount())
+        clearActiveAccount()
         window.localStorage.removeItem(connectorLocalStorageKey)
-    }, [deactivate, dispatch])
+    }, [clearActiveAccount, deactivate])
 
     return { login, logout }
 }

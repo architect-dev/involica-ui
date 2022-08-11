@@ -1,4 +1,3 @@
-import { ElevOrPalette } from 'config/constants/types'
 import React, { useEffect, useRef } from 'react'
 import { useCountUp } from 'react-countup'
 import { textGold } from 'theme/colors'
@@ -11,7 +10,6 @@ interface CardValueProps {
   prefix?: string
   postfix?: string
   postfixFontSize?: string
-  summitPalette?: ElevOrPalette
   gold?: boolean
   isMultiplier?: boolean
   color?: string
@@ -25,7 +23,6 @@ const CardValue: React.FC<CardValueProps> = ({
   postfix,
   isMultiplier,
   postfixFontSize,
-  summitPalette,
   gold = false,
   color,
 }) => {
@@ -46,12 +43,12 @@ const CardValue: React.FC<CardValueProps> = ({
   }, [value, updateValue])
 
   return (
-    <HighlightedText color={gold ? textGold : color} bold monospace fontSize={fontSize} summitPalette={summitPalette} header>
+    <HighlightedText color={gold ? textGold : color} bold monospace fontSize={fontSize} header>
       {prefix}
       {countUp}
       {isMultiplier && 'X'}
       {postfix != null && (
-        <HighlightedText color={gold ? textGold : color} bold summitPalette={summitPalette} fontSize={postfixFontSize || fontSize} header ml="6px" mt='2px'>
+        <HighlightedText color={gold ? textGold : color} bold fontSize={postfixFontSize || fontSize} header ml="6px" mt='2px'>
           {postfix}
         </HighlightedText>
       )}

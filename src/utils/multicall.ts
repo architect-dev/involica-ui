@@ -1,7 +1,6 @@
 import { Interface } from '@ethersproject/abi'
-import { retryDecorator } from './callHelpers'
+import BigNumber from 'bignumber.js'
 import { getMulticallContract } from './contractHelpers'
-import { chunkArray } from './helpers'
 
 export interface Call {
   address: string // Address of the contract
@@ -9,7 +8,7 @@ export interface Call {
   params?: any[] // Function params
 }
 
-export const multicall = async (abi: any[], calls: Call[]) => {
+const multicall = async (abi: any[], calls: Call[]) => {
   const multi = getMulticallContract()
   const itf = new Interface(abi)
 
@@ -20,31 +19,75 @@ export const multicall = async (abi: any[], calls: Call[]) => {
   return res
 }
 
-export const chunkedMulticall = async (abi: any[], calls: Call[], chunk: number) => {
-  const chunkedCalls = chunkArray(chunk, calls)
-  const res = []
-  for (let i = 0; i < chunkedCalls.length; i++) {
-    console.log({ i, call: chunkedCalls[i] })
-    const chunkedRes = await multicall(abi, chunkedCalls[i])
-    console.log({ chunkedRes })
-    res.push(...chunkedRes)
-  }
-  console.log({ finalRes: res })
-  return res
+export enum ParseFieldType {
+  custom,
+  nested,
+  nestedArr,
+
+  address,
+  addressArr,
+  string,
+  bignumber,
+  bignumberArr,
+  number,
+  numberRaw,
+  numberArr,
+  bool,
 }
 
-export const retryableMulticall = async (abi: any[], calls: Call[], functionName: string): Promise<null | any[]> => {
-  const multicallTx = retryDecorator(async () => multicall(abi, calls), 0)
+export interface ParseFieldConfig {
+  type: ParseFieldType
+  stateField?: string
+  customParse?: (any) => any
+  nestedFields?: Record<string, ParseFieldConfig>
+}
 
-  const res = (await multicallTx()) as any
+const parseField = (value: any, type: ParseFieldType, customParse?: (any) => any) => {
+  switch (type) {
+    case ParseFieldType.custom:
+      return customParse(value)
 
-  if (res.err != null) {
-    console.log({
-      res
+    case ParseFieldType.nested:
+      console.log('parse nested', value)
+      return value
+    case ParseFieldType.nestedArr:
+      console.log('parse nested array', value)
+      return value
+
+    case ParseFieldType.bignumber:
+      return new BigNumber(value._hex).toJSON()
+    case ParseFieldType.number:
+      return Number(new BigNumber(value._hex))
+    case ParseFieldType.numberRaw:
+      return value
+    case ParseFieldType.bignumberArr:
+      return value.map((item) => new BigNumber(item._hex).toJSON())
+    case ParseFieldType.numberArr:
+      return value.map((item) => Number(new BigNumber(item._hex)))
+    case ParseFieldType.bool:
+    case ParseFieldType.address:
+    case ParseFieldType.addressArr:
+    case ParseFieldType.string:
+      return value
+    default: return null
+  }
+}
+
+const parseMulticallRes = (res: any, fields: Record<string, ParseFieldConfig>) => {
+  return res.map((resItem) => {
+    const itemData = {}
+    Object.entries(fields).forEach(([field, { type, stateField, customParse }]) => {
+      itemData[stateField || field] = parseField(resItem[field], type, customParse)
     })
-    console.error(`${functionName}:\n\t${res.err.join('\n')}`)
-    return null
-  }
-
-  return res as any
+    return itemData
+  })
 }
+
+const multicallAndParse = async (abi: any[], calls: Call[], parseFields: Record<string, ParseFieldConfig>) => {
+  return parseMulticallRes(
+    await multicall(abi, calls),
+    parseFields
+  )
+}
+
+export default multicallAndParse

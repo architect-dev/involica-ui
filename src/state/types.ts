@@ -1,6 +1,4 @@
 import BigNumber from 'bignumber.js'
-import { FarmConfig, Elevation, FarmElevationConfig } from 'config/constants/types'
-/* eslint-disable camelcase */
 
 export const NamedChainId = {
   FTM: '250',
@@ -9,254 +7,81 @@ export const NamedChainId = {
   POLYGON: '137',
 }
 
-export interface FarmElevation extends FarmElevationConfig {
-  supply?: BigNumber
-  launched?: boolean
-  stakedBalance?: BigNumber
-  claimable?: BigNumber
-  bonusBP?: number
-  claimableBonus?: BigNumber
-  yieldContributed?: BigNumber
-  summitPerYear?: BigNumber
+// ECOSYSTEM
+export interface Ecosystem {
+  account?: string
+  isDark: boolean
 }
-export interface FarmElevations {
-  [Elevation.OASIS]: FarmElevation
-  [Elevation.PLAINS]: FarmElevation
-  [Elevation.MESA]: FarmElevation
-  [Elevation.SUMMIT]: FarmElevation
-}
-export interface Farm extends FarmConfig {
-  elevations: FarmElevations
-
-  getUrl?: string
+interface EcosystemMutators {
+  setActiveAccount: (string) => void
+  clearActiveAccount: () => void
+  setIsDark: (boolean) => void
 }
 
-export interface ExpeditionUserData {
-  everestOwned: BigNumber
-
-  deity: number | null
-  deitySelectionRound: number
-  faith: number | null
-
-  entered: boolean
-
-  summitLifetimeWinnings: BigNumber
-  usdcLifetimeWinnings: BigNumber
-
-  summitWinnings: BigNumber
-  usdcWinnings: BigNumber
-}
-
-export interface ExpeditionTokenInfo {
-  roundEmission: BigNumber
-  emissionsRemaining: BigNumber
-  markedForDist: BigNumber
-  distributed: BigNumber
-}
-export interface ExpeditionInfo {
-  live: boolean
-  launched: boolean
-
-  safeEverest: BigNumber
-  deitiedEverest: BigNumber
-  deityEverest: BigNumber[]
-
-  summit: ExpeditionTokenInfo
-  usdc: ExpeditionTokenInfo
-
-  roundsRemaining: number
-}
-
-// Slices states
-export interface ElevationFarmsData {
-  claimable: BigNumber
-  claimableBonus: BigNumber
-  yieldContributed: BigNumber
-  potentialWinnings: BigNumber
-  roundRewards: BigNumber
-  totemRoundRewards: BigNumber[]
-  totemMultipliers: number[]
-}
-
-export interface FarmsState {
-  farmsLoaded: boolean
-  userDataLoaded: boolean
-  elevationDataLoaded: boolean
-  lifetimeSummitWinnings: BigNumber
-  lifetimeSummitBonuses: BigNumber
-  data: Farm[]
-  elevationData: ElevationFarmsData[]
-}
-
-export interface ExpeditionState {
-  userData: ExpeditionUserData
-  userDataLoaded: boolean
-  data: ExpeditionInfo
-  expeditionLoaded: boolean
-}
-
-export interface ElevationInfo {
-  unlockTimestamp: number
-  roundEndTimestamp: number
-  roundNumber: number
-  totemWinAcc: number[]
-  prevWinners: number[]
-  prevWinningsMultipliers: number[]
-  winningTotem: number | null
-  winningNumberDrawn: number | null
-}
-
-export enum FarmType {
-  All = 'All',
-  Token = 'Token',
-  LP = 'LP',
-}
-export interface PendingTx {
-  hash: string
-  title: string
-}
-
-export interface SummitEcosystemState {
-  activeAccount: string
-  summitEnabled: boolean
-  totems: Array<number | null>
-  winningTotems: Array<number | null>
-  winningNumbersDrawn: Array<number | null>
-  elevMarkedWinningRound: number[]
-  totemSelectionRounds: Array<number | null>
-  elevationsInfo: ElevationInfo[]
-  expeditionDivider: number
-  farmType: FarmType
-  liveFarms: boolean
-  pendingTxs: PendingTx[]
-  elevationRolloversToShow: Elevation[]
-  rolloverRewardInNativeToken: BigNumber
-  expeditionPotTotalValue: number
-  expeditionTreasurySummitBalance: BigNumber
-  pendingExpeditionTx: boolean
-  pendingTotemSelection: boolean
-  expeditionAPR: number
-  forceOpenConnectModal: boolean
-}
-
-// API Price State
-
-export interface PriceState {
-  pricesPerToken?: { [key: string]: BigNumber }
-}
-
-// Tokens
-
-export interface UserTokenData {
-  symbol: string
-  tokenAddress: string
-  staked?: BigNumber
-  bonusResetTimestamp?: number
-  bonusBP?: number
-  taxResetTimestamp?: number
-  taxBP?: number
-  farmAllowance?: BigNumber
-  walletBalance?: BigNumber
-}
-
-export interface TokenDailyPassthroughApr {
-  symbol: string
-  passthroughDailyApr: string
-}
-export interface TokensState {
-  data: UserTokenData[]
-  aprs: TokenDailyPassthroughApr[]
-  avgStakingLoyaltyDuration?: number
-}
-
-// Glacier State
-export interface Epoch {
-  index: number
-  frozenSummit: BigNumber
-  isThawed: boolean
-}
-export interface GlacierState {
-  epochs: Epoch[]
-  currentEpochIndex: number
-  totalFrozenSummit: BigNumber
-  totalThawedSummit: BigNumber
-}
-
-// Everest State
-export interface EverestUserData {
-  everestOwned: BigNumber
-  summitLocked: BigNumber
-  lockRelease: number
-  lockDuration: number
-  everestLockMult: number
-  summitBalance: BigNumber
-  summitAllowance: BigNumber
-  everestBalance: BigNumber
-  everestAllowance: BigNumber
-}
-export interface EverestState {
-  totalSummitLocked: BigNumber
-  averageLockDuration: number
-  everestSupply: BigNumber
-  userData?: EverestUserData
-}
-
-export interface TokenData {
-  symbol: string
-  address: string
-  wallet: BigNumber
-  allowance: BigNumber
-  price: BigNumber
-}
-
+// PUBLIC DATA
 export interface Token {
-  address: string
   symbol: string
-  price?: BigNumber
-  wallet?: BigNumber
-  allowance?: BigNumber
+  address: string
+  price: BigNumber
+  decimals: number
+}
+export interface PublicData {
+  tokens: Token[]
+}
+interface PublicDataMutators {
+  fetchPublicData: () => Promise<void>
 }
 
+// USER DATA
 export interface PositionOut {
   token: string
   weight: number
   route: string[]
   maxSlippage: number
 }
-
 export interface Position {
   user: string
   tokenIn: string
   outs: PositionOut
   amountDCA: BigNumber
-  intervalDCA: BigNumber
-  lastDCA: BigNumber
-  maxGasPrice: BigNumber
+  intervalDCA: number
+  lastDCA: number
+  maxGasPrice: number
   taskId: string
   finalizationReason: string
 }
+export interface UserTokenData {
+  token: string
+  allowance: BigNumber
+  balance: BigNumber
+}
+export interface UserData {
+  userHasPosition: boolean
+  userTreasury: BigNumber
+  position: Position
+  allowance: BigNumber
+  balance: BigNumber
+  dcasRemaining: number
+  userTokensData: UserTokenData[]
+}
+interface UserDataState {
+  userData?: UserData
+}
+interface UserDataMutators {
+  fetchUserData: (account) => Promise<void>
+}
+
+interface Loaded {
+  userDataLoaded: boolean
+  publicDataLoaded: boolean
+}
 
 // Global state
-export interface State {
-  position: Position
-  tokens: Token[]
-}
-
-
-
-
-
-
-
-
-
-
-// UI
-
-
-
-export enum LockSummitButtonType {
-  LockSummit,
-  IncreaseLockedSummit,
-  IncreaseLockDuration,
-}
+export interface State
+  extends Ecosystem,
+    EcosystemMutators,
+    PublicData,
+    PublicDataMutators,
+    UserDataState,
+    UserDataMutators,
+    Loaded {}
