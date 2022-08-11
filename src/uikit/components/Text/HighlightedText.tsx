@@ -1,11 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react'
-import { ElevOrPalette } from 'config/constants/types'
 import styled from 'styled-components'
 import { Text } from './Text'
 
 export const HighlightedText = styled(Text)<{
-  summitPalette?: ElevOrPalette
   header?: boolean
   fontSize?: string
   gold?: boolean
@@ -19,9 +17,9 @@ export const HighlightedText = styled(Text)<{
   font-style: italic;
   text-align: center;
   font-size: ${({ header, fontSize }) => fontSize || (header ? '22' : '16')}px !important;
-  text-shadow: ${({ theme, summitPalette }) => {
+  text-shadow: ${({ theme }) => {
     if (theme.isDark) return 'none'
-    return `1px 1px 0px ${theme.colors[summitPalette || 'textShadow']}`
+    return '1px 1px 0px textShadow'
   }}
 `
 

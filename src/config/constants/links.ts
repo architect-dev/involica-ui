@@ -1,12 +1,16 @@
-import { bscTestnetLinks } from './chain/bsc_testnet/links'
-import { ftmLinks } from './chain/ftm/links'
-import { polygonLinks } from './chain/polygon/links'
 import { CHAIN_ID } from './networks'
 
+const bscTestnetLinks: ExternalLinks = {
+  etherscan: 'https://testnet.bscscan.com'
+}
+const ftmLinks: ExternalLinks = {
+  etherscan: 'https://ftmscan.com/',
+}
+const polygonLinks: ExternalLinks = {
+  etherscan: 'https://poligonscan.com/'
+}
+
 export interface ExternalLinks {
-  exchange: string
-  liquidity: string
-  summitTokenLink: string
   etherscan: string
 }
 

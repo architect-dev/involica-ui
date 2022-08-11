@@ -1,4 +1,3 @@
-import { transparentize, darken } from 'polished'
 import styled, { DefaultTheme } from 'styled-components'
 import { InputProps, scales } from './types'
 
@@ -60,11 +59,7 @@ const Input = styled.input<InputProps>`
   }
 
   &:focus:not(:disabled) {
-    box-shadow: ${({ theme, elevation }) =>
-      `0px 0px 0px 1px ${theme.colors[elevation] || theme.colors.text}, 0px 0px 0px 4px ${transparentize(
-        0.6,
-        darken(0.1, theme.colors[elevation] || 'transparent'),
-      )}`};
+    box-shadow: ${({ theme }) => `0px 0px 0px 1px ${theme.colors.text}`};
   }
 `
 

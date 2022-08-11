@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react'
 import { useWeb3React } from '@web3-react/core'
-import { useDispatch } from 'react-redux'
 import { useERC20, useInvolica } from './useContract'
 import useToast from './useToast'
 import { useInvolicaStore } from 'state/zustand'
@@ -42,8 +41,9 @@ const useExecuteTx = () => {
   return { handleExecute, pending }
 }
 
-export const useApprove = (symbol: string, erc20Address: string, spender: string) => {
+export const useApprove = (symbol: string, erc20Address: string) => {
   const erc20Contract = useERC20(erc20Address)
+  const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
 
   const onApprove = useCallback(
@@ -52,12 +52,12 @@ export const useApprove = (symbol: string, erc20Address: string, spender: string
       handleExecute(
         erc20Contract,
         'approve',
-        [spender, amountRaw],
+        [involica.address, amountRaw],
         `Approved ${symbol}`,
         `${symbol} Approval Failed`
       )
     },
-    [erc20Contract, handleExecute, spender, symbol]
+    [erc20Contract, involica, handleExecute, symbol]
   )
 
   return { onApprove, pending }

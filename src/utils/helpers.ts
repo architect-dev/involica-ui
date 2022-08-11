@@ -1,5 +1,5 @@
-import { BN_ZERO } from "config/constants"
 import { chunk } from "lodash"
+import { bnZero } from "./bigNum"
 
 export const chunkArray = <T>(chunkSize: number, array: T[]): T[][] => {
   const groups: T[][] = []
@@ -141,8 +141,8 @@ export const addressArrayIndexOf = (arr: string[], add: string): number => {
 }
 
 export const sumBigNumbersByKey = (objs: any[], key: string) => {
-  return objs.reduce((acc, obj) => acc.plus(obj[key] || BN_ZERO), BN_ZERO)
+  return objs.reduce((acc, obj) => acc.plus(obj[key] || bnZero), bnZero)
 }
 export const maxBigNumberByKey = (objs: any[], key: string) => {
-  return objs.reduce((acc, obj) => acc.isGreaterThan((obj[key] || BN_ZERO)) ? acc : (obj[key] || BN_ZERO), BN_ZERO)
+  return objs.reduce((acc, obj) => acc.isGreaterThan((obj[key] || bnZero)) ? acc : (obj[key] || bnZero), bnZero)
 }

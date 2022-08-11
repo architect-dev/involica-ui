@@ -1,5 +1,3 @@
-import { Elevation } from 'config/constants/types'
-import { usePendingTxs } from 'hooks/usePendingTx'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 import { pressableMixin } from 'uikit/util/styledMixins'
@@ -9,11 +7,9 @@ import { linearGradient } from 'polished'
 import { SummitPopUp } from 'uikit/widgets/Popup'
 import ConnectPopUp from 'uikit/widgets/WalletModal/ConnectPopUp'
 import AccountPopUp from 'uikit/widgets/WalletModal/AccountPopUp'
-import { useForceOpenConnectModal } from 'state/hooksNew'
-import { setForceOpenConnectModal } from 'state/summitEcosystem'
-import { useDispatch } from 'react-redux'
 import { ChainIcon } from 'uikit/components/Svg'
 import { CHAIN_ID } from 'utils'
+import { useInvolicaStore } from 'state/zustand'
 
 const UserBlockFlex = styled.div`
   display: flex;
@@ -70,20 +66,19 @@ interface Props {
   account?: string
   isDark: boolean
   toggleTheme: () => void
-  elevation?: Elevation
   login: Login
   logout: () => void
 }
 
 const UserBlock: React.FC<Props> = ({ account, isDark, toggleTheme, login, logout }) => {
+  const { connectModalOpen, setConnectModalOpen } = useInvolicaStore((state) => ({
+    connectModalOpen: state.connectModalOpen, setConnectModalOpen: state.setConnectModalOpen
+  }))
   const chain = parseInt(CHAIN_ID)
-  const dispatch = useDispatch()
-  const pendingTxs = usePendingTxs()
   const accountEllipsis = account ? `${account.substring(0, 4)}...${account.substring(account.length - 4)}` : null
-  const forceOpenConnectModal = useForceOpenConnectModal()
-  const setForcedOpenFalse = useCallback(
-    () => dispatch(setForceOpenConnectModal(false)),
-    [dispatch]
+  const closeConnectModal = useCallback(
+    () => setConnectModalOpen(false),
+    [setConnectModalOpen]
   )
 
   return (
@@ -94,7 +89,7 @@ const UserBlock: React.FC<Props> = ({ account, isDark, toggleTheme, login, logou
           <AccountDot connected={account != null}>
             { account != null && <StyledChainIcon white chain={chain}/> }
           </AccountDot>
-          <Text bold monospace>{account ? `${accountEllipsis}${pendingTxs.length > 0 ? ` | ${pendingTxs.length} TX` : ''}` : 'CONNECT'}</Text>
+          <Text bold monospace>{account ? accountEllipsis : 'CONNECT'}</Text>
         </UserBlockFlex>
       }
       popUpContent={
@@ -102,8 +97,8 @@ const UserBlock: React.FC<Props> = ({ account, isDark, toggleTheme, login, logou
           <AccountPopUp account={account} isDark={isDark} toggleTheme={toggleTheme} logout={logout}/> :
           <ConnectPopUp login={login} isDark={isDark} toggleTheme={toggleTheme}/>
       }
-      open={forceOpenConnectModal || undefined}
-      callOnDismiss={setForcedOpenFalse}
+      open={connectModalOpen}
+      callOnDismiss={closeConnectModal}
     />
   )
 }

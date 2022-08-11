@@ -10,12 +10,10 @@ export * from './components/Image'
 export * from './components/Input'
 export * from './components/Layouts'
 export * from './components/Svg'
-export * from './components/Tag'
 export * from './components/Text'
 export * from './components/Link'
 export * from './components/Skeleton'
 export * from './components/Table'
-export * from './components/Totem'
 export * from './components/Divider'
 
 // Hooks

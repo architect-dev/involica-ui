@@ -2,10 +2,7 @@ import React, { useState, useCallback } from 'react'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 import styled, { css } from 'styled-components'
-import { linearGradient } from 'polished'
 import { pressableMixin } from 'uikit/util/styledMixins'
-import { getPaletteGradientStops  } from 'utils'
-import { Elevation } from 'config/constants'
 import { Flex } from 'uikit/components/Box'
 import { Text } from 'uikit/components/Text'
 import { selectorWrapperMixin } from 'uikit/widgets/Selector/styles'
@@ -96,10 +93,7 @@ const FakeMarkDot = styled.div<{ perc: number, isExisting?: boolean }>`
             border-radius: 6px;
             width: 10px;
             height: 10px;
-            background-color: ${linearGradient({
-                colorStops: getPaletteGradientStops(Elevation.EXPEDITION),
-                toDirection: '120deg',
-            })};
+            background-color: red; // TODO: this
         }
     `}
 `
@@ -119,10 +113,7 @@ const FakeSliderHandle = styled.div<{ perc: number }>`
     align-items: center;
     justify-content: center;
     box-shadow: ${({ theme }) => `3px 3px 6px ${theme.colors.textShadow}`} !important;
-    background: ${linearGradient({
-        colorStops: getPaletteGradientStops(Elevation.EXPEDITION),
-        toDirection: '120deg',
-    })};
+    background: red; // TODO: this
     border-radius: 20px;
 `
 

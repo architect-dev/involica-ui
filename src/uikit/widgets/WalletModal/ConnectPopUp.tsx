@@ -4,7 +4,6 @@ import config from './config'
 import { Login } from './types'
 import { Text } from '../../components/Text'
 import styled from 'styled-components'
-import { SummitPalette } from 'config/constants'
 import { Flex } from 'uikit/components/Box'
 import Divider from 'uikit/components/Divider'
 import DarkModeToggle from '../Menu/components/DarkModeToggle'
@@ -44,7 +43,7 @@ const ConnectPopUp: React.FC<Props> = ({ login, isDark, toggleTheme, onDismiss =
 
     <Flex width='100%' alignItems='center' justifyContent='space-between'>
       <Text bold monospace>Site Theme</Text>
-      <DarkModeToggle summitPalette={SummitPalette.BASE} isDark={isDark} toggleTheme={toggleTheme}/>
+      <DarkModeToggle isDark={isDark} toggleTheme={toggleTheme}/>
     </Flex>
   </PopUpWrapper>
 )

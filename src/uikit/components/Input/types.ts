@@ -1,4 +1,3 @@
-import { Elevation } from 'config/constants/types'
 import { SpaceProps } from 'styled-system'
 
 export const scales = {
@@ -13,5 +12,4 @@ export interface InputProps extends SpaceProps {
   scale?: Scales
   isSuccess?: boolean
   isWarning?: boolean
-  elevation?: Elevation
 }

@@ -1,4 +1,3 @@
-import { Elevation } from 'config/constants/types'
 import { Login } from '../WalletModal/types'
 
 export interface LangType {
@@ -34,7 +33,6 @@ export interface MenuEntry {
   calloutClass?: string
   initialOpenState?: boolean
   disabled?: boolean
-  elevation?: Elevation
   neverHighlight?: boolean
   keyPaths?: string[]
 }
@@ -52,5 +50,4 @@ export interface NavProps extends PanelProps {
   login: Login
   profile?: Profile
   logout: () => void
-  summitPriceUsd?: number
 }

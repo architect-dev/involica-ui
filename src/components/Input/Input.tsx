@@ -1,5 +1,4 @@
 import React from 'react'
-import { ElevOrPalette } from 'config/constants/types'
 import styled, { css } from 'styled-components'
 import { HighlightedText, Lock } from 'uikit'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
@@ -11,7 +10,6 @@ export interface InputProps {
   placeholder?: string
   startAdornment?: React.ReactNode
   value: string
-  summitPalette?: ElevOrPalette
   disabled?: boolean
   isLocked?: boolean
   invalid?: boolean
@@ -95,7 +93,7 @@ const SymbolText = styled(HighlightedText)`
   text-shadow: none;
 `
 
-export const StyledInput = styled.input<{ summitPalette?: ElevOrPalette, invalid?: boolean }>`
+export const StyledInput = styled.input<{ invalid?: boolean }>`
   width: 100%;
   background: none;
   border: 0;

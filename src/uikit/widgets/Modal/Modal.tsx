@@ -1,14 +1,10 @@
 import React from 'react'
-import styled, { css, keyframes } from 'styled-components'
+import styled from 'styled-components'
 import Heading from '../../components/Heading/Heading'
 import Flex from '../../components/Box/Flex'
 import { ArrowBackIcon, CloseIcon } from '../../components/Svg'
 import { IconButton } from '../../components/Button'
 import { InjectedProps } from './types'
-import { elevationUtils, ElevOrPalette } from 'config/constants/types'
-import { getPaletteGradientFarmCardBackground } from 'utils'
-import { Text } from 'uikit/components/Text'
-import { ElevationPuck } from './ElevationPuck'
 
 interface Props extends InjectedProps {
   title: string
@@ -17,28 +13,10 @@ interface Props extends InjectedProps {
   onBack?: () => void
   bodyPadding?: string
   headerless?: boolean
-  elevationGlow?: ElevOrPalette
   elevationCircleHeader?: string
 }
 
-const StyledElevationPuck = styled(ElevationPuck)`
-  z-index: 15;
-  position: relative;
-`
-
-const RainbowLight = keyframes`
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-`
-
-const StyledModal = styled.div<{ elevationGlow?: ElevOrPalette }>`
+const StyledModal = styled.div`
   display: flex;
   justify-content: center;
   position: relative;
@@ -57,45 +35,13 @@ const StyledModal = styled.div<{ elevationGlow?: ElevOrPalette }>`
     max-width: calc(100% - 18px);
     margin-top: 130px;
   }
-
-  ${({ elevationGlow, theme }) =>
-    elevationGlow != null &&
-    css`
-      &:before {
-        content: ' ';
-        background: ${getPaletteGradientFarmCardBackground(elevationGlow)};
-
-        background-size: 200% 200%;
-        animation: ${RainbowLight} 2s linear infinite;
-        border-radius: 4px;
-        filter: blur(3px);
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        bottom: -5px;
-        left: -5px;
-        z-index: -2;
-        transition: filter 0.2s;
-      }
-      &:after {
-        content: ' ';
-        background: ${theme.colors.background};
-        border-radius: 4px;
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: -1;
-      }
-    `}
 `
 
-const ScrollableContent = styled(Flex)<{ elevationCircleHeader: string }>`
+const ScrollableContent = styled(Flex)`
   overflow: auto;
   height: 100%;
   width: 100%;
-  padding-top: ${({ elevationCircleHeader }) => (elevationCircleHeader != null ? 110 : 24)}px;
+  padding-top: 24px;
 `
 
 const StyledCloseIcon = styled(CloseIcon)`
@@ -130,12 +76,9 @@ const Modal: React.FC<Props> = ({
   hideCloseButton = false,
   bodyPadding = '24px',
   headerless = false,
-  elevationGlow,
-  elevationCircleHeader,
 }) => {
-    const elevTitle = elevationUtils.modalTitle(elevationCircleHeader)
     return (
-    <StyledModal elevationGlow={elevationGlow}>
+    <StyledModal>
       {!headerless && (
         <ModalHeader>
           <ModalTitle>
@@ -154,7 +97,7 @@ const Modal: React.FC<Props> = ({
         </ModalHeader>
       )}
       { HeaderComponent != null && HeaderComponent}
-      <ScrollableContent flexDirection="column" p={bodyPadding} elevationCircleHeader={elevationCircleHeader}>
+      <ScrollableContent flexDirection="column" p={bodyPadding}>
         {children}
         {headerless && !hideCloseButton && (
           <AbsoluteIconButton variant="text" onClick={onDismiss} aria-label="Close the dialog">
@@ -162,13 +105,6 @@ const Modal: React.FC<Props> = ({
           </AbsoluteIconButton>
         )}
       </ScrollableContent>
-
-      <StyledElevationPuck elevation={elevationCircleHeader}>
-        { elevTitle != null && <Text fontSize="16px" color="inherit" mb="2px">
-          {elevTitle}
-        </Text> }
-        {title.split('|').map((text) => (text === 'br' ? <br key={text} /> : text))}
-      </StyledElevationPuck>
     </StyledModal>
   )
 }

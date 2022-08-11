@@ -1,6 +1,4 @@
-import { linearGradient } from 'polished'
 import { css, DefaultTheme, FlattenSimpleInterpolation } from 'styled-components'
-import { getPaletteGradientStops } from 'utils'
 
 export const pressableMixin = ({
   theme,
@@ -47,25 +45,5 @@ export const pressableMixin = ({
     }
 
     ${enabledStyles}
-  `
-}
-
-export const paletteLinearGradientBackground = ({
-  theme,
-  secondary,
-  summitPalette,
-}: {
-  theme: DefaultTheme,
-  secondary: boolean,
-  summitPalette?: string,
-}) => {
-  if (secondary && summitPalette == null) return css`
-    background: ${theme.colors.text};
-  `
-  return css`
-    background: ${linearGradient({
-      colorStops: getPaletteGradientStops(summitPalette),
-      toDirection: '120deg',
-    })}};
   `
 }

@@ -1,13 +1,12 @@
 import React, { useCallback } from 'react'
 import SummitButton from 'uikit/components/Button/SummitButton'
-import { useDispatch } from 'react-redux'
-import { setForceOpenConnectModal } from 'state/summitEcosystem'
+import { useInvolicaStore } from 'state/zustand'
 
 const UnlockButton = ({ summitPalette = null, ...props}) => {
-  const dispatch = useDispatch()
+  const setConnectModalOpen = useInvolicaStore((state) => state.setConnectModalOpen)
   const onPresentConnectModal = useCallback(
-    () => dispatch(setForceOpenConnectModal(true)),
-    [dispatch]
+    () => setConnectModalOpen(true),
+    [setConnectModalOpen]
   )
 
   return (

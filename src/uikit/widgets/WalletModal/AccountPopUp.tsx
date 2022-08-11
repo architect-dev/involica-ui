@@ -5,7 +5,7 @@ import CopyToClipboard from './CopyToClipboard'
 import { connectorLocalStorageKey } from './config'
 import SummitButton from '../../components/Button/SummitButton'
 import ExternalLinkButton from '../../components/Link/ExternalLinkButton'
-import { getLinks, SummitPalette } from 'config/constants'
+import { getLinks } from 'config/constants'
 import { linearGradient } from 'polished'
 import styled from 'styled-components'
 import Divider from 'uikit/components/Divider'
@@ -66,8 +66,6 @@ const AccountPopUp: React.FC<Props> = ({ account, isDark, toggleTheme, logout, o
           secondary
           height='28px'
           width='120px'
-          summitPalette={SummitPalette.BASE}
-          insetColor='background'
           onClick={() => {
             logout()
             window.localStorage.removeItem(connectorLocalStorageKey)
@@ -112,7 +110,7 @@ const AccountPopUp: React.FC<Props> = ({ account, isDark, toggleTheme, logout, o
 
       <Flex width='100%' alignItems='center' justifyContent='space-between'>
         <Text bold monospace>Site Theme</Text>
-        <DarkModeToggle summitPalette={SummitPalette.BASE} isDark={isDark} toggleTheme={toggleTheme}/>
+        <DarkModeToggle isDark={isDark} toggleTheme={toggleTheme}/>
       </Flex>
 
 

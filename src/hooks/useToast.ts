@@ -1,4 +1,4 @@
-import { IsSummitRevertReason } from 'config/constants/types'
+import { isInvolicaRevertReason } from 'config/constants/revert'
 import { ToastsContext } from 'contexts/ToastsContext'
 import { useContext, useCallback } from 'react'
 import { Toast } from 'uikit/widgets/Toast'
@@ -27,7 +27,7 @@ export const useTransactionToasts = () => {
         title,
         description
       })
-      const errorTitle = IsSummitRevertReason[description] ? title : 'Wallet / Chain Error'
+      const errorTitle = isInvolicaRevertReason(description) ? title : 'Wallet / Chain Error'
       toastError(errorTitle, description.split('_').join(' '))
     },
     [toastError]

@@ -1,19 +1,17 @@
 import React from 'react'
 import styled from 'styled-components'
 import { OpenNewIcon } from '../Svg'
-import { darken } from 'polished'
 import Link from './Link'
 import { LinkProps } from './types'
-import { ElevOrPalette } from 'config/constants/types'
 import { pressableMixin } from 'uikit/util/styledMixins'
 
-const StyledExternalIcon = styled(OpenNewIcon)<{ summitPalette?: ElevOrPalette }>`
+const StyledExternalIcon = styled(OpenNewIcon)`
   fill: ${({ theme }) => theme.colors.textSubtle};
   width: 18px;
   height: 18px;
 `
 
-const StyleButton = styled(Link)<{ summitPalette?: ElevOrPalette }>`
+const StyleButton = styled(Link)`
   position: relative;
   display: flex;
   align-items: center;
@@ -30,11 +28,11 @@ const StyleButton = styled(Link)<{ summitPalette?: ElevOrPalette }>`
   ${pressableMixin}
 `
 
-const ExternalLinkButton: React.FC<LinkProps> = ({ children, summitPalette, ...props }) => {
+const ExternalLinkButton: React.FC<LinkProps> = ({ children, ...props }) => {
   return (
-    <StyleButton external summitPalette={summitPalette} rel="noreferrer noopener" target="_blank" {...props}>
+    <StyleButton external rel="noreferrer noopener" target="_blank" {...props}>
       {children}
-      <StyledExternalIcon width="20px" summitPalette={summitPalette} />
+      <StyledExternalIcon width="20px" />
     </StyleButton>
   )
 }

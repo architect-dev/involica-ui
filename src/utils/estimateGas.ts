@@ -1,5 +1,6 @@
 import { Contract, PayableOverrides } from '@ethersproject/contracts'
 import { TransactionResponse } from '@ethersproject/providers'
+import { getInvolicaRevertReason } from 'config/constants/revert'
 
 /**
  * Estimate the gas needed to call a function, and add a 10% margin
@@ -38,7 +39,8 @@ export class RevertError extends Error {
 
 
 export const extractRevertMsg = (err) => {
-    return err.data?.message?.split('execution reverted: ')[1] || err.message || 'Unknown Error'
+    const rawRevertMessage = err.data?.message?.split('execution reverted: ')[1] || err.message || 'Unknown Error'
+    return getInvolicaRevertReason(rawRevertMessage)
 }
 
 /**

@@ -11,11 +11,13 @@ export const NamedChainId = {
 export interface Ecosystem {
   account?: string
   isDark: boolean
+  connectModalOpen: boolean
 }
 interface EcosystemMutators {
   setActiveAccount: (string) => void
   clearActiveAccount: () => void
   setIsDark: (boolean) => void
+  setConnectModalOpen: (boolean) => void
 }
 
 // PUBLIC DATA

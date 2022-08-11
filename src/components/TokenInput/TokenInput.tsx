@@ -2,11 +2,9 @@ import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import BigNumber from 'bignumber.js/bignumber'
 import TextInput, { InputProps } from '../Input'
-import { ElevOrPalette, SummitPalette } from 'config/constants/types'
 import { Text, SummitButton } from 'uikit'
 
 interface TokenInputProps extends InputProps {
-  summitPalette?: ElevOrPalette
   max: number | string
   symbol: string
   onSelectMax?: () => void

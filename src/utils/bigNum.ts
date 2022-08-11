@@ -6,6 +6,8 @@ export const bnToDec = (bn: BigNumber, decimals = 18): number => {
   return bn.dividedBy(new BigNumber(10).pow(decimals)).toNumber()
 }
 
+export const bnZero = new BigNumber(0)
+
 export const bnExp = (decimals: number): BigNumber => {
   return new BigNumber(10).pow(decimals)
 }

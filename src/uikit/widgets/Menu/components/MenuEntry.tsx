@@ -9,15 +9,14 @@ export interface Props {
   theme: DefaultTheme
   textItem: boolean
   isPushed: boolean
-  elevation?: string
   disabled?: boolean
 }
 
-const LinkLabel = styled.div<{ isPushed: boolean; isActive: boolean; elevation?: string }>`
+const LinkLabel = styled.div<{ isActive: boolean }>`
   flex-grow: 1;
   padding-left: 8px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : '400')};
-  color: ${({ isActive, elevation, theme }) => (isActive && elevation ? theme.colors[elevation] : theme.colors.text)};
+  color: ${({ theme }) => theme.colors.text};
 `
 
 const MenuEntry = styled.div<Props>`
@@ -45,19 +44,19 @@ const MenuEntry = styled.div<Props>`
     fill: ${({ isActive, theme }) => (isActive ? theme.colors.primary : theme.colors.textSubtle)};
   }
 
-  ${({ theme, disabled, elevation }) =>
+  ${({ theme, disabled }) =>
     pressableMixin({
       theme,
       disabled,
       hoverStyles: css`
-        border-left-color: ${theme.colors[elevation] || theme.colors.text};
+        border-left-color: ${theme.colors.text};
         background-color: ${linearGradient({
           colorStops: [
-            transparentize(0.8, theme.colors[elevation] || theme.colors.text),
-            transparentize(1, theme.colors[elevation] || theme.colors.text),
+            transparentize(0.8, theme.colors.text),
+            transparentize(1, theme.colors.text),
           ],
           toDirection: 'to right',
-          fallback: transparentize(0.8, theme.colors[elevation] || theme.colors.text),
+          fallback: transparentize(0.8, theme.colors.text),
         })};
         color: ${theme.colors.text};
         .selectableIcon {

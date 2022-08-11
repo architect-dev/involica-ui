@@ -1,11 +1,8 @@
 import React, { useState, useCallback } from 'react'
 import Slider from 'rc-slider'
 import styled from 'styled-components'
-import { linearGradient } from 'polished'
 import 'rc-slider/assets/index.css'
 import { pressableMixin } from 'uikit/util/styledMixins'
-import { getPaletteGradientStops, lockDurationSliderMarks, lockDurationSliderPerc, sliderPercLockDuration } from 'utils'
-import { SummitPalette } from 'config/constants'
 import { selectorWrapperMixin } from 'uikit/widgets/Selector/styles'
 import { Flex } from 'uikit/components/Box'
 
@@ -113,10 +110,7 @@ const FakeSliderHandle = styled.div<{ perc: number }>`
     margin-left: -12px;
     z-index: 6;
     box-shadow: ${({ theme }) => `3px 3px 6px ${theme.colors.textShadow}`} !important;
-    background: ${linearGradient({
-        colorStops: getPaletteGradientStops(SummitPalette.EVEREST),
-        toDirection: '120deg',
-    })};
+    background: red; // TODO: this
     border-radius: 20px;
 `
 

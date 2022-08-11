@@ -1,9 +1,8 @@
-import { Elevation } from 'config/constants/types'
 import styled, { css } from 'styled-components'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { SpinnerKeyframes } from '../Svg/Icons/Spinner'
 
-const SummitIconButton = styled.div<{ elevation: Elevation; isLocked?: boolean, isLoading?: boolean }>`
+const SummitIconButton = styled.div<{ isLocked?: boolean, isLoading?: boolean }>`
   cursor: pointer;
   position: relative;
   background-color: ${({ theme }) => theme.colors.background};
@@ -38,18 +37,6 @@ const SummitIconButton = styled.div<{ elevation: Elevation; isLocked?: boolean, 
         box-shadow: ${`1px 1px 2px ${theme.colors.textShadow}`};
       `,
     })}
-
-  &::after {
-    position: absolute;
-    top: 3px;
-    right: 3px;
-    bottom: 3px;
-    left: 3px;
-    content: '';
-    background-color: ${({ theme, elevation }) => theme.colors[elevation]};
-    border-radius: 50px;
-    box-shadow: ${({ theme }) => `1px 1px 2px ${theme.colors.textShadow}`};
-  }
 `
 
 export default SummitIconButton

@@ -1,4 +1,3 @@
-import { TokensWithCustomArtwork } from 'config/constants'
 import React from 'react'
 import styled from 'styled-components'
 import { getSymbolParts } from 'utils';
@@ -52,14 +51,7 @@ const SymbolImage: React.FC<Props> = ({ symbol, width, height }) => {
   const symbolParts = getSymbolParts(symbol)
   return (
     <LpSymbolWrapper width={width} height={height}>
-      {(TokensWithCustomArtwork[symbol] || symbolParts.length === 1) ? (
-        <SingleSymbolIcon symbol={symbol} width={width} height={height} />
-      ) : (
-        <>
-          <LpASymbolIcon symbol={symbolParts[0]} width={width} height={height} />
-          <LpBSymbolIcon symbol={symbolParts[1]} width={width} height={height} />
-        </>
-      )}
+      <SingleSymbolIcon symbol={symbol} width={width} height={height} />
     </LpSymbolWrapper>
   )
 }

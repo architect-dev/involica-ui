@@ -38,7 +38,8 @@ const userDataFields: Record<string, ParseFieldConfig> = {
       allowance: { type: ParseFieldType.bignumber },
       balance: { type: ParseFieldType.bignumber },
     }
-  }
+  },
+  swapsAmountOutMin: { type: ParseFieldType.bignumberArr },
 }
 
 const fetchUserData = async (account): Promise<UserData> => {
