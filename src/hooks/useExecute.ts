@@ -3,7 +3,7 @@ import { useWeb3React } from '@web3-react/core'
 import { useERC20, useInvolica } from './useContract'
 import useToast from './useToast'
 import { useInvolicaStore } from 'state/zustand'
-import { Contract } from '@ethersproject/contracts'
+import { Contract, PayableOverrides } from '@ethersproject/contracts'
 import { callWithEstimateGas } from 'utils/estimateGas'
 import BigNumber from 'bignumber.js'
 import { eN } from 'utils'
@@ -17,13 +17,14 @@ const useExecuteTx = () => {
   const { account } = useWeb3React()
 
   const handleExecute = useCallback(
-    async (contract: Contract, method: string, args: any[], successMsg: string, errorMsg: string, callback?: (...cbArgs: any[]) => void) => {
+    async (contract: Contract, method: string, args: any[], overrides: PayableOverrides | undefined, successMsg: string, errorMsg: string, callback?: (...cbArgs: any[]) => void) => {
       try {
         setPending(true)
         await callWithEstimateGas(
           contract,
           method,
-          args
+          args,
+          overrides,
         )
         toastSuccess(successMsg)
       } catch (error) {
@@ -53,6 +54,7 @@ export const useApprove = (symbol: string, erc20Address: string) => {
         erc20Contract,
         'approve',
         [involica.address, amountRaw],
+        undefined,
         `Approved ${symbol}`,
         `${symbol} Approval Failed`
       )
@@ -68,13 +70,14 @@ export const useDepositTreasury = () => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onDepositTreasury = useCallback(
-    (amount: BigNumber) => {
-      const amountRaw = eN(amount, 18)
+    (amount: string, decimals: number) => {
+      const amountRaw = eN(amount, decimals)
       handleExecute(
         involica,
         'depositTreasury',
-        [amountRaw],
-        `Added Funds`,
+        [],
+        { value: amountRaw },
+        `Funds Added`,
         'Error Adding Funds'
       )
     },
@@ -95,6 +98,7 @@ export const useWithdrawTreasury = () => {
         involica,
         'withdrawTreasury',
         [amountRaw],
+        undefined,
         `Withdrew Funds`,
         'Error Withdrawing Funds'
       )
@@ -119,6 +123,7 @@ export const useSetPosition = () => {
         involica,
         'setPosition',
         [positionRaw],
+        undefined,
         `Position Set`,
         'Error Setting Position'
       )
@@ -139,6 +144,7 @@ export const useReInitPosition = () => {
         involica,
         'reInitPosition',
         [],
+        undefined,
         `Position Re-Initialized`,
         'Error Re-Initializing Position'
       )
@@ -159,6 +165,7 @@ export const useExitPosition = () => {
         involica,
         'exitPosition',
         [],
+        undefined,
         `Position Exited`,
         'Error Exiting Position'
       )

@@ -8,10 +8,11 @@ export const bnToDec = (bn: BigNumber, decimals = 18): number => {
 
 export const bnZero = new BigNumber(0)
 
+export type BigNumberish = BigNumber | string | number
+export const bn = (toBN: BigNumberish) => new BigNumber(toBN)
 export const bnExp = (decimals: number): BigNumber => {
   return new BigNumber(10).pow(decimals)
 }
-
-export const eN = (bn: BigNumber, decimals: number): string => {
-  return bn.times(bnExp(decimals)).toString()
+export const eN = (ish: BigNumberish, decimals: number): string => {
+  return bn(ish).times(bnExp(decimals)).toString()
 }

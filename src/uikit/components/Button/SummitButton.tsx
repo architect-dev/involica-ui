@@ -1,6 +1,7 @@
 import React, { cloneElement, ElementType, isValidElement, useCallback } from 'react'
 import styled from 'styled-components'
 import getExternalLinkProps from '../../util/getExternalLinkProps'
+import { Dots } from '../Dots'
 import { Lock, Spinner } from '../Svg'
 import SummitStyledButton from './SummitStyledButton'
 import { ButtonProps, scales, variants } from './types'
@@ -86,14 +87,13 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
             mr: '0.5rem',
           })}
         <ChildWrapper>
-          {children}
+          {children}<Dots loading={isLoading}/>
         </ChildWrapper>
         {isValidElement(endIcon) &&
           cloneElement(endIcon, {
             ml: '0.5rem',
           })}
         {isLocked && <StyledLock width="28px" />}
-        {isLoading && <StyledSpinner className="spinner" />}
       </>
     </SummitStyledButton>
   )

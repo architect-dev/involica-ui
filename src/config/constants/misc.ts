@@ -1,0 +1,1 @@
+export const nativeAdd = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'

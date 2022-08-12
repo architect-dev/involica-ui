@@ -1,11 +1,10 @@
 import create from 'zustand'
-import { persist } from 'zustand/middleware'
 import fetchPublicData from './fetchPublicData'
 import fetchUserData from './fetchUserData'
 import { State } from './types'
 
 export const useInvolicaStore = create<State>()(
-  persist((set) => ({
+  (set) => ({
     account: null,
     isDark: false,
     connectModalOpen: false,
@@ -25,7 +24,8 @@ export const useInvolicaStore = create<State>()(
     fetchPublicData: async () => {
       set({ tokens: await fetchPublicData(), publicDataLoaded: true })
     },
-  }), {
-    name: 'involica'
   })
+  // ), {
+  //   name: 'involica'
+  // })
 )

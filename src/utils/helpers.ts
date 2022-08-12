@@ -66,10 +66,10 @@ export const groupBy = <T>(
 
 export const groupByAndMap = <T, U>(
   fromArray: T[],
-  keyExtractor: (item: T, index: number) => string | number,
+  keyExtractor: (item: T, index: number) => string,
   transform: (item: T, index: number) => U,
-): Map<string | number, U> => {
-  const grouped: Map<string | number, U> = {} as Map<string | number, U>
+): Record<string, U> => {
+  const grouped: Record<string, U> = {} as Record<string, U>
   fromArray.forEach((item, index) => {
     grouped[keyExtractor(item, index)] = transform(item, index)
   })

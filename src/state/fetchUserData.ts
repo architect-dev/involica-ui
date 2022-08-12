@@ -1,7 +1,7 @@
 import FetcherABI from 'config/abi/InvolicaFetcher.json'
-import { ParseFieldConfig, ParseFieldType, getFetcherAddress } from 'utils'
+import { ParseFieldConfig, ParseFieldType, getFetcherAddress, groupByAndMap } from 'utils'
 import multicallAndParse from 'utils/multicall'
-import { UserData } from './types'
+import { UserData, UserTokenData } from './types'
 
 const userDataFields: Record<string, ParseFieldConfig> = {
   userHasPosition: { type: ParseFieldType.bool },
@@ -33,7 +33,7 @@ const userDataFields: Record<string, ParseFieldConfig> = {
   userTokensData: {
     type: ParseFieldType.nestedArr,
     nestedFields: {
-      token: { type: ParseFieldType.address },
+      token: { type: ParseFieldType.address, stateField: 'address' },
       allowance: { type: ParseFieldType.bignumber },
       balance: { type: ParseFieldType.bignumber },
     }
@@ -51,7 +51,16 @@ const fetchUserData = async (account): Promise<UserData> => {
     },
   ]
 
-  return multicallAndParse(FetcherABI, calls, userDataFields)
+  const [userData] = await multicallAndParse(FetcherABI, calls, userDataFields)
+
+  return {
+    ...userData,
+    userTokensData: groupByAndMap(
+      userData.userTokensData,
+      (token: UserTokenData) => token.address,
+      (token: UserTokenData) => token
+    )
+  }
 }
 
 export default fetchUserData

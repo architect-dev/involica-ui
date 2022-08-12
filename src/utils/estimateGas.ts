@@ -14,12 +14,13 @@ export const estimateGas = async (
     contract: Contract,
     methodName: string,
     methodArgs: any[],
+    overrides: PayableOverrides,
     gasMarginPer10000: number,
 ) => {
     if (!contract[methodName]) {
         throw new Error(`Method ${methodName} doesn't exist on ${contract.address}`)
     }
-    const rawGasEstimation = await contract.estimateGas[methodName](...methodArgs)
+    const rawGasEstimation = await contract.estimateGas[methodName](...methodArgs, overrides)
     // By convention, BigNumber values are multiplied by 1000 to avoid dealing with real numbers
     const gasEstimation = rawGasEstimation
         .mul(10000 + gasMarginPer10000)
@@ -39,7 +40,7 @@ export class RevertError extends Error {
 
 
 export const extractRevertMsg = (err) => {
-    const rawRevertMessage = err.data?.message?.split('execution reverted: ')[1] || err.message || 'Unknown Error'
+    const rawRevertMessage = err.data?.message?.split('execution reverted: ')[1] || err.reason?.split('execution reverted: ')[1] || err.message || 'Unknown Error'
     return getInvolicaRevertReason(rawRevertMessage)
 }
 
@@ -58,8 +59,12 @@ export const callWithEstimateGas = async (
     overrides: PayableOverrides = {},
     gasMarginPer10000 = 1000,
 ): Promise<TransactionResponse> => {
-    const gasEstimation = estimateGas(contract, methodName, methodArgs, gasMarginPer10000)
+    const gasEstimation = estimateGas(contract, methodName, methodArgs, overrides, gasMarginPer10000)
     try {
+        console.log({
+            methodName,
+            args: [...methodArgs, { gasLimit: gasEstimation, ...overrides }]
+        })
         const tx = await contract[methodName](...methodArgs, {
             gasLimit: gasEstimation,
             ...overrides,

@@ -7,6 +7,8 @@ export const NamedChainId = {
   POLYGON: '137',
 }
 
+export type AddressRecord<T> = Record<string, T>
+
 // ECOSYSTEM
 export interface Ecosystem {
   account?: string
@@ -28,7 +30,7 @@ export interface Token {
   decimals: number
 }
 export interface PublicData {
-  tokens: Token[]
+  tokens: AddressRecord<Token>
 }
 interface PublicDataMutators {
   fetchPublicData: () => Promise<void>
@@ -52,7 +54,7 @@ export interface Position {
   finalizationReason: string
 }
 export interface UserTokenData {
-  token: string
+  address: string
   allowance: BigNumber
   balance: BigNumber
 }
@@ -63,7 +65,7 @@ export interface UserData {
   allowance: BigNumber
   balance: BigNumber
   dcasRemaining: number
-  userTokensData: UserTokenData[]
+  userTokensData: AddressRecord<UserTokenData>
 }
 interface UserDataState {
   userData?: UserData

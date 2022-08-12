@@ -1,21 +1,21 @@
 import FetcherABI from 'config/abi/InvolicaFetcher.json'
-import { ParseFieldConfig, ParseFieldType, getFetcherAddress } from 'utils'
+import { ParseFieldConfig, ParseFieldType, getFetcherAddress, groupByAndMap } from 'utils'
 import multicallAndParse from 'utils/multicall'
-import { Token } from './types'
+import { AddressRecord, Token } from './types'
 
 const tokensFields: Record<string, ParseFieldConfig> = {
   tokensData: {
     stateField: 'tokens',
     type: ParseFieldType.nestedArr,
     nestedFields: {
-      token: { type: ParseFieldType.address },
+      token: { type: ParseFieldType.address, stateField: 'address' },
       decimals: { type: ParseFieldType.number },
-      price: { type: ParseFieldType.bignumber },
+      price: { type: ParseFieldType.number },
     },
   },
 }
 
-const fetchPublicData = async (): Promise<Token[]> => {
+const fetchPublicData = async (): Promise<AddressRecord<Token>> => {
   const fetcher = getFetcherAddress()
   const calls = [
     {
@@ -26,11 +26,10 @@ const fetchPublicData = async (): Promise<Token[]> => {
 
   const { tokens } = (await multicallAndParse(FetcherABI, calls, tokensFields))[0]
 
-  return tokens.map(
-    (token): Token => ({
-      ...token,
-      symbol: 'TEST',
-    }),
+  return groupByAndMap(
+    tokens,
+    (token: Token) => token.address,
+    (token: Token) => ({ ...token, symbol: 'TEST', price: token.price / 1e6 }),
   )
 }
 
