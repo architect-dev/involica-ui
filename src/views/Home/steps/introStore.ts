@@ -14,43 +14,64 @@ interface PositionConfig {
 interface PositionConfigMutators {
   setTokenIn: (tokenIn: string) => void
   addOut: (token: string, weight: number, maxSlippage: number) => void
-  removeOut: (token: string) => void
-  updateOutWeight: (token: string, weight: number) => void
+  removeOut: (index: number) => void
+  updateWeights: (weights: number[]) => void
   updateOutMaxSlippage: (token: string, maxSlippage: number) => void
   setIntervalDCA: (intervalDCA: number) => void
   setAmountDCA: (amountDCA: string) => void
 }
 
-export const usePositionConfigState = create<PositionConfig & PositionConfigMutators>()(
+const weights = (n: number) => {
+  const weight = 100 / n
+  return [...new Array(n)].map(
+    (_, i) => Math.round(weight * i) - Math.round(weight * (i - 1)),
+  )
+}
+
+export const usePositionConfigState = create<
+  PositionConfig & PositionConfigMutators
+>()(
   // persist(
-    (set, get) => ({
-      tokenIn: null,
-      outs: [],
-      amountDCA: null,
-      intervalDCA: null,
-      maxGasPrice: null,
-      setTokenIn: (tokenIn: string) => set({ tokenIn }),
-      addOut: (token: string, weight: number, maxSlippage: number) =>
-        set({ outs: get().outs.concat({ token, weight, maxSlippage }) }),
-      removeOut: (token: string) =>
-        set({
-          outs: get().outs.filter(({ token: outToken }) => token !== outToken),
-        }),
-      updateOutWeight: (token: string, weight: number) =>
-        set({
-          outs: get().outs.map((out) =>
-            out.token === token ? { ...out, weight } : out,
-          ),
-        }),
-      updateOutMaxSlippage: (token: string, maxSlippage: number) =>
-        set({
-          outs: get().outs.map((out) =>
-            out.token === token ? { ...out, maxSlippage } : out,
-          ),
-        }),
-      setIntervalDCA: (intervalDCA: number) => set({ intervalDCA }),
-      setAmountDCA: (amountDCA: string) => set({ amountDCA }),
-    }),
+  (set, get) => ({
+    tokenIn: null,
+    outs: [],
+    amountDCA: null,
+    intervalDCA: null,
+    maxGasPrice: null,
+    setTokenIn: (tokenIn: string) => set({ tokenIn }),
+    addOut: (token: string) => {
+      const w = weights(get().outs.length + 1)
+      set({
+        outs: get()
+          .outs.concat({
+            token,
+            weight: 0,
+            maxSlippage: 10,
+          })
+          .map((out, i) => ({ ...out, weight: w[i] })),
+      })
+    },
+    removeOut: (index: number) => {
+      const w = weights(get().outs.length - 1)
+      set({
+        outs: get()
+          .outs.filter((_, i) => index !== i)
+          .map((out, i) => ({ ...out, weight: w[i] })),
+      })
+    },
+    updateWeights: (w: number[]) =>
+      set({
+        outs: get().outs.map((out, i) => ({ ...out, weight: w[i] })),
+      }),
+    updateOutMaxSlippage: (token: string, maxSlippage: number) =>
+      set({
+        outs: get().outs.map((out) =>
+          out.token === token ? { ...out, maxSlippage } : out,
+        ),
+      }),
+    setIntervalDCA: (intervalDCA: number) => set({ intervalDCA }),
+    setAmountDCA: (amountDCA: string) => set({ amountDCA }),
+  }),
   //   {
   //     name: `involica_positionConfig_${CHAIN_ID}`,
   //   },
@@ -63,30 +84,29 @@ export enum IntroStep {
   Outs,
   Treasury,
   Approve,
-  Finalize
+  Finalize,
 }
 
-export const usePositionConfig = (): PositionConfig => usePositionConfigState(state => ({
-  tokenIn: state.tokenIn,
-  outs: state.outs,
-  amountDCA: state.amountDCA,
-  intervalDCA: state.intervalDCA,
-  maxGasPrice: state.maxGasPrice,
-}))
+export const usePositionConfig = (): PositionConfig =>
+  usePositionConfigState((state) => ({
+    tokenIn: state.tokenIn,
+    outs: state.outs,
+    amountDCA: state.amountDCA,
+    intervalDCA: state.intervalDCA,
+    maxGasPrice: state.maxGasPrice,
+  }))
 
 export const useIntroActiveStep = () => {
-  const {
-    tokenIn,
-    outs,
-    amountDCA,
-    intervalDCA,
-  } = usePositionConfig()
+  const { tokenIn, outs, amountDCA, intervalDCA } = usePositionConfig()
   const userTreasury = useInvolicaStore((state) => state.userData?.userTreasury)
-  const tokenInApprovedAmount = useInvolicaStore((state) => state.userData?.userTokensData?.[tokenIn]?.balance)
+  const tokenInApprovedAmount = useInvolicaStore(
+    (state) => state.userData?.userTokensData?.[tokenIn]?.balance,
+  )
 
   if (tokenIn == null) return IntroStep.TokenIn
 
-  if (intervalDCA == null || amountDCA == null) return IntroStep.IntervalAndAmount 
+  if (intervalDCA == null || amountDCA == null)
+    return IntroStep.IntervalAndAmount
   if (intervalDCA <= 30 * 60) return IntroStep.IntervalAndAmount
   if (amountDCA === '0') return IntroStep.IntervalAndAmount
 

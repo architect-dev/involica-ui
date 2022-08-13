@@ -35,6 +35,17 @@ const GlobalStyle = createGlobalStyle`
     background-color: ${({ theme }) => transparentize(0.8, theme.colors.text)};
     backdrop-filter: blur(2px);
   }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
 `
 
 export default GlobalStyle

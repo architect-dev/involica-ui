@@ -1,13 +1,10 @@
-import { StyledTextInput } from 'components/Input'
-import TextInput from 'components/Input/TextInput'
-import TokenInput from 'components/TokenInput'
-import { getNativeTokenSymbol } from 'config/constants'
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { SummitButton, Text } from 'uikit'
-import { pressableMixin } from 'uikit/util/styledMixins'
+import { Text } from 'uikit'
 import { AddFundsStep } from './AddFunds'
 import { IntroStep } from './introStore'
+import { SelectIntervalAndAmount } from './SelectIntervalAndAmount'
+import { SelectOuts } from './SelectOuts'
 import { SelectTokenIn } from './SelectTokenIn'
 
 const HoverableText = styled(Text)<{ active: boolean }>`
@@ -26,44 +23,12 @@ const StepHeader: React.FC<{
   )
 }
 
-const StepContentWrapper = styled.div<{
-  expanded: boolean
-  borderOnlyWhenExpanded?: boolean
-}>`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 18px;
-  border-left: 1px dashed
-    ${({ theme, expanded, borderOnlyWhenExpanded = false }) =>
-      !borderOnlyWhenExpanded || expanded ? theme.colors.text : 'transparent'};
-  padding: ${({ expanded }) => (expanded ? '24px 18px' : '12px 18px')};
-  transition: padding 200ms;
-  margin-left: 4px;
-`
-
-const StepContent: React.FC<{
-  expanded: boolean
-  expandedContent: JSX.Element[] | JSX.Element | null
-  borderOnlyWhenExpanded?: boolean
-}> = ({ expanded, expandedContent, borderOnlyWhenExpanded = false }) => {
-  return (
-    <StepContentWrapper
-      expanded={expanded}
-      borderOnlyWhenExpanded={borderOnlyWhenExpanded}
-    >
-      {expanded && expandedContent}
-    </StepContentWrapper>
-  )
-}
-
 const stepTitle: Record<IntroStep, string> = {
   [IntroStep.TokenIn]: 'Choose which token you want to DCA with.',
-  [IntroStep.IntervalAndAmount]:
-    'Select how much and how often you want to DCA.',
   [IntroStep.Outs]:
     'Select one or more tokens to DCA into to create a portfolio.',
+  [IntroStep.IntervalAndAmount]:
+    'Select how often and how much you want to DCA',
   [IntroStep.Treasury]: 'Fund your account.',
   [IntroStep.Approve]: 'Approve your DCA token.',
   [IntroStep.Finalize]: 'Finalize.',
@@ -71,8 +36,8 @@ const stepTitle: Record<IntroStep, string> = {
 
 const stepContent: Record<IntroStep, JSX.Element | null> = {
   [IntroStep.TokenIn]: <SelectTokenIn />,
-  [IntroStep.IntervalAndAmount]: null,
-  [IntroStep.Outs]: null,
+  [IntroStep.IntervalAndAmount]: <SelectIntervalAndAmount />,
+  [IntroStep.Outs]: <SelectOuts />,
   [IntroStep.Treasury]: <AddFundsStep />,
   [IntroStep.Approve]: null,
   [IntroStep.Finalize]: null,
@@ -88,8 +53,8 @@ export const IntroSteps: React.FC = () => {
         <Text small italic>
           {[
             IntroStep.TokenIn,
-            IntroStep.IntervalAndAmount,
             IntroStep.Outs,
+            IntroStep.IntervalAndAmount,
             IntroStep.Treasury,
             IntroStep.Approve,
           ].map((step, stepIndex) => (
@@ -104,8 +69,8 @@ export const IntroSteps: React.FC = () => {
       <br />
       {[
         IntroStep.TokenIn,
-        IntroStep.IntervalAndAmount,
         IntroStep.Outs,
+        IntroStep.IntervalAndAmount,
         IntroStep.Treasury,
         IntroStep.Approve,
         IntroStep.Finalize

@@ -22,6 +22,8 @@ export const SelectTokenIn: React.FC = () => {
       <TokenSelectButton
         token={tokenIn}
         setToken={setTokenIn}
+        noTokenString='Select'
+        modalVariant='balance'
       />
     </StepContentWrapper>
   )

@@ -1,26 +1,34 @@
+import { TokenButton } from 'components/TokenButton'
 import React, { useCallback, useMemo, useState } from 'react'
 import { AddressRecord } from 'state/types'
 import { useInvolicaStore } from 'state/zustand'
-import { Row, RowBetween, SummitButton, TokenSymbolImage, Text } from 'uikit'
+import { Text } from 'uikit'
 import { SummitPopUp } from 'uikit/widgets/Popup'
 import { bn, bnDisplay } from 'utils'
-import TokenSelectModal from './TokenSelectModal'
+import TokenSelectModal, { ModalVariant } from './TokenSelectModal'
 
 export const TokenSelectButton: React.FC<{
   token: string | null
+  noTokenString: string
   setToken: (token: string) => void
   disabledTokens?: AddressRecord<string>
-}> = ({ token, setToken, disabledTokens }) => {
+  modalVariant: ModalVariant
+}> = ({ token, setToken, noTokenString, disabledTokens, modalVariant }) => {
   const tokenData = useInvolicaStore((state) => state.tokens?.[token])
-  const userTokenData = useInvolicaStore((state) => state.userData?.userTokensData?.[token])
+  const userTokenData = useInvolicaStore(
+    (state) => state.userData?.userTokensData?.[token],
+  )
 
   const selectedTokenBalance = useMemo(
     () => bnDisplay(userTokenData?.balance, tokenData?.decimals, 3),
-    [userTokenData?.balance, tokenData?.decimals]
+    [userTokenData?.balance, tokenData?.decimals],
   )
   const selectedTokenBalanceUsd = useMemo(
-    () => selectedTokenBalance != null && tokenData?.price != null ? bn(selectedTokenBalance).times(tokenData.price).toFixed(2) : null,
-    [selectedTokenBalance, tokenData?.price]
+    () =>
+      selectedTokenBalance != null && tokenData?.price != null
+        ? bn(selectedTokenBalance).times(tokenData.price).toFixed(2)
+        : null,
+    [selectedTokenBalance, tokenData?.price],
   )
 
   const [tokenSelectModalOpen, setTokenSelectModalOpen] = useState(false)
@@ -32,7 +40,7 @@ export const TokenSelectButton: React.FC<{
     () => setTokenSelectModalOpen(false),
     [setTokenSelectModalOpen],
   )
-  
+
   return (
     <>
       <SummitPopUp
@@ -40,32 +48,31 @@ export const TokenSelectButton: React.FC<{
         callOnDismiss={hideSelectTokenModal}
         modal
         button={
-          <SummitButton onClick={showSelectTokenModal} padding={tokenData != null && "0 12px 0 2px"} width="100px">
-            {tokenData != null ? (
-              <RowBetween>
-                <TokenSymbolImage
-                  symbol={tokenData.symbol}
-                  width={24}
-                  height={24}
-                />
-                {tokenData.symbol}
-              </RowBetween>
-            ) : (
-              'Select'
-            )}
-          </SummitButton>
+          <TokenButton
+            token={token}
+            onClick={showSelectTokenModal}
+            noTokenString={noTokenString}
+          />
         }
         popUpContent={
-          <TokenSelectModal setToken={setToken} disabledTokens={disabledTokens} />
+          <TokenSelectModal
+            setToken={setToken}
+            disabledTokens={disabledTokens}
+            variant={modalVariant}
+          />
         }
       />
-      { selectedTokenBalance != null &&
+      {selectedTokenBalance != null && (
         <Text>
           Balance: <b>{selectedTokenBalance}</b>
-          <br/>
-          { selectedTokenBalanceUsd != null && <Text small italic>(USD: ${selectedTokenBalanceUsd})</Text>}
+          <br />
+          {selectedTokenBalanceUsd != null && (
+            <Text small italic>
+              (USD: ${selectedTokenBalanceUsd})
+            </Text>
+          )}
         </Text>
-      }
+      )}
     </>
   )
 }
