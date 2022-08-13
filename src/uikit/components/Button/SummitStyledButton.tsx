@@ -10,16 +10,21 @@ const SummitStyledButton = styled(StyledButton)<{
   $isLocked: boolean
   $freezeSummitButton?: boolean
 }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
   position: relative;
-  height: ${({ height }) => height || 36}px;
+  height: ${({ height }) => height || 28}px;
   border-radius: 22px;
   border: 0px solid ${({ theme }) => theme.colors.text};
   
-  padding: 0px ${({ padding }) => padding || 38}px;
+  padding: ${({ padding }) => padding || '0px 38px'};
   /* box-shadow: ${({ theme, disabled, $isLocked }) => disabled || $isLocked ? 'none' : `1px 1px 1px ${theme.colors.textShadow}, 1px 1px 1px inset ${theme.colors.textShadow}`}; */
   
   opacity: ${({ disabled, $isLocked }) => (disabled || $isLocked ? 0.5 : 1)};
   background: ${({ theme }) => transparentize(0.75, theme.colors.text)};
+  color: ${({ theme }) => theme.colors.text};
   
   > * {
     text-align: center;

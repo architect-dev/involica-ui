@@ -51,7 +51,7 @@ const StyledInputWrapper = styled(SelectorWrapperBase)`
 
   border-radius: 16px;
   display: flex;
-  height: 62px;
+  height: 52px;
   padding: 0 ${(props) => props.theme.spacing[3]}px;
 
   ${({ disabled }) =>
@@ -105,7 +105,7 @@ export const StyledInput = styled.input<{ invalid?: boolean }>`
   margin: 0;
   padding: 0;
   outline: none;
-  color: ${({ theme, invalid }) => invalid ? theme.colors.red : theme.colors.text};
+  color: ${({ theme, invalid }) => invalid ? theme.colors.failure : theme.colors.text};
 `
 
 export default Input

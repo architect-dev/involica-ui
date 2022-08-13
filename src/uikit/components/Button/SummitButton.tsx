@@ -1,4 +1,9 @@
-import React, { cloneElement, ElementType, isValidElement, useCallback } from 'react'
+import React, {
+  cloneElement,
+  ElementType,
+  isValidElement,
+  useCallback,
+} from 'react'
 import styled from 'styled-components'
 import getExternalLinkProps from '../../util/getExternalLinkProps'
 import { Dots } from '../Dots'
@@ -26,7 +31,8 @@ const SecondaryInset = styled.div<{ insetColor?: string }>`
   left: 2px;
   bottom: 2px;
   border-radius: 50px;
-  background-color: ${({ theme, insetColor }) => theme.colors[insetColor || 'cardHover']};
+  background-color: ${({ theme, insetColor }) =>
+    theme.colors[insetColor || 'cardHover']};
 `
 
 const ChildWrapper = styled.div`
@@ -37,7 +43,9 @@ const ChildWrapper = styled.div`
   flex-direction: row;
 `
 
-const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): JSX.Element => {
+const SummitButton = <E extends ElementType = 'button'>(
+  props: ButtonProps<E>,
+): JSX.Element => {
   const {
     startIcon,
     endIcon,
@@ -49,6 +57,8 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
     secondary = false,
     children,
     onClick,
+    activeText,
+    loadingText,
     freezeSummitButton,
     ...rest
   } = props
@@ -86,9 +96,10 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
           cloneElement(startIcon, {
             mr: '0.5rem',
           })}
-        <ChildWrapper>
-          {children}<Dots loading={isLoading}/>
-        </ChildWrapper>
+        {children != null && children}
+        {activeText != null && !isLoading && activeText}
+        {loadingText != null && isLoading && loadingText}
+        {isLoading && <Dots />}
         {isValidElement(endIcon) &&
           cloneElement(endIcon, {
             ml: '0.5rem',

@@ -56,8 +56,8 @@ export const mapKeysAndValues = <T, U, V extends boolean | undefined>(
 export const groupBy = <T>(
   fromArray: T[],
   keyExtractor: (item: T, index: number) => string | number,
-): Map<string | number, T> => {
-  const grouped: Map<string | number, T> = {} as Map<string | number, T>
+): Record<string, T> => {
+  const grouped: Record<string, T> = {} as Record<string, T>
   fromArray.forEach((item, index) => {
     grouped[keyExtractor(item, index)] = item
   })
@@ -146,3 +146,7 @@ export const sumBigNumbersByKey = (objs: any[], key: string) => {
 export const maxBigNumberByKey = (objs: any[], key: string) => {
   return objs.reduce((acc, obj) => acc.isGreaterThan((obj[key] || bnZero)) ? acc : (obj[key] || bnZero), bnZero)
 }
+
+export const keys = <T>(object: T) => {
+  return Object.keys(object) as (keyof T)[];
+};

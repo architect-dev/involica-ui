@@ -1,0 +1,5 @@
+export default {
+  '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': 'FTM',
+  '0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83': 'wFTM',
+  '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75': 'USDC',
+}

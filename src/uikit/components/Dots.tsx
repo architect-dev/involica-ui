@@ -1,8 +1,8 @@
 /* eslint-disable no-irregular-whitespace */
 import styled, { css } from "styled-components";
 
-export const Dots = styled.span<{ loading: boolean }>`
-  ${({ loading, theme }) => loading && css`
+export const Dots = styled.span<{ loading?: boolean }>`
+  ${({ loading = true, theme }) => loading && css`
     &::after {
       display: inline-block;
       animation: ellipsis 2s infinite;

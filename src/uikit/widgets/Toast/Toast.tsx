@@ -67,7 +67,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove, style, ttl, ...props }) 
       <StyledToast ref={ref} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         <Alert title={title} variant={alertTypeMap[type]} onClick={handleRemove}>
           {description != null && (
-            <Text as="p" mb="8px">
+            <Text as="p">
               {description}
             </Text>
           )}

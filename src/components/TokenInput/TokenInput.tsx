@@ -3,9 +3,10 @@ import styled from 'styled-components'
 import BigNumber from 'bignumber.js/bignumber'
 import TextInput, { InputProps } from '../Input'
 import { Text, SummitButton } from 'uikit'
+import { Dots } from 'uikit/components/Dots'
 
 interface TokenInputProps extends InputProps {
-  max: number | string
+  max: number | string | undefined
   symbol: string
   onSelectMax?: () => void
   balanceText?: string
@@ -29,18 +30,16 @@ const TokenInput: React.FC<TokenInputProps> = ({
   isLocked = false,
   invalid = false,
 }) => {
-
   const feeToTake = useMemo(
-    () => feeBP > 0 ?
-      new BigNumber(value || 0).times(feeBP / 10000).toNumber() :
-      0,
-    [value, feeBP]
+    () =>
+      feeBP > 0 ? new BigNumber(value || 0).times(feeBP / 10000).toNumber() : 0,
+    [value, feeBP],
   )
 
   return (
     <StyledTokenInput>
       <StyledMaxText bold monospace>
-        {balanceText}: {parseFloat(max.toLocaleString()).toFixed(4)} {symbol}
+        {balanceText}: {max == null ? <Dots/> : parseFloat(max.toLocaleString()).toFixed(3)} {symbol}
       </StyledMaxText>
       <TextInput
         disabled={disabled}
@@ -50,9 +49,12 @@ const TokenInput: React.FC<TokenInputProps> = ({
           <StyledTokenAdornmentWrapper>
             <StyledSpacer />
             <div>
-              <SummitButton disabled={disabled || isLocked} padding="12px" onClick={onSelectMax}>
-                MAX
-              </SummitButton>
+              <SummitButton
+                activeText="Max"
+                disabled={disabled || isLocked}
+                padding="12px"
+                onClick={onSelectMax}
+              />
             </div>
           </StyledTokenAdornmentWrapper>
         }
@@ -62,7 +64,9 @@ const TokenInput: React.FC<TokenInputProps> = ({
         invalid={invalid}
       />
       {feeBP > 0 ? (
-        <StyledFeeText monospace red={feeToTake > 0}>{feeText}: {feeToTake.toFixed(4)}</StyledFeeText>
+        <StyledFeeText monospace red={feeToTake > 0}>
+          {feeText}: {feeToTake.toFixed(4)}
+        </StyledFeeText>
       ) : null}
     </StyledTokenInput>
   )
@@ -85,7 +89,7 @@ const StyledTokenAdornmentWrapper = styled.div`
 
 const StyledMaxText = styled(Text)<{ red?: boolean }>`
   align-items: center;
-  color: ${({ theme, red }) => red ? theme.colors.red : theme.colors.text};
+  color: ${({ theme, red }) => (red ? theme.colors.failure : theme.colors.text)};
   display: flex;
   font-style: italic;
   margin-right: 16px;

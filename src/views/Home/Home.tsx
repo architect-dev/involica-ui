@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { HighlightedText, Text } from 'uikit'
 import Page from 'components/layout/Page'
-import { GetStartedSteps } from './components/GetStartedSteps'
+import { IntroSteps } from './steps/IntroSteps'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -33,13 +33,13 @@ const Home: React.FC = () => {
           <br/>
           hedge against bear market volitility,
           <br/>
-          make DeFi as easy as possible.
+          make DeFi as accessible as possible.
           <br/>
           - by Architect
         </Text>
       </Hero>
 
-      <GetStartedSteps/>
+      <IntroSteps/>
     </Page>
   )
 }

@@ -56,10 +56,11 @@ const fetchUserData = async (account): Promise<UserData> => {
   return {
     ...userData,
     userTokensData: groupByAndMap(
-      userData.userTokensData,
+      userData.userTokensData.slice(0, -1),
       (token: UserTokenData) => token.address,
       (token: UserTokenData) => token
-    )
+    ),
+    userNativeTokenData: userData.userTokensData[userData.userTokensData.length - 1]
   }
 }
 

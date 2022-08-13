@@ -1,3 +1,4 @@
+import { transparentize } from 'polished'
 import { createGlobalStyle } from 'styled-components'
 // eslint-disable-next-line import/no-unresolved
 import { PancakeTheme } from 'uikit'
@@ -29,6 +30,10 @@ const GlobalStyle = createGlobalStyle`
       height: auto;
       max-width: 100%;
     }
+  }
+  .popup-overlay {
+    background-color: ${({ theme }) => transparentize(0.8, theme.colors.text)};
+    backdrop-filter: blur(2px);
   }
 `
 

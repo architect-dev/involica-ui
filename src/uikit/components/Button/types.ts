@@ -51,6 +51,8 @@ export interface BaseButtonProps extends LayoutProps, SpaceProps {
   secondary?: boolean
   freezeSummitButton?: boolean
   InsetComponent?: ReactNode
+  activeText?: string
+  loadingText?: string
 }
 
 export type ButtonProps<P extends ElementType = 'button'> = PolymorphicComponentProps<P, BaseButtonProps>

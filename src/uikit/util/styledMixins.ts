@@ -29,7 +29,6 @@ export const pressableMixin = ({
 
     ${theme.mediaQueries.nav} {
       &:hover {
-        text-decoration: underline;
         font-weight: bold;
         ${$translate === true && 'transform: translateY(-1px)'};
         ${hoverStyles}

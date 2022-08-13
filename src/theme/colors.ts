@@ -1,7 +1,7 @@
 import { Colors } from './types'
 
 export const baseColors = {
-  failure: '#ED4B9E',
+  failure: '#cc0000',
   primary: '#2F70FF',
   primaryBright: '#588cff',
   primaryDark: '#2559cc',
@@ -28,7 +28,6 @@ export const brandColors = {
   GLACIER: '#39749e',
 
   textGold: '#EE9F3D',
-  red: '#cc0000',
 }
 
 export const lightColors: Colors = {

@@ -9,6 +9,22 @@ const Flex = styled(Box)<FlexProps>`
   ${flexbox}
 `
 
+export const Row = styled(Flex)`
+  flex-direction: row;
+  flex: 1;
+  align-items: center;
+  width: 100%;
+`
+export const RowCenter = styled(Row)`
+  justify-content: center;
+`
+export const RowBetween = styled(Row)`
+  justify-content: space-between;
+`
+export const Column = styled(Flex)`
+  flex-direction: column;
+`
+
 export const MobileColumnFlex = styled(Flex)`
   flex-direction: column;
 

@@ -1,3 +1,4 @@
+import { CHAIN_ID } from 'utils'
 import create from 'zustand'
 import fetchPublicData from './fetchPublicData'
 import fetchUserData from './fetchUserData'
@@ -20,12 +21,13 @@ export const useInvolicaStore = create<State>()(
     },
     
     tokens: null,
+    nativeToken: null,
     publicDataLoaded: false,
     fetchPublicData: async () => {
-      set({ tokens: await fetchPublicData(), publicDataLoaded: true })
+      set({ ...(await fetchPublicData()), publicDataLoaded: true })
     },
   })
   // ), {
-  //   name: 'involica'
+  //   name: `involica_${CHAIN_ID}`
   // })
 )

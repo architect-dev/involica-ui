@@ -31,6 +31,7 @@ export interface Token {
 }
 export interface PublicData {
   tokens: AddressRecord<Token>
+  nativeToken: Token
 }
 interface PublicDataMutators {
   fetchPublicData: () => Promise<void>
@@ -66,6 +67,7 @@ export interface UserData {
   balance: BigNumber
   dcasRemaining: number
   userTokensData: AddressRecord<UserTokenData>
+  userNativeTokenData: UserTokenData
 }
 interface UserDataState {
   userData?: UserData
