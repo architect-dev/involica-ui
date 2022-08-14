@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { StepContentWrapper } from './styles'
+import { StepContentWrapper } from './StepContentWrapper'
 import { Flex, SummitButton, Text } from 'uikit'
-import { usePositionConfigState } from './introStore'
+import { IntroStep, useIntroActiveStep, usePositionConfigState } from './introStore'
 import { TokenSelectButton } from 'components/TokenSelect/TokenSelectButton'
 import { TokenButton } from 'components/TokenButton'
 import { AddressRecord } from 'state/types'
@@ -71,7 +71,8 @@ const SelectedOutButton: React.FC<{ token: string, index: number }>= ({ token, i
 }
 
 export const SelectOuts: React.FC = () => {
-  const expanded = true
+  const introStep = useIntroActiveStep()
+  const expanded = introStep >= IntroStep.Outs
   const tokenIn = usePositionConfigState((state) => state.tokenIn)
   const outs = usePositionConfigState((state) => state.outs)
   const addOut = usePositionConfigState((state) => state.addOut)

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { StepContentWrapper } from './styles'
+import { StepContentWrapper } from './StepContentWrapper'
 import { Text, RowStart } from 'uikit'
-import { usePositionConfigState } from './introStore'
+import { IntroStep, useIntroActiveStep, usePositionConfigState } from './introStore'
 import NumericInput from 'components/Input/NumericInput'
 
 const sToI = (s: string): number => {
@@ -12,7 +12,8 @@ const dhmToSec = (d: string, h: string, m: string): number => {
 }
 
 export const SelectInterval: React.FC = () => {
-  const expanded = true
+  const introStep = useIntroActiveStep()
+  const expanded = introStep >= IntroStep.Interval
   const intervalDCA = usePositionConfigState((state) => state.intervalDCA)
   const setIntervalDCA = usePositionConfigState((state) => state.setIntervalDCA)
   const [days, setDays] = useState<string>('')

@@ -1,11 +1,12 @@
 import React, {  } from 'react'
-import { StepContentWrapper } from './styles'
+import { StepContentWrapper } from './StepContentWrapper'
 import { Text } from 'uikit'
-import { usePositionConfigState } from './introStore'
+import { IntroStep, useIntroActiveStep, usePositionConfigState } from './introStore'
 import { TokenSelectButton } from 'components/TokenSelect/TokenSelectButton'
 
 export const SelectTokenIn: React.FC = () => {
-  const expanded = true
+  const introStep = useIntroActiveStep()
+  const expanded = introStep >= IntroStep.TokenIn
   const tokenIn = usePositionConfigState((state) => state.tokenIn)
   const setTokenIn = usePositionConfigState((state) => state.setTokenIn)
 

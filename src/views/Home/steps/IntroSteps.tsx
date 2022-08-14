@@ -2,8 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import { SummitButton, Text } from 'uikit'
 import { AddFundsStep } from './AddFunds'
-import { IntroStep } from './introStore'
-import { SelectInterval } from './SelectIntervalAndAmount'
+import { IntroStep, usePositionConfigState } from './introStore'
+import { SelectInterval } from './SelectInterval'
 import { SelectOuts } from './SelectOuts'
 import { SelectTokenIn } from './SelectTokenIn'
 
@@ -24,6 +24,7 @@ const StepHeader: React.FC<{
 }
 
 const stepTitle: Record<IntroStep, string> = {
+  [IntroStep.NotStarted]: '',
   [IntroStep.TokenIn]: 'Choose which token you want to DCA with.',
   [IntroStep.Outs]: 'Select multiple tokens to DCA into to create a portfolio.',
   [IntroStep.Interval]: 'Select how often to execute the DCA.',
@@ -34,9 +35,10 @@ const stepTitle: Record<IntroStep, string> = {
 }
 
 const stepContent: Record<IntroStep, JSX.Element | null> = {
+  [IntroStep.NotStarted]: null,
   [IntroStep.TokenIn]: <SelectTokenIn />,
-  [IntroStep.Interval]: <SelectInterval />,
   [IntroStep.Outs]: <SelectOuts />,
+  [IntroStep.Interval]: <SelectInterval />,
   [IntroStep.Amount]: null,
   [IntroStep.Approve]: null,
   [IntroStep.Treasury]: <AddFundsStep />,
@@ -44,6 +46,7 @@ const stepContent: Record<IntroStep, JSX.Element | null> = {
 }
 
 export const IntroSteps: React.FC = () => {
+  const getStarted = usePositionConfigState((state) => state.getStarted)
   return (
     <>
       <Text>
@@ -75,7 +78,7 @@ export const IntroSteps: React.FC = () => {
       <br />
       <br />
       <br />
-      <SummitButton activeText="Get started with Involica" />
+      <SummitButton onClick={getStarted} activeText="Get started with Involica" />
       <br />
       <br />
       <br />

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { StepContentWrapper } from './styles'
+import { StepContentWrapper } from './StepContentWrapper'
 import { SummitButton, Text } from 'uikit'
 import TokenInput from 'components/TokenInput'
 import { getNativeTokenSymbol } from 'config/constants'
@@ -7,9 +7,11 @@ import { isNumber } from 'lodash'
 import { useInvolicaStore } from 'state/zustand'
 import { bn, bnDisplay } from 'utils'
 import { useDepositTreasury } from 'hooks/useExecute'
+import { IntroStep, useIntroActiveStep } from './introStore'
 
 export const AddFundsStep: React.FC = () => {
-  const expanded = true
+  const introStep = useIntroActiveStep()
+  const expanded = introStep >= IntroStep.Treasury
   const userTreasury = useInvolicaStore((state) => state.userData?.userTreasury)
   const userNativeToken = useInvolicaStore(
     (state) => state.userData?.userNativeTokenData,

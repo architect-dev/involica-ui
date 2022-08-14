@@ -11,6 +11,8 @@ interface PositionConfig {
   maxGasPrice?: number
 }
 interface PositionConfigMutators {
+  startIntro: boolean
+  getStarted: () => void
   setTokenIn: (tokenIn: string) => void
   addOut: (token: string, weight: number, maxSlippage: number) => void
   removeOut: (index: number) => void
@@ -37,6 +39,8 @@ export const usePositionConfigState = create<
     amountDCA: null,
     intervalDCA: null,
     maxGasPrice: null,
+    startIntro: false,
+    getStarted: () => set({ startIntro: true }),
     setTokenIn: (tokenIn: string) => set({ tokenIn }),
     addOut: (token: string) => {
       const w = weights(get().outs.length + 1)
@@ -78,6 +82,7 @@ export const usePositionConfigState = create<
 )
 
 export enum IntroStep {
+  NotStarted,
   TokenIn,
   Outs,
   Interval,
@@ -97,26 +102,31 @@ export const usePositionConfig = (): PositionConfig =>
   }))
 
 export const useIntroActiveStep = () => {
+  const startIntro = usePositionConfigState((state) => state.startIntro)
   const { tokenIn, outs, amountDCA, intervalDCA } = usePositionConfig()
   const userTreasury = useInvolicaStore((state) => state.userData?.userTreasury)
   const tokenInApprovedAmount = useInvolicaStore(
     (state) => state.userData?.userTokensData?.[tokenIn]?.balance,
   )
 
-  if (tokenIn == null) return IntroStep.TokenIn
+  if (!startIntro) return IntroStep.NotStarted
 
-  if (intervalDCA == null || amountDCA == null)
-    return IntroStep.Interval
-  if (intervalDCA <= 30 * 60) return IntroStep.Interval
-  if (amountDCA === '0') return IntroStep.Interval
+  if (tokenIn == null) return IntroStep.TokenIn
 
   if (outs.length === 0) return IntroStep.Outs
 
-  if (userTreasury == null) return IntroStep.Treasury
-  if (bn(userTreasury).toNumber() === 0) return IntroStep.Treasury
+  if (intervalDCA == null || intervalDCA <= 30 * 60) return IntroStep.Interval
 
-  if (tokenInApprovedAmount == null) return IntroStep.Approve
-  if (bn(tokenInApprovedAmount).toNumber() === 0) return IntroStep.Approve
+  if (amountDCA == null || amountDCA === '0') return IntroStep.Interval
+
+  if (
+    tokenInApprovedAmount == null ||
+    bn(tokenInApprovedAmount).toNumber() === 0
+  )
+    return IntroStep.Approve
+
+  if (userTreasury == null || bn(userTreasury).toNumber() === 0)
+    return IntroStep.Treasury
 
   return IntroStep.Finalize
 }
