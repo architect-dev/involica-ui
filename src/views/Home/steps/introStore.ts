@@ -1,8 +1,7 @@
 import { PositionOut } from 'state/types'
 import { useInvolicaStore } from 'state/zustand'
-import { bn, CHAIN_ID } from 'utils'
+import { bn } from 'utils'
 import create from 'zustand'
-import { persist } from 'zustand/middleware'
 
 interface PositionConfig {
   tokenIn?: string
@@ -80,10 +79,11 @@ export const usePositionConfigState = create<
 
 export enum IntroStep {
   TokenIn,
-  IntervalAndAmount,
   Outs,
-  Treasury,
+  Interval,
+  Amount,
   Approve,
+  Treasury,
   Finalize,
 }
 
@@ -106,9 +106,9 @@ export const useIntroActiveStep = () => {
   if (tokenIn == null) return IntroStep.TokenIn
 
   if (intervalDCA == null || amountDCA == null)
-    return IntroStep.IntervalAndAmount
-  if (intervalDCA <= 30 * 60) return IntroStep.IntervalAndAmount
-  if (amountDCA === '0') return IntroStep.IntervalAndAmount
+    return IntroStep.Interval
+  if (intervalDCA <= 30 * 60) return IntroStep.Interval
+  if (amountDCA === '0') return IntroStep.Interval
 
   if (outs.length === 0) return IntroStep.Outs
 

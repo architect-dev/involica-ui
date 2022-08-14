@@ -11,7 +11,7 @@ const dhmToSec = (d: string, h: string, m: string): number => {
   return sToI(d) * 86400 + sToI(h) * 3600 + sToI(m) * 60
 }
 
-export const SelectIntervalAndAmount: React.FC = () => {
+export const SelectInterval: React.FC = () => {
   const expanded = true
   const intervalDCA = usePositionConfigState((state) => state.intervalDCA)
   const setIntervalDCA = usePositionConfigState((state) => state.setIntervalDCA)

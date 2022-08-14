@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Text } from 'uikit'
+import { SummitButton, Text } from 'uikit'
 import { AddFundsStep } from './AddFunds'
 import { IntroStep } from './introStore'
-import { SelectIntervalAndAmount } from './SelectIntervalAndAmount'
+import { SelectInterval } from './SelectIntervalAndAmount'
 import { SelectOuts } from './SelectOuts'
 import { SelectTokenIn } from './SelectTokenIn'
 
@@ -25,21 +25,21 @@ const StepHeader: React.FC<{
 
 const stepTitle: Record<IntroStep, string> = {
   [IntroStep.TokenIn]: 'Choose which token you want to DCA with.',
-  [IntroStep.Outs]:
-    'Select one or more tokens to DCA into to create a portfolio.',
-  [IntroStep.IntervalAndAmount]:
-    'Select how often and how much you want to DCA',
-  [IntroStep.Treasury]: 'Fund your account.',
+  [IntroStep.Outs]: 'Select multiple tokens to DCA into to create a portfolio.',
+  [IntroStep.Interval]: 'Select how often to execute the DCA.',
+  [IntroStep.Amount]: 'Select the amount to use for each DCA.',
   [IntroStep.Approve]: 'Approve your DCA token.',
+  [IntroStep.Treasury]: 'Fund your account.',
   [IntroStep.Finalize]: 'Finalize.',
 }
 
 const stepContent: Record<IntroStep, JSX.Element | null> = {
   [IntroStep.TokenIn]: <SelectTokenIn />,
-  [IntroStep.IntervalAndAmount]: <SelectIntervalAndAmount />,
+  [IntroStep.Interval]: <SelectInterval />,
   [IntroStep.Outs]: <SelectOuts />,
-  [IntroStep.Treasury]: <AddFundsStep />,
+  [IntroStep.Amount]: null,
   [IntroStep.Approve]: null,
+  [IntroStep.Treasury]: <AddFundsStep />,
   [IntroStep.Finalize]: null,
 }
 
@@ -47,40 +47,49 @@ export const IntroSteps: React.FC = () => {
   return (
     <>
       <Text>
-        To get started with Involica:
-        <br />
-        <br />
-        <Text small italic>
-          {[
-            IntroStep.TokenIn,
-            IntroStep.Outs,
-            IntroStep.IntervalAndAmount,
-            IntroStep.Treasury,
-            IntroStep.Approve,
-          ].map((step, stepIndex) => (
-            <span key={step}>
-              {stepIndex + 1}. {stepTitle[step]}
-              <br />
-            </span>
-          ))}
-        </Text>
+        <b>What is Involica?</b>
       </Text>
+      <Text small italic>
+        <br />
+        <b>In short, the bear market is rough, Involica is the solution.</b>
+        <br/>
+        <br/>
+        Involica is dead simple insulation against market volitility.
+        <br />
+        You create a DCA Portfolio, one token in and multiple tokens out,
+        <br />
+        set how often, and how much to DCA each time.
+        <br />
+        <br />
+        Then for each DCA, Involica pulls the funds from your wallet,
+        <br />
+        performs the necessary swaps, and sends your new portfolio
+        <br />
+        back in a single transaction. Your funds always remain in your
+        <br />
+        wallet, safe and secure.
+        <br />
+        <br />
+        <b>In</b>sulate from the bear market <b>voli</b>tility with D<b>CA</b>
+      </Text>
+      <br />
+      <br />
+      <br />
+      <SummitButton activeText="Get started with Involica" />
+      <br />
       <br />
       <br />
       {[
         IntroStep.TokenIn,
         IntroStep.Outs,
-        IntroStep.IntervalAndAmount,
-        IntroStep.Treasury,
+        IntroStep.Interval,
+        IntroStep.Amount,
         IntroStep.Approve,
-        IntroStep.Finalize
+        IntroStep.Treasury,
+        IntroStep.Finalize,
       ].map((step, stepIndex) => (
         <div key={step}>
-          <StepHeader
-            index={stepIndex}
-            text={stepTitle[step]}
-            active
-          />
+          <StepHeader index={stepIndex} text={stepTitle[step]} active />
           {stepContent[step]}
         </div>
       ))}
