@@ -9,6 +9,7 @@ interface PositionConfig {
   amountDCA?: string
   intervalDCA?: number
   maxGasPrice?: number
+  executeImmediately?: boolean
 }
 interface PositionConfigMutators {
   startIntro: boolean
@@ -39,6 +40,7 @@ export const usePositionConfigState = create<
     amountDCA: null,
     intervalDCA: null,
     maxGasPrice: null,
+    executeImmediately: true,
     startIntro: false,
     getStarted: () => set({ startIntro: true }),
     setTokenIn: (tokenIn: string) => set({ tokenIn }),
@@ -73,7 +75,7 @@ export const usePositionConfigState = create<
         ),
       }),
     setIntervalDCA: (intervalDCA: number) => set({ intervalDCA }),
-    setAmountDCA: (amountDCA: string) => set({ amountDCA }),
+    setAmountDCA: (amountDCA: string | null) => set({ amountDCA }),
   }),
   //   {
   //     name: `involica_positionConfig_${CHAIN_ID}`,
@@ -99,14 +101,17 @@ export const usePositionConfig = (): PositionConfig =>
     amountDCA: state.amountDCA,
     intervalDCA: state.intervalDCA,
     maxGasPrice: state.maxGasPrice,
+    executeImmediately: state.executeImmediately,
   }))
 
 export const useIntroActiveStep = () => {
+  // return IntroStep.Amount
+
   const startIntro = usePositionConfigState((state) => state.startIntro)
   const { tokenIn, outs, amountDCA, intervalDCA } = usePositionConfig()
   const userTreasury = useInvolicaStore((state) => state.userData?.userTreasury)
-  const tokenInApprovedAmount = useInvolicaStore(
-    (state) => state.userData?.userTokensData?.[tokenIn]?.balance,
+  const tokenInAllowance = useInvolicaStore(
+    (state) => state.userData?.userTokensData?.[tokenIn]?.allowance,
   )
 
   if (!startIntro) return IntroStep.NotStarted
@@ -117,11 +122,12 @@ export const useIntroActiveStep = () => {
 
   if (intervalDCA == null || intervalDCA <= 30 * 60) return IntroStep.Interval
 
-  if (amountDCA == null || amountDCA === '0') return IntroStep.Interval
+  if (amountDCA == null || amountDCA === '' || amountDCA === '0') return IntroStep.Amount
 
+  console.log({ tokenInAllowance })
   if (
-    tokenInApprovedAmount == null ||
-    bn(tokenInApprovedAmount).toNumber() === 0
+    tokenInAllowance == null ||
+    bn(tokenInAllowance).toNumber() === 0
   )
     return IntroStep.Approve
 

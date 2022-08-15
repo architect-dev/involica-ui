@@ -2,6 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import { SummitButton, Text } from 'uikit'
 import { AddFundsStep } from './AddFunds'
+import { AmountIn } from './AmountIn'
+import { ApproveIn } from './ApproveIn'
 import { IntroStep, usePositionConfigState } from './introStore'
 import { SelectInterval } from './SelectInterval'
 import { SelectOuts } from './SelectOuts'
@@ -39,8 +41,8 @@ const stepContent: Record<IntroStep, JSX.Element | null> = {
   [IntroStep.TokenIn]: <SelectTokenIn />,
   [IntroStep.Outs]: <SelectOuts />,
   [IntroStep.Interval]: <SelectInterval />,
-  [IntroStep.Amount]: null,
-  [IntroStep.Approve]: null,
+  [IntroStep.Amount]: <AmountIn />,
+  [IntroStep.Approve]: <ApproveIn />,
   [IntroStep.Treasury]: <AddFundsStep />,
   [IntroStep.Finalize]: null,
 }

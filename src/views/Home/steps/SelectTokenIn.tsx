@@ -1,4 +1,4 @@
-import React, {  } from 'react'
+import React, { useMemo } from 'react'
 import { StepContentWrapper } from './StepContentWrapper'
 import { Text } from 'uikit'
 import { IntroStep, useIntroActiveStep, usePositionConfigState } from './introStore'
@@ -9,6 +9,20 @@ export const SelectTokenIn: React.FC = () => {
   const expanded = introStep >= IntroStep.TokenIn
   const tokenIn = usePositionConfigState((state) => state.tokenIn)
   const setTokenIn = usePositionConfigState((state) => state.setTokenIn)
+  const outs = usePositionConfigState((state) => state.outs)
+  const disabledReasons = useMemo(
+    () => {
+      const reasons = {}
+      outs.forEach((out) => {
+        reasons[out.token] = 'Used as DCA out'
+      })
+      return reasons
+    },
+    [outs]
+  )
+  console.log({
+    disabledReasons
+  })
 
   return (
     <StepContentWrapper expanded={expanded}>
@@ -24,7 +38,8 @@ export const SelectTokenIn: React.FC = () => {
         token={tokenIn}
         setToken={setTokenIn}
         noTokenString='Select'
-        modalVariant='balance'
+        disabledTokens={disabledReasons}
+        modalVariant='tokenIn'
       />
     </StepContentWrapper>
   )

@@ -3,7 +3,6 @@ import { keys } from 'lodash'
 import { useInvolicaStore } from 'state/zustand'
 import {
   Column,
-  Flex,
   Row,
   RowBetween,
   SummitButton,
@@ -15,15 +14,15 @@ import { transparentize } from 'polished'
 import styled, { css } from 'styled-components'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { bnDisplay } from 'utils'
+import { getIsStable } from 'config/tokens'
 
-export type ModalVariant = 'price' | 'balance'
+export type ModalVariant = 'tokenIn' | 'tokenOut'
 
 const TokenRowButton = styled(RowBetween)<{ disabled }>`
-  width: calc(100% + 36px);
+  width: 100%;
   padding: 0 18px;
   height: 48px;
   min-height: 48px;
-  margin: 0 -18px;
   ${({ theme, disabled }) =>
     pressableMixin({
       theme,
@@ -47,11 +46,11 @@ const TokenSelectRow: React.FC<{
 }> = ({ token, userData, variant, disabledReason, setToken }) => {
   const balance = useMemo(() => {
     switch (variant) {
-      case 'price': {
+      case 'tokenOut': {
         const price = token.price?.toFixed(2)
         return price != null ? `$${price}` : '-'
       }
-      case 'balance':
+      case 'tokenIn':
       default:
         return bnDisplay(userData?.balance, token?.decimals, 3)
     }
@@ -59,14 +58,16 @@ const TokenSelectRow: React.FC<{
   return (
     <TokenRowButton
       disabled={disabledReason != null}
-      onClick={() => setToken(token.address)}
+      onClick={() => disabledReason != null ? null : setToken(token.address)}
     >
       <Row gap="6px">
         <TokenSymbolImage symbol={token.symbol} width={24} height={24} />
         <Column>
           <Text bold>{token.symbol}</Text>
           {disabledReason != null && (
-            <Text fontSize="11px" mt='-4px'>{disabledReason}</Text>
+            <Text fontSize="11px" mt="-4px">
+              {disabledReason}
+            </Text>
           )}
         </Column>
       </Row>
@@ -74,6 +75,25 @@ const TokenSelectRow: React.FC<{
     </TokenRowButton>
   )
 }
+
+const ModalWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 300px;
+  max-height: 600px;
+`
+
+const Scrollable = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
+  align-items: center;
+  justify-content: flex-start;
+  width: calc(100% + 36px);
+  margin: 0 -18px;
+`
 
 const HeaderRow = styled(RowBetween)`
   width: 100%;
@@ -88,7 +108,7 @@ const TokenSelectModal: React.FC<{
   setToken: (string) => void
 }> = ({
   disabledTokens,
-  variant = 'balance',
+  variant = 'tokenIn',
   setToken,
   onDismiss = () => null,
 }) => {
@@ -105,32 +125,47 @@ const TokenSelectModal: React.FC<{
     [setToken, onDismiss],
   )
 
+  const sortedTokens = useMemo(() => {
+    if (variant === 'tokenIn')
+      return keys(tokens).sort(
+        (a, b) =>
+          Number(
+            bnDisplay(userTokensData?.[b]?.balance, tokens[b].decimals, 3),
+          ) -
+          Number(
+            bnDisplay(userTokensData?.[a]?.balance, tokens[a].decimals, 3),
+          ),
+      )
+    if (variant === 'tokenOut')
+      return keys(tokens).sort(
+        (a, b) => (getIsStable(a) ? 1 : -1) - (getIsStable(b) ? 1 : -1),
+      )
+    return keys(tokens)
+  }, [variant, tokens, userTokensData])
+
   return (
-    <Flex
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      minWidth="300px"
-    >
+    <ModalWrapper>
       <Text bold>Select Token:</Text>
       <br />
       <HeaderRow>
         <Text>Token</Text>
-        <Text>{variant === 'price' ? 'Price' : 'Bal'}</Text>
+        <Text>{variant === 'tokenIn' ? 'Bal' : 'Price'}</Text>
       </HeaderRow>
-      {keys(tokens).map((addr) => (
-        <TokenSelectRow
-          key={addr}
-          token={tokens[addr]}
-          userData={userTokensData?.[addr]}
-          disabledReason={disabledTokens?.[addr]}
-          setToken={handleSelect}
-          variant={variant}
-        />
-      ))}
+      <Scrollable>
+        {sortedTokens.map((addr) => (
+          <TokenSelectRow
+            key={addr}
+            token={tokens[addr]}
+            userData={userTokensData?.[addr]}
+            disabledReason={disabledTokens?.[addr]}
+            setToken={handleSelect}
+            variant={variant}
+          />
+        ))}
+      </Scrollable>
       <br />
       <SummitButton onClick={onDismiss} activeText="Close" />
-    </Flex>
+    </ModalWrapper>
   )
 }
 

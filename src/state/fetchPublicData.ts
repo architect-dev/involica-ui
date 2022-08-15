@@ -1,5 +1,5 @@
 import FetcherABI from 'config/abi/InvolicaFetcher.json'
-import { getSymbol } from 'config/symbols'
+import { getSymbol } from 'config/tokens'
 import { ParseFieldConfig, ParseFieldType, getFetcherAddress, groupBy } from 'utils'
 import multicallAndParse from 'utils/multicall'
 import { AddressRecord, Token } from './types'

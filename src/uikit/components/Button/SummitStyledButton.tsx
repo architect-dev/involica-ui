@@ -16,6 +16,7 @@ const SummitStyledButton = styled(StyledButton)<{
   flex-direction: row;
   position: relative;
   height: ${({ height }) => height || 28}px;
+  min-height: ${({ height }) => height || 28}px;
   border-radius: 22px;
   border: 0px solid ${({ theme }) => theme.colors.text};
   

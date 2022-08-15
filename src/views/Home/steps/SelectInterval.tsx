@@ -5,7 +5,7 @@ import { IntroStep, useIntroActiveStep, usePositionConfigState } from './introSt
 import NumericInput from 'components/Input/NumericInput'
 
 const sToI = (s: string): number => {
-  return s == null || s === '' ? 0 : parseInt(s)
+  return s == null || s === '' || isNaN(parseInt(s)) ? 0 : parseInt(s)
 }
 const dhmToSec = (d: string, h: string, m: string): number => {
   return sToI(d) * 86400 + sToI(h) * 3600 + sToI(m) * 60
@@ -22,19 +22,19 @@ export const SelectInterval: React.FC = () => {
 
   const handleSetDays = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
-      setDays(`${sToI(e.currentTarget.value)}`)
+      setDays(e.currentTarget.value)
     },
     [setDays],
   )
   const handleSetHours = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
-      setHours(`${sToI(e.currentTarget.value)}`)
+      setHours(e.currentTarget.value)
     },
     [setHours],
   )
   const handleSetMinutes = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
-      setMinutes(`${sToI(e.currentTarget.value)}`)
+      setMinutes(e.currentTarget.value)
     },
     [setMinutes],
   )
@@ -62,9 +62,6 @@ export const SelectInterval: React.FC = () => {
           onChange={handleSetDays}
           endText="days"
           placeholder="0"
-          min="0"
-          step="1"
-          type="number"
         />
         <Text small>-</Text>
         <NumericInput
@@ -72,10 +69,6 @@ export const SelectInterval: React.FC = () => {
           onChange={handleSetHours}
           endText="hours"
           placeholder="0"
-          min="0"
-          max="23"
-          step="1"
-          type="number"
         />
         <Text small>-</Text>
         <NumericInput
@@ -83,10 +76,6 @@ export const SelectInterval: React.FC = () => {
           onChange={handleSetMinutes}
           endText="mins"
           placeholder="0"
-          min="0"
-          max="59"
-          step="1"
-          type="number"
         />
       </RowStart>
       <br />

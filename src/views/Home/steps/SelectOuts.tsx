@@ -17,7 +17,7 @@ const OutsRow = styled.div`
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: 12px;
-  max-width: 350px;
+  max-width: 450px;
 `
 
 const SelectedOutModal: React.FC<{ token: string, index: number, onDismiss?: () => void }> = ({ index, onDismiss }) => {
@@ -79,7 +79,6 @@ export const SelectOuts: React.FC = () => {
 
   const disabledReasons = useMemo(() => {
     const reasons: AddressRecord<string> = {}
-    return reasons
     reasons[tokenIn] = 'DCA input token'
     outs.forEach((out) => {
       reasons[out.token] = 'Already added'
@@ -111,13 +110,13 @@ export const SelectOuts: React.FC = () => {
             index={i}
           />
         ))}
-        {outs.length < 6 && (
+        {outs.length < 8 && (
           <TokenSelectButton
             token={null}
             setToken={handleAddOutToken}
             noTokenString="+ Add"
             disabledTokens={disabledReasons}
-            modalVariant="price"
+            modalVariant="tokenOut"
           />
         )}
       </OutsRow>

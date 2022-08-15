@@ -11,7 +11,7 @@ export const selectorWrapperMixin = ({
 }) => {
     return css`
         background-color: ${theme.colors.selectorBackground};
-        box-shadow: ${(disabled || isLocked) ? 'none' : `inset 1px 1px 2px ${theme.colors.textShadow}`};
+        box-shadow: ${(disabled || isLocked) ? 'none' : `inset 1px 1px 1px ${theme.colors.textShadow}`};
     `
 }
 

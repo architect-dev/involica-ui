@@ -1,13 +1,22 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { StepContentWrapper } from './StepContentWrapper'
-import { SummitButton, Text } from 'uikit'
+import { Column, SummitButton, Text } from 'uikit'
 import TokenInput from 'components/TokenInput'
 import { getNativeTokenSymbol } from 'config/constants'
 import { isNumber } from 'lodash'
 import { useInvolicaStore } from 'state/zustand'
 import { bn, bnDisplay } from 'utils'
 import { useDepositTreasury } from 'hooks/useExecute'
-import { IntroStep, useIntroActiveStep } from './introStore'
+import {
+  IntroStep,
+  useIntroActiveStep,
+  usePositionConfigState,
+} from './introStore'
+import { useGasPrice } from 'utils/gasPrice'
+import MaxGasPriceSelector from './MaxGasPriceSelector'
+
+const baseGasPrice = 450000
+const perSwapGasPrice = 195000
 
 export const AddFundsStep: React.FC = () => {
   const introStep = useIntroActiveStep()
@@ -17,7 +26,29 @@ export const AddFundsStep: React.FC = () => {
     (state) => state.userData?.userNativeTokenData,
   )
   const nativeToken = useInvolicaStore((state) => state.nativeToken)
+  const outs = usePositionConfigState((state) => state.outs)
   const { onDepositTreasury, pending } = useDepositTreasury()
+  const gas = useGasPrice()
+  console.log({
+    gas,
+  })
+  const txPrice = useMemo(() => {
+    if (gas == null) return null
+    return bnDisplay(
+      (baseGasPrice + outs.length * perSwapGasPrice) * parseFloat(gas),
+      9,
+      4,
+    )
+  }, [gas, outs.length])
+  const [maxGas, setMaxGas] = useState<'5' | '15' | '50'>('50')
+  const maxTxPrice = useMemo(() => {
+    if (maxGas == null) return null
+    return bnDisplay(
+      (baseGasPrice + outs.length * perSwapGasPrice) * parseFloat(maxGas),
+      9,
+      4,
+    )
+  }, [maxGas, outs.length])
 
   const [val, setVal] = useState<string>('10')
   const treasury = useMemo(
@@ -58,18 +89,6 @@ export const AddFundsStep: React.FC = () => {
     [nativeToken?.decimals, onDepositTreasury, val],
   )
 
-  const collapsedContent = useMemo(
-    () => (
-      <Text>
-        Funds:{' '}
-        <b>
-          {treasury} FTM (${treasuryUsd})
-        </b>
-      </Text>
-    ),
-    [treasury, treasuryUsd],
-  )
-
   return (
     <StepContentWrapper expanded={expanded}>
       <Text small>
@@ -101,7 +120,34 @@ export const AddFundsStep: React.FC = () => {
         loadingText="Adding"
       />
       <br />
-      {collapsedContent}
+      <Text>
+        Funds:{' '}
+        <b>
+          {treasury} FTM (${treasuryUsd})
+        </b>
+      </Text>
+      <Column alignItems='flex-start'>
+        <Text small italic>
+          Select max DCA gas price:
+          <br/>
+          (Will not execute DCA if gas price {'>'} max)
+        </Text>
+        <MaxGasPriceSelector maxGas={maxGas} setMaxGas={setMaxGas} />
+        <br/>
+
+        {txPrice != null && (
+          <Text small italic>
+            Estimated DCA gas price: {txPrice} FTM (@ {Number(gas).toFixed(1)}{' '}
+            gwei)
+          </Text>
+        )}
+        {maxTxPrice != null && (
+          <Text small italic>
+            Max DCA gas price: {maxTxPrice} FTM (@ {Number(maxGas).toFixed(1)}{' '}
+            gwei)
+          </Text>
+        )}
+      </Column>
     </StepContentWrapper>
   )
 }

@@ -5,7 +5,7 @@ import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 import styled from 'styled-components'
 import { Row, Text, TokenSymbolImage } from 'uikit'
-import { getSymbol } from 'config/symbols'
+import { getSymbol } from 'config/tokens'
 
 const SliderWrapper = styled.div`
   height: 60px;
@@ -128,8 +128,9 @@ export const WeightsSlider: React.FC = () => {
       <WeightsRow>
         <Bound/>
         {outs.length === 0 && <EmptySlider/>}
-        {outs.map((out) => (
-          <WeightIndicator weight={out.weight}>
+        {outs.map((out, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <WeightIndicator key={i} weight={out.weight}>
             <TokenSymbolImage symbol={getSymbol(out.token)} width={24} height={24}/>
             <Text>{out.weight}%</Text>
           </WeightIndicator>

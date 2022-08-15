@@ -6,6 +6,7 @@ import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 interface NumericInputProps {
   value: string
   onChange: (e: React.FormEvent<HTMLInputElement>) => void
+  onFocus?: () => void
   endText?: string
   disabled?: boolean
   invalid?: boolean
@@ -13,11 +14,11 @@ interface NumericInputProps {
   min?: string
   max?: string
   step?: string
-  type?: string
 }
 
 const NumericInput: React.FC<NumericInputProps> = ({
   onChange,
+  onFocus,
   value,
   endText,
   disabled = false,
@@ -33,6 +34,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
             disabled={disabled}
             value={value}
             onChange={onChange}
+            onFocus={onFocus}
             invalid={invalid}
             {...rest}
           />

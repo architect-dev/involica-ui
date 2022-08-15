@@ -28,7 +28,7 @@ const useContract = (ABI: any, address: string | undefined, withSignerIfPossible
 
 export const useERC20 = (address: string) => {
   const { library } = useActiveWeb3React()
-  return useMemo(() => getErc20Contract(address, library.getSigner()), [library, address])
+  return useMemo(() => address == null ? null : getErc20Contract(address, library.getSigner()), [library, address])
 }
 
 export const useInvolica = () => {

@@ -6,6 +6,7 @@ import { useInvolicaStore } from 'state/zustand'
 import { Contract, PayableOverrides } from '@ethersproject/contracts'
 import { callWithEstimateGas } from 'utils/estimateGas'
 import BigNumber from 'bignumber.js'
+import { ethers } from 'ethers'
 import { eN } from 'utils'
 import { Position } from 'state/types'
 
@@ -47,8 +48,22 @@ export const useApprove = (symbol: string, erc20Address: string) => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
 
+  const onInfApprove = useCallback(
+    () => {
+      handleExecute(
+        erc20Contract,
+        'approve',
+        [involica.address, ethers.constants.MaxUint256],
+        undefined,
+        `Approved ${symbol}`,
+        `${symbol} Approval Failed`
+      )
+    },
+    [erc20Contract, involica, handleExecute, symbol]
+  )
+
   const onApprove = useCallback(
-    (amount: BigNumber, decimals: number) => {
+    (amount: string, decimals: number) => {
       const amountRaw = eN(amount, decimals)
       handleExecute(
         erc20Contract,
@@ -62,7 +77,7 @@ export const useApprove = (symbol: string, erc20Address: string) => {
     [erc20Contract, involica, handleExecute, symbol]
   )
 
-  return { onApprove, pending }
+  return { onApprove, onInfApprove, pending }
 }
 
 export const useDepositTreasury = () => {
