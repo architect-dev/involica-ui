@@ -3,12 +3,13 @@ import { useInvolicaStore } from 'state/zustand'
 import { bn } from 'utils'
 import create from 'zustand'
 
+type MaxGasPriceOptions = '5' | '15' | '50'
 interface PositionConfig {
   tokenIn?: string
   outs: PositionOut[]
   amountDCA?: string
   intervalDCA?: number
-  maxGasPrice?: number
+  maxGasPrice?: MaxGasPriceOptions
   executeImmediately?: boolean
 }
 interface PositionConfigMutators {
@@ -21,6 +22,7 @@ interface PositionConfigMutators {
   updateOutMaxSlippage: (token: string, maxSlippage: number) => void
   setIntervalDCA: (intervalDCA: number) => void
   setAmountDCA: (amountDCA: string) => void
+  setMaxGasPrice: (maxGasPrice: MaxGasPriceOptions) => void
 }
 
 const weights = (n: number) => {
@@ -39,7 +41,7 @@ export const usePositionConfigState = create<
     outs: [],
     amountDCA: null,
     intervalDCA: null,
-    maxGasPrice: null,
+    maxGasPrice: '50',
     executeImmediately: true,
     startIntro: false,
     getStarted: () => set({ startIntro: true }),
@@ -76,6 +78,7 @@ export const usePositionConfigState = create<
       }),
     setIntervalDCA: (intervalDCA: number) => set({ intervalDCA }),
     setAmountDCA: (amountDCA: string | null) => set({ amountDCA }),
+    setMaxGasPrice: (maxGasPrice: MaxGasPriceOptions) => set({ maxGasPrice }),
   }),
   //   {
   //     name: `involica_positionConfig_${CHAIN_ID}`,
@@ -124,7 +127,6 @@ export const useIntroActiveStep = () => {
 
   if (amountDCA == null || amountDCA === '' || amountDCA === '0') return IntroStep.Amount
 
-  console.log({ tokenInAllowance })
   if (
     tokenInAllowance == null ||
     bn(tokenInAllowance).toNumber() === 0

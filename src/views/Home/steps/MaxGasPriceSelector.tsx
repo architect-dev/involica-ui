@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import SummitButton from 'uikit/components/Button/SummitButton'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
+import { usePositionConfigState } from './introStore'
 
 const buttonWidth = 100
 const buttonHeight = 28
@@ -44,27 +45,29 @@ const TextButton = styled.div<{ selected: boolean }>`
   ${pressableMixin}
 `
 
-const MaxGasPriceSelector: React.FC<{
-  maxGas: '5' | '15' | '50'
-  setMaxGas: (string) => void
-}> = ({ maxGas, setMaxGas }) => {
-  const selectedIndex = maxGas === '5' ? 0 : maxGas === '15' ? 1 : 2
+const MaxGasPriceSelector = () => {
+  const maxGasPrice = usePositionConfigState((state) => state.maxGasPrice)
+  const setMaxGasPrice = usePositionConfigState((state) => state.setMaxGasPrice)
+  const selectedIndex = maxGasPrice === '5' ? 0 : maxGasPrice === '15' ? 1 : 2
   return (
     <SelectorWrapper>
       <SelectedSummitButton selectedIndex={selectedIndex} padding="0px">
-        {maxGas} gwei
+        {maxGasPrice} gwei
       </SelectedSummitButton>
-      <TextButton onClick={() => setMaxGas('5')} selected={selectedIndex === 0}>
+      <TextButton
+        onClick={() => setMaxGasPrice('5')}
+        selected={selectedIndex === 0}
+      >
         5 gwei
       </TextButton>
       <TextButton
-        onClick={() => setMaxGas('15')}
+        onClick={() => setMaxGasPrice('15')}
         selected={selectedIndex === 1}
       >
         15 gwei
       </TextButton>
       <TextButton
-        onClick={() => setMaxGas('50')}
+        onClick={() => setMaxGasPrice('50')}
         selected={selectedIndex === 2}
       >
         50 gwei

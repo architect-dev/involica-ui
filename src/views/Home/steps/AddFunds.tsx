@@ -28,10 +28,9 @@ export const AddFundsStep: React.FC = () => {
   const nativeToken = useInvolicaStore((state) => state.nativeToken)
   const outs = usePositionConfigState((state) => state.outs)
   const { onDepositTreasury, pending } = useDepositTreasury()
+  const maxGasPrice = usePositionConfigState((state) => state.maxGasPrice)
   const gas = useGasPrice()
-  console.log({
-    gas,
-  })
+
   const txPrice = useMemo(() => {
     if (gas == null) return null
     return bnDisplay(
@@ -40,15 +39,15 @@ export const AddFundsStep: React.FC = () => {
       4,
     )
   }, [gas, outs.length])
-  const [maxGas, setMaxGas] = useState<'5' | '15' | '50'>('50')
+
   const maxTxPrice = useMemo(() => {
-    if (maxGas == null) return null
+    if (maxGasPrice == null) return null
     return bnDisplay(
-      (baseGasPrice + outs.length * perSwapGasPrice) * parseFloat(maxGas),
+      (baseGasPrice + outs.length * perSwapGasPrice) * parseFloat(maxGasPrice),
       9,
       4,
     )
-  }, [maxGas, outs.length])
+  }, [maxGasPrice, outs.length])
 
   const [val, setVal] = useState<string>('10')
   const treasury = useMemo(
@@ -132,7 +131,7 @@ export const AddFundsStep: React.FC = () => {
           <br/>
           (Will not execute DCA if gas price {'>'} max)
         </Text>
-        <MaxGasPriceSelector maxGas={maxGas} setMaxGas={setMaxGas} />
+        <MaxGasPriceSelector />
         <br/>
 
         {txPrice != null && (
@@ -143,7 +142,7 @@ export const AddFundsStep: React.FC = () => {
         )}
         {maxTxPrice != null && (
           <Text small italic>
-            Max DCA gas price: {maxTxPrice} FTM (@ {Number(maxGas).toFixed(1)}{' '}
+            Max DCA gas price: {maxTxPrice} FTM (@ {Number(maxGasPrice).toFixed(1)}{' '}
             gwei)
           </Text>
         )}
