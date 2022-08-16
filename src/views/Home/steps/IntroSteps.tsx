@@ -1,9 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
-import { SummitButton, Text } from 'uikit'
-import { AddFundsStep } from './AddFunds'
+import { RowBetween, SummitButton, Text } from 'uikit'
+import { AddFunds } from './AddFunds'
 import { AmountIn } from './AmountIn'
 import { ApproveIn } from './ApproveIn'
+import { ConfigPreview } from './ConfigPreview'
+import { Finalize } from './Finalize'
 import { IntroStep, usePositionConfigState } from './introStore'
 import { SelectInterval } from './SelectInterval'
 import { SelectOuts } from './SelectOuts'
@@ -11,6 +13,19 @@ import { SelectTokenIn } from './SelectTokenIn'
 
 const HoverableText = styled(Text)<{ active: boolean }>`
   text-decoration: ${({ active }) => active && 'underline'};
+`
+
+const IntroText = styled(Text)`
+  max-width: 500px;
+`
+
+const FixedDiv = styled.div`
+  position: sticky;
+  top: 45px;
+  margin-left: auto;
+  width: 100px;
+  z-index: 10;
+  margin-bottom: -28px;
 `
 
 const StepHeader: React.FC<{
@@ -43,8 +58,8 @@ const stepContent: Record<IntroStep, JSX.Element | null> = {
   [IntroStep.Interval]: <SelectInterval />,
   [IntroStep.Amount]: <AmountIn />,
   [IntroStep.Approve]: <ApproveIn />,
-  [IntroStep.Treasury]: <AddFundsStep />,
-  [IntroStep.Finalize]: null,
+  [IntroStep.Treasury]: <AddFunds />,
+  [IntroStep.Finalize]: <Finalize />,
 }
 
 export const IntroSteps: React.FC = () => {
@@ -54,33 +69,31 @@ export const IntroSteps: React.FC = () => {
       <Text>
         <b>What is Involica?</b>
       </Text>
-      <Text small italic>
+      <IntroText small italic>
         <br />
         <b>In short, the bear market is rough, Involica is the solution.</b>
-        <br/>
-        <br/>
-        Involica is dead simple insulation against market volitility.
-        <br />
-        You create a DCA Portfolio, one token in and multiple tokens out,
-        <br />
-        set how often, and how much to DCA each time.
         <br />
         <br />
-        Then for each DCA, Involica pulls the funds from your wallet,
+        Involica is dead simple insulation against market volitility. You create
+        a DCA Position, one input token and multiple out tokens, set how often,
+        and how much to DCA each time.
         <br />
-        performs the necessary swaps, and sends your new portfolio
         <br />
-        back in a single transaction. Your funds always remain in your
-        <br />
-        wallet, safe and secure.
+        Then for each DCA, Involica pulls the funds from your wallet, performs
+        the necessary swaps (0.1% swap fee), and sends your new portfolio back
+        in a single transaction. Your funds always remain in your wallet, safe
+        and secure.
         <br />
         <br />
         <b>In</b>sulate from the bear market <b>voli</b>tility with D<b>CA</b>
-      </Text>
+      </IntroText>
       <br />
       <br />
       <br />
-      <SummitButton onClick={getStarted} activeText="Get started with Involica" />
+      <SummitButton
+        onClick={getStarted}
+        activeText="I Understand, Get Started"
+      />
       <br />
       <br />
       <br />
@@ -93,10 +106,19 @@ export const IntroSteps: React.FC = () => {
         IntroStep.Treasury,
         IntroStep.Finalize,
       ].map((step, stepIndex) => (
-        <div key={step}>
-          <StepHeader index={stepIndex} text={stepTitle[step]} active />
-          {stepContent[step]}
-        </div>
+        <>
+          {step === IntroStep.Outs && (
+            <FixedDiv>
+              <ConfigPreview />
+            </FixedDiv>
+          )}
+          <div key={step}>
+            <RowBetween>
+              <StepHeader index={stepIndex} text={stepTitle[step]} active />
+            </RowBetween>
+            {stepContent[step]}
+          </div>
+        </>
       ))}
     </>
   )

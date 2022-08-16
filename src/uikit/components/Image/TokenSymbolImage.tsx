@@ -31,11 +31,12 @@ interface Props {
   symbol: string
   width: number
   height: number
+  className?: string
 }
 
-const SymbolImage: React.FC<Props> = ({ symbol, width, height }) => {
+const SymbolImage: React.FC<Props> = ({ symbol, width, height, className }) => {
   return (
-    <LpSymbolWrapper width={width} height={height}>
+    <LpSymbolWrapper width={width} height={height} className={className}>
       <SingleSymbolIcon symbol={symbol} width={width} height={height} />
     </LpSymbolWrapper>
   )

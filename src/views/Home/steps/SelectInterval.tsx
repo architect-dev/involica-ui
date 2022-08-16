@@ -1,25 +1,40 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { StepContentWrapper } from './StepContentWrapper'
 import { Text, RowStart } from 'uikit'
-import { IntroStep, useIntroActiveStep, usePositionConfigState } from './introStore'
+import {
+  IntroStep,
+  useIntroActiveStep,
+  usePositionConfigState,
+} from './introStore'
 import NumericInput from 'components/Input/NumericInput'
-
-const sToI = (s: string): number => {
-  return s == null || s === '' || isNaN(parseInt(s)) ? 0 : parseInt(s)
-}
-const dhmToSec = (d: string, h: string, m: string): number => {
-  return sToI(d) * 86400 + sToI(h) * 3600 + sToI(m) * 60
-}
 
 export const SelectInterval: React.FC = () => {
   const introStep = useIntroActiveStep()
   const expanded = introStep >= IntroStep.Interval
-  const intervalDCA = usePositionConfigState((state) => state.intervalDCA)
-  const setIntervalDCA = usePositionConfigState((state) => state.setIntervalDCA)
-  const [days, setDays] = useState<string>('')
-  const [hours, setHours] = useState<string>('')
-  const [minutes, setMinutes] = useState<string>('')
+  const {
+    intervalDCA,
+    weeks,
+    setWeeks,
+    days,
+    setDays,
+    hours,
+    setHours,
+  } = usePositionConfigState((state) => ({
+    intervalDCA: state.intervalDCA,
+    weeks: state.weeks,
+    setWeeks: state.setWeeks,
+    days: state.days,
+    setDays: state.setDays,
+    hours: state.hours,
+    setHours: state.setHours,
+  }))
 
+  const handleSetWeeks = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setWeeks(e.currentTarget.value)
+    },
+    [setWeeks],
+  )
   const handleSetDays = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
       setDays(e.currentTarget.value)
@@ -32,19 +47,23 @@ export const SelectInterval: React.FC = () => {
     },
     [setHours],
   )
-  const handleSetMinutes = useCallback(
-    (e: React.FormEvent<HTMLInputElement>) => {
-      setMinutes(e.currentTarget.value)
-    },
-    [setMinutes],
-  )
 
-  useEffect(() => setIntervalDCA(dhmToSec(days, hours, minutes)), [
-    setIntervalDCA,
-    days,
-    hours,
-    minutes,
-  ])
+  const intervalString = useMemo(() => {
+    if (intervalDCA == null) return '-'
+    if (intervalDCA === 3600 * 24 * 28) return 'month'
+    if (intervalDCA === 3600 * 24 * 14) return 'other week'
+    if (intervalDCA === 3600 * 24 * 7) return 'week'
+    if (intervalDCA === 3600 * 24 * 2) return 'other day'
+    if (intervalDCA === 3600 * 24) return 'day'
+    if (intervalDCA === 3600 * 2) return 'other hour'
+    if (intervalDCA === 3600) return 'hour'
+    if (intervalDCA % (3600 * 24 * 7) === 0)
+      return `${intervalDCA / (3600 * 24 * 7)} weeks`
+    if (intervalDCA % (3600 * 24) === 0)
+      return `${intervalDCA / (3600 * 24)} days`
+    if (intervalDCA % 3600 === 0) return `${intervalDCA / 3600} hours`
+    return '-'
+  }, [intervalDCA])
 
   return (
     <StepContentWrapper expanded={expanded}>
@@ -58,6 +77,13 @@ export const SelectInterval: React.FC = () => {
       </Text>
       <RowStart gap="12px">
         <NumericInput
+          value={weeks}
+          onChange={handleSetWeeks}
+          endText="weeks"
+          placeholder="0"
+        />
+        <Text small>-</Text>
+        <NumericInput
           value={days}
           onChange={handleSetDays}
           endText="days"
@@ -70,17 +96,11 @@ export const SelectInterval: React.FC = () => {
           endText="hours"
           placeholder="0"
         />
-        <Text small>-</Text>
-        <NumericInput
-          value={minutes}
-          onChange={handleSetMinutes}
-          endText="mins"
-          placeholder="0"
-        />
       </RowStart>
-      <br />
-      <br />
-      <Text>Interval (seconds): {intervalDCA === 0 ? '-' : intervalDCA}</Text>
+      <Text italic>
+        Interval:{' '}
+        {intervalDCA === 0 ? '-' : `DCA executes every ${intervalString}`}
+      </Text>
     </StepContentWrapper>
   )
 }

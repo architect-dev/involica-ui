@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { HighlightedText, Text } from 'uikit'
+import { HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
 import { IntroSteps } from './steps/IntroSteps'
 
@@ -14,9 +14,12 @@ const Hero = styled.div`
   text-align: center;
 `
 
-const StyledHighlightedText = styled(HighlightedText)<{ fontSize: string; letterSpacing: string }>`
+const StyledHighlightedText = styled(HighlightedText)<{
+  fontSize: string
+  letterSpacing: string
+}>`
   letter-spacing: ${({ letterSpacing }) => letterSpacing};
-  font-weight: 900;
+  font-weight: 200;
   font-size: ${({ fontSize }) => fontSize};
   text-shadow: none;
 `
@@ -25,12 +28,16 @@ const Home: React.FC = () => {
   return (
     <Page>
       <Hero>
-        <StyledHighlightedText fontSize="32px" letterSpacing="16px">
+        <StyledHighlightedText
+          className="sticky"
+          fontSize="34px"
+          letterSpacing="16px"
+        >
           INVOLICA
         </StyledHighlightedText>
       </Hero>
 
-      <IntroSteps/>
+      <IntroSteps />
     </Page>
   )
 }

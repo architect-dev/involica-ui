@@ -15,6 +15,8 @@ interface TokenInputProps extends InputProps {
   disabled?: boolean
   isLocked?: boolean
   invalid?: boolean
+  presetValue?: string
+  onSelectPreset?: () => void
 }
 
 const TokenInput: React.FC<TokenInputProps> = ({
@@ -29,6 +31,8 @@ const TokenInput: React.FC<TokenInputProps> = ({
   disabled = false,
   isLocked = false,
   invalid = false,
+  presetValue,
+  onSelectPreset,
 }) => {
   const feeToTake = useMemo(
     () =>
@@ -39,7 +43,9 @@ const TokenInput: React.FC<TokenInputProps> = ({
   return (
     <StyledTokenInput>
       <StyledMaxText bold monospace>
-        {balanceText}: {max == null ? <Dots/> : parseFloat(max.toLocaleString()).toFixed(3)} {symbol}
+        {balanceText}:{' '}
+        {max == null ? <Dots /> : parseFloat(max.toLocaleString()).toFixed(3)}{' '}
+        {symbol}
       </StyledMaxText>
       <TextInput
         disabled={disabled}
@@ -48,6 +54,17 @@ const TokenInput: React.FC<TokenInputProps> = ({
         endAdornment={
           <StyledTokenAdornmentWrapper>
             <StyledSpacer />
+            {presetValue != null && (
+              <div>
+                <SummitButton
+                  activeText={presetValue}
+                  disabled={disabled || isLocked}
+                  padding="12px"
+                  mr='6px'
+                  onClick={onSelectPreset}
+                />
+              </div>
+            )}
             <div>
               <SummitButton
                 activeText="Max"
@@ -89,7 +106,8 @@ const StyledTokenAdornmentWrapper = styled.div`
 
 const StyledMaxText = styled(Text)<{ red?: boolean }>`
   align-items: center;
-  color: ${({ theme, red }) => (red ? theme.colors.failure : theme.colors.text)};
+  color: ${({ theme, red }) =>
+    red ? theme.colors.failure : theme.colors.text};
   display: flex;
   font-style: italic;
   margin-right: 16px;

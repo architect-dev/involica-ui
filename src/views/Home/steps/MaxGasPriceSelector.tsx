@@ -14,21 +14,21 @@ const SelectorWrapper = styled(SelectorWrapperBase)`
   height: ${buttonHeight}px;
   width: ${buttonWidth * 3};
   border-radius: 22px;
-  background-color: ${({ theme }) => theme.colors.background};
   position: relative;
 `
 
 const SelectedSummitButton = styled(SummitButton)<{ selectedIndex: number }>`
   pointer-events: none;
   position: absolute;
-  top: 3px;
-  height: ${buttonHeight - 6}px;
-  max-height: ${buttonHeight - 6}px;
-  min-height: ${buttonHeight - 6}px;
-  width: ${buttonWidth - 6}px;
-  left: ${({ selectedIndex }) => selectedIndex * buttonWidth + 3}px;
+  top: 0px;
+  height: ${buttonHeight - 0}px;
+  max-height: ${buttonHeight - 0}px;
+  min-height: ${buttonHeight - 0}px;
+  width: ${buttonWidth - 0}px;
+  left: ${({ selectedIndex }) => selectedIndex * buttonWidth + 0}px;
   z-index: 3;
   font-size: 14px;
+  cursor: default;
 `
 
 const TextButton = styled.div<{ selected: boolean }>`
@@ -41,8 +41,10 @@ const TextButton = styled.div<{ selected: boolean }>`
   height: ${buttonHeight}px;
   line-height: ${buttonHeight}px;
   text-align: center;
-
-  ${pressableMixin}
+  
+  ${pressableMixin};
+  
+  cursor: ${({ selected }) => selected ? 'default' : 'pointer'};
 `
 
 const MaxGasPriceSelector = () => {

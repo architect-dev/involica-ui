@@ -13,12 +13,12 @@ const GlobalStyle = createGlobalStyle`
     font-family: monospace;
   }
   html {
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
   }
   body {
     background-color: ${({ theme }) => theme.colors.background};
     position: relative;
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
 
     ::-webkit-scrollbar { /* Chrome */
         display: none;

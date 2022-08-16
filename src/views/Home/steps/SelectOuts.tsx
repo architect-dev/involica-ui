@@ -9,6 +9,7 @@ import 'rc-slider/assets/index.css'
 import styled from 'styled-components'
 import { WeightsSlider } from './WeightsSlider'
 import { SummitPopUp } from 'uikit/widgets/Popup'
+import { PortfolioPresets } from './PortfolioPresets'
 
 const OutsRow = styled.div`
   display: flex;
@@ -20,6 +21,7 @@ const OutsRow = styled.div`
   max-width: 450px;
 `
 
+// TODO: Add max slippage setting
 const SelectedOutModal: React.FC<{ token: string, index: number, onDismiss?: () => void }> = ({ index, onDismiss }) => {
   const removeOut = usePositionConfigState((state) => state.removeOut)
   const handleRemove = useCallback(
@@ -39,6 +41,7 @@ const SelectedOutModal: React.FC<{ token: string, index: number, onDismiss?: () 
       <Text bold>Manage Token:</Text>
       <br />
       <SummitButton onClick={handleRemove} activeText="Remove" />
+      <br />
       <SummitButton onClick={onDismiss} activeText="Close" />
     </Flex>
   )
@@ -56,7 +59,6 @@ const SelectedOutButton: React.FC<{ token: string, index: number }>= ({ token, i
         button={
           <TokenButton
             token={token}
-            onClick={console.log}
             noTokenString="Missing"
           />
         }
@@ -95,14 +97,21 @@ export const SelectOuts: React.FC = () => {
 
   return (
     <StepContentWrapper expanded={expanded}>
-      <Text small>
+      <Text small mb='-12px'>
         Build a portfolio by adding tokens to swap into each DCA.
         <br />
         <br />
-        <i>Add portfolio tokens:</i>
+        <i>Select a portfolio preset:</i>
+      </Text>
+      <PortfolioPresets/>
+      <Text mb='-12px'>
+        <i>- OR -</i>
+        <br/>
+        <br/>
+        <i>Build your own portfolio:</i>
       </Text>
       <OutsRow>
-        {outs.map(({ token, weight, maxSlippage }, i) => (
+        {outs.map(({ token }, i) => (
           <SelectedOutButton
             // eslint-disable-next-line react/no-array-index-key
             key={i}

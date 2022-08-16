@@ -20,9 +20,6 @@ export const SelectTokenIn: React.FC = () => {
     },
     [outs]
   )
-  console.log({
-    disabledReasons
-  })
 
   return (
     <StepContentWrapper expanded={expanded}>

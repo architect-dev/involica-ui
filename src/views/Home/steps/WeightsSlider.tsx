@@ -67,8 +67,9 @@ const StyledSlider = styled(Slider)`
   .rc-slider-handle {
     width: 4px;
     height: 24px;
+    border: none;
     border-radius: 0;
-    border-color: ${({ theme }) => theme.colors.text};
+    background-color: ${({ theme }) => theme.colors.text};
     margin-top: -10px;
     opacity: 1;
     position: absolute;
@@ -118,10 +119,6 @@ export const WeightsSlider: React.FC = () => {
     },
     [updateWeights],
   )
-
-  console.log({
-    outs,
-  })
 
   return (
     <SliderWrapper>

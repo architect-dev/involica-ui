@@ -24,7 +24,6 @@ const StyledPanel = styled.div<{ isPushed: boolean }>`
   height: 100vh;
   transition: width 0.2s;
   z-index: 11;
-  overflow: ${({ isPushed }) => (isPushed ? 'initial' : 'hidden')};
   transform: translate3d(0, 0, 0);
 
   ${({ theme }) => theme.mediaQueries.nav} {

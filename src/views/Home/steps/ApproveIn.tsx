@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { StepContentWrapper } from './StepContentWrapper'
 import { Column, RowStart, SummitButton, Text } from 'uikit'
 import { useInvolicaStore } from 'state/zustand'
@@ -26,16 +26,16 @@ export const ApproveIn: React.FC = () => {
     tokenInAdd,
   )
 
-  console.log({
-    tokenInUserData,
-  })
-
   const allowance = useMemo(
     () => bnDisplay(tokenInUserData?.allowance, tokenIn?.decimals),
     [tokenIn?.decimals, tokenInUserData?.allowance],
   )
 
-  const [dcasCount, setDcasCount] = useState('')
+  const { dcasCount, setDcasCount } = usePositionConfigState((state) => ({
+    dcasCount: state.dcasCount,
+    setDcasCount: state.setDcasCount,
+  }))
+  
   const handleSetDcasCount = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
       setDcasCount(e.currentTarget.value)
@@ -44,19 +44,18 @@ export const ApproveIn: React.FC = () => {
   )
   const handleSetInf = useCallback(() => setDcasCount(`Inf`), [setDcasCount])
 
-  const approvalAmount = useMemo(
-    () =>
-      dcasCount === 'Inf'
-        ? 'Inf'
-        : bnDisplay(
-            bn(amountDCA)
-              .times(dcasCount === '' ? '0' : parseInt(dcasCount))
-              .minus(tokenInUserData?.allowance ?? 0),
-            tokenIn?.decimals,
-            3,
-          ),
-    [amountDCA, dcasCount, tokenIn?.decimals, tokenInUserData?.allowance],
-  )
+  const approvalAmount = useMemo(() => {
+    if (dcasCount === 'Inf') return 'Inf'
+    if (dcasCount === '' || dcasCount === '' || isNaN(parseInt(dcasCount)))
+      return '-'
+    return bnDisplay(
+      bn(amountDCA)
+        .times(dcasCount === '' ? '0' : parseInt(dcasCount))
+        .minus(tokenInUserData?.allowance ?? 0),
+      tokenIn?.decimals,
+      3,
+    )
+  }, [amountDCA, dcasCount, tokenIn?.decimals, tokenInUserData?.allowance])
 
   const alreadyApproved = useMemo(
     () =>
@@ -68,7 +67,7 @@ export const ApproveIn: React.FC = () => {
 
   const handleApprove = useCallback(() => {
     if (dcasCount === 'Inf') onInfApprove()
-    onApprove(bn(amountDCA).times(dcasCount).toString(), 0)
+    else onApprove(bn(amountDCA).times(dcasCount).toString(), 0)
   }, [amountDCA, dcasCount, onApprove, onInfApprove])
 
   const clearIfInf = useCallback(() => {
@@ -112,11 +111,13 @@ export const ApproveIn: React.FC = () => {
       <br />
       <Column>
         <Text>
-          Amount to approve: {alreadyApproved ? 0 : approvalAmount} {tokenIn?.symbol}
+          Amount to approve: {alreadyApproved ? 0 : approvalAmount}{' '}
+          {tokenIn?.symbol}
         </Text>
         {bn(tokenInUserData?.allowance).toNumber() > 0 && (
           <Text small italic>
-            Current allowance: ({allowance} {tokenIn?.symbol}){!alreadyApproved && ' subtracted'}
+            Current allowance: ({allowance} {tokenIn?.symbol})
+            {!alreadyApproved && ' subtracted'}
           </Text>
         )}
       </Column>
@@ -125,11 +126,15 @@ export const ApproveIn: React.FC = () => {
           alreadyApproved ||
           dcasCount === '0' ||
           dcasCount === '' ||
-          approvalAmount === 'NaN'
+          approvalAmount === '-'
         }
         isLoading={pending}
         onClick={handleApprove}
-        activeText={alreadyApproved ? 'Already Approved' : 'Approve'}
+        activeText={
+          alreadyApproved && dcasCount != null && parseInt(dcasCount) > 0
+            ? 'Already Approved'
+            : `${dcasCount === 'Inf' ? 'Inf ' : ''}Approve`
+        }
         loadingText="Approving"
       />
     </StepContentWrapper>

@@ -52,9 +52,6 @@ const fetchUserData = async (account): Promise<UserData> => {
   ]
 
   const [userData] = await multicallAndParse(FetcherABI, calls, userDataFields)
-  console.log({
-    userData
-  })
 
   return {
     ...userData,

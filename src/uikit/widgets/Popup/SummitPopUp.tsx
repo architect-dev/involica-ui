@@ -11,11 +11,13 @@ interface Props {
   open?: boolean
 	modal?: boolean
   callOnDismiss?: () => void
+  className?: string
 }
 
 const StyledPopup = styled(Popup)`
   &-content {
-    top: 55px !important;
+    top: 95px !important;
+    margin: 0 auto auto auto !important;
   }
 `
 
@@ -37,6 +39,7 @@ const SummitPopUp: React.FC<Props> = ({
   open,
   callOnDismiss,
 	modal,
+  className,
 }) => {
   const ref = useRef()
   const onDismiss = useCallback(() => {
@@ -63,6 +66,7 @@ const SummitPopUp: React.FC<Props> = ({
       open={open}
       arrow={false}
       onClose={onDismiss}
+      className={className}
     >
       <PopUpCard contentPadding={contentPadding}>
         {React.cloneElement(popUpContent, {

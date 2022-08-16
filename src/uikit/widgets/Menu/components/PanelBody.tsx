@@ -13,7 +13,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
 

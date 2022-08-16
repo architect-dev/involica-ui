@@ -3,7 +3,7 @@ import { useInvolicaStore } from 'state/zustand'
 import { SummitButton, RowBetween, TokenSymbolImage } from 'uikit'
 
 export const TokenButton: React.FC<{
-  onClick: () => void
+  onClick?: () => void
   token: string | null
   noTokenString: string
 }> = ({ onClick, token, noTokenString }) => {
@@ -17,8 +17,8 @@ export const TokenButton: React.FC<{
     >
       {tokenData != null ? (
         <RowBetween>
-          <TokenSymbolImage symbol={tokenData.symbol} width={24} height={24} />
-          {tokenData.symbol}
+          <TokenSymbolImage symbol={tokenData?.symbol} width={24} height={24} />
+          {tokenData?.symbol}
         </RowBetween>
       ) : (
         noTokenString

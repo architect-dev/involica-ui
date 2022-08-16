@@ -52,7 +52,7 @@ const AccountDot = styled.div<{ connected: boolean }>`
       left: 2px;
       bottom: 2px;
       border-radius: 50px;
-      background-color: ${theme.colors.background};
+      background-color: ${theme.colors.selectorBackground};
     }
   `}
 `
