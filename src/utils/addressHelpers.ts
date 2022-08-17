@@ -1,4 +1,4 @@
-import addresses from 'config/constants/contracts'
+import addresses from 'config/constants/contracts.json'
 import { CHAIN_ID } from '../config/constants/networks'
 
 export const getInvolicaAddress = () => {

@@ -19,7 +19,7 @@ const tokensFields: Record<string, ParseFieldConfig> = {
 const fetchPublicData = async (): Promise<{
   tokens: AddressRecord<Token>,
   nativeToken: Token,
-}> => {
+} | null> => {
   const fetcher = getFetcherAddress()
   const calls = [
     {
@@ -28,7 +28,10 @@ const fetchPublicData = async (): Promise<{
     },
   ]
 
-  const { tokens } = (await multicallAndParse(FetcherABI, calls, tokensFields))[0]
+  const res = await multicallAndParse(FetcherABI, calls, tokensFields)
+  if (res == null) return null
+
+  const { tokens } = res[0]
   const popTokens = tokens.map((token: Token) => ({ ...token, symbol: getSymbol(token.address), price: token.price / 1e6 }))
   const nonNatives = popTokens.slice(0, -1)
   const nativeToken = popTokens[popTokens.length - 1]

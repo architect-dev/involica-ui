@@ -8,7 +8,6 @@ import { callWithEstimateGas } from 'utils/estimateGas'
 import BigNumber from 'bignumber.js'
 import { ethers } from 'ethers'
 import { eN } from 'utils'
-import { Position } from 'state/types'
 
 const useExecuteTx = () => {
   const fetchUserData = useInvolicaStore((state) => state.fetchUserData)
@@ -18,15 +17,18 @@ const useExecuteTx = () => {
   const { account } = useWeb3React()
 
   const handleExecute = useCallback(
-    async (contract: Contract, method: string, args: any[], overrides: PayableOverrides | undefined, successMsg: string, errorMsg: string, callback?: (...cbArgs: any[]) => void) => {
+    async (
+      contract: Contract,
+      method: string,
+      args: any[],
+      overrides: PayableOverrides | undefined,
+      successMsg: string,
+      errorMsg: string,
+      callback?: (...cbArgs: any[]) => void,
+    ) => {
       try {
         setPending(true)
-        await callWithEstimateGas(
-          contract,
-          method,
-          args,
-          overrides,
-        )
+        await callWithEstimateGas(contract, method, args, overrides)
         toastSuccess(successMsg)
       } catch (error) {
         toastError(errorMsg, (error as Error).message)
@@ -48,19 +50,16 @@ export const useApprove = (symbol: string, erc20Address: string) => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
 
-  const onInfApprove = useCallback(
-    () => {
-      handleExecute(
-        erc20Contract,
-        'approve',
-        [involica.address, ethers.constants.MaxUint256],
-        undefined,
-        `Approved ${symbol}`,
-        `${symbol} Approval Failed`
-      )
-    },
-    [erc20Contract, involica, handleExecute, symbol]
-  )
+  const onInfApprove = useCallback(() => {
+    handleExecute(
+      erc20Contract,
+      'approve',
+      [involica.address, ethers.constants.MaxUint256],
+      undefined,
+      `Approved ${symbol}`,
+      `${symbol} Approval Failed`,
+    )
+  }, [erc20Contract, involica, handleExecute, symbol])
 
   const onApprove = useCallback(
     (amount: string, decimals: number) => {
@@ -71,10 +70,10 @@ export const useApprove = (symbol: string, erc20Address: string) => {
         [involica.address, amountRaw],
         undefined,
         `Approved ${symbol}`,
-        `${symbol} Approval Failed`
+        `${symbol} Approval Failed`,
       )
     },
-    [erc20Contract, involica, handleExecute, symbol]
+    [erc20Contract, involica, handleExecute, symbol],
   )
 
   return { onApprove, onInfApprove, pending }
@@ -93,10 +92,10 @@ export const useDepositTreasury = () => {
         [],
         { value: amountRaw },
         `Funds Added`,
-        'Error Adding Funds'
+        'Error Adding Funds',
       )
     },
-    [handleExecute, involica]
+    [handleExecute, involica],
   )
 
   return { onDepositTreasury, pending }
@@ -115,10 +114,10 @@ export const useWithdrawTreasury = () => {
         [amountRaw],
         undefined,
         `Withdrew Funds`,
-        'Error Withdrawing Funds'
+        'Error Withdrawing Funds',
       )
     },
-    [handleExecute, involica]
+    [handleExecute, involica],
   )
 
   return { onWithdrawTreasury, pending }
@@ -129,21 +128,17 @@ export const useSetPosition = () => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onSetPosition = useCallback(
-    (position: Position) => {
-      const positionRaw = {
-        ...position,
-        amountDCA: position.amountDCA.toString(),
-      }
+    (config: any[], isNewPosition: boolean) => {
       handleExecute(
         involica,
         'setPosition',
-        [positionRaw],
+        config,
         undefined,
-        `Position Set`,
-        'Error Setting Position'
+        isNewPosition ? 'Position Created' : 'Position Updated',
+        isNewPosition ? 'Error Creating Position' : 'Error Updating Position',
       )
     },
-    [handleExecute, involica]
+    [handleExecute, involica],
   )
 
   return { onSetPosition, pending }
@@ -153,19 +148,16 @@ export const useReInitPosition = () => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
 
-  const onReInitPosition = useCallback(
-    () => {
-      handleExecute(
-        involica,
-        'reInitPosition',
-        [],
-        undefined,
-        `Position Re-Initialized`,
-        'Error Re-Initializing Position'
-      )
-    },
-    [handleExecute, involica]
-  )
+  const onReInitPosition = useCallback(() => {
+    handleExecute(
+      involica,
+      'reInitPosition',
+      [],
+      undefined,
+      `Position Re-Initialized`,
+      'Error Re-Initializing Position',
+    )
+  }, [handleExecute, involica])
 
   return { onReInitPosition, pending }
 }
@@ -174,19 +166,16 @@ export const useExitPosition = () => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
 
-  const onExitPosition = useCallback(
-    () => {
-      handleExecute(
-        involica,
-        'exitPosition',
-        [],
-        undefined,
-        `Position Exited`,
-        'Error Exiting Position'
-      )
-    },
-    [handleExecute, involica]
-  )
+  const onExitPosition = useCallback(() => {
+    handleExecute(
+      involica,
+      'exitPosition',
+      [],
+      undefined,
+      `Position Exited`,
+      'Error Exiting Position',
+    )
+  }, [handleExecute, involica])
 
   return { onExitPosition, pending }
 }
@@ -200,7 +189,7 @@ export const useExitPosition = () => {
 //   const onManualExecuteDCA = useCallback(
 //     (position: Position) => {
 //       const swapsAmountOutMin = position.outs.map((out) => {
-//         return 
+//         return
 //       })
 //       handleExecute(
 //         involica,

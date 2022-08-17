@@ -1,4 +1,3 @@
-import { CHAIN_ID } from 'utils'
 import create from 'zustand'
 import fetchPublicData from './fetchPublicData'
 import fetchUserData from './fetchUserData'
@@ -17,14 +16,18 @@ export const useInvolicaStore = create<State>()(
     userData: null,
     userDataLoaded: false,
     fetchUserData: async (account) => {
-      set({ userData: await fetchUserData(account), userDataLoaded: true })
+      const userData = await fetchUserData(account)
+      if (userData == null) return
+      set({ userData, userDataLoaded: true })
     },
     
     tokens: null,
     nativeToken: null,
     publicDataLoaded: false,
     fetchPublicData: async () => {
-      set({ ...(await fetchPublicData()), publicDataLoaded: true })
+      const publicData = await fetchPublicData()
+      if (publicData == null) return
+      set({ ...publicData, publicDataLoaded: true })
     },
   })
   // ), {

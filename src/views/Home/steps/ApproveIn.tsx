@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { StepContentWrapper } from './StepContentWrapper'
 import { Column, RowStart, SummitButton, Text } from 'uikit'
 import { useInvolicaStore } from 'state/zustand'
-import { bn, bnDisplay } from 'utils'
+import { bn, bnDisplay, eN } from 'utils'
 import {
   IntroStep,
   useIntroActiveStep,
@@ -35,7 +35,7 @@ export const ApproveIn: React.FC = () => {
     dcasCount: state.dcasCount,
     setDcasCount: state.setDcasCount,
   }))
-  
+
   const handleSetDcasCount = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
       setDcasCount(e.currentTarget.value)
@@ -49,7 +49,7 @@ export const ApproveIn: React.FC = () => {
     if (dcasCount === '' || dcasCount === '' || isNaN(parseInt(dcasCount)))
       return '-'
     return bnDisplay(
-      bn(amountDCA)
+      bn(eN(amountDCA, tokenIn?.decimals))
         .times(dcasCount === '' ? '0' : parseInt(dcasCount))
         .minus(tokenInUserData?.allowance ?? 0),
       tokenIn?.decimals,
@@ -67,8 +67,8 @@ export const ApproveIn: React.FC = () => {
 
   const handleApprove = useCallback(() => {
     if (dcasCount === 'Inf') onInfApprove()
-    else onApprove(bn(amountDCA).times(dcasCount).toString(), 0)
-  }, [amountDCA, dcasCount, onApprove, onInfApprove])
+    else onApprove(bn(amountDCA).times(dcasCount).toString(), tokenIn?.decimals)
+  }, [amountDCA, dcasCount, onApprove, onInfApprove, tokenIn?.decimals])
 
   const clearIfInf = useCallback(() => {
     if (dcasCount === 'Inf') setDcasCount('')
@@ -132,7 +132,7 @@ export const ApproveIn: React.FC = () => {
         onClick={handleApprove}
         activeText={
           alreadyApproved && dcasCount != null && parseInt(dcasCount) > 0
-            ? 'Already Approved'
+            ? 'Approved'
             : `${dcasCount === 'Inf' ? 'Inf ' : ''}Approve`
         }
         loadingText="Approving"

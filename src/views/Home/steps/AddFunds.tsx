@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo } from 'react'
 import { StepContentWrapper } from './StepContentWrapper'
-import { Column, Text } from 'uikit'
+import { Column, SummitButton, Text } from 'uikit'
 import TokenInput from 'components/TokenInput'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useInvolicaStore } from 'state/zustand'
-import { bnDisplay } from 'utils'
+import { bn, bnDisplay } from 'utils'
 import {
   IntroStep,
   useIntroActiveStep,
@@ -12,6 +12,7 @@ import {
 } from './introStore'
 import { useGasPrice } from 'utils/gasPrice'
 import MaxGasPriceSelector from './MaxGasPriceSelector'
+import { useDepositTreasury } from 'hooks/useExecute'
 
 const baseGasPrice = 450000
 const perSwapGasPrice = 195000
@@ -19,6 +20,7 @@ const perSwapGasPrice = 195000
 export const AddFunds: React.FC = () => {
   const introStep = useIntroActiveStep()
   const expanded = introStep >= IntroStep.Treasury
+  const userTreasury = useInvolicaStore((state) => state.userData?.userTreasury)
   const nativeToken = useInvolicaStore((state) => state.nativeToken)
   const userNativeToken = useInvolicaStore(
     (state) => state.userData?.userNativeTokenData,
@@ -27,6 +29,7 @@ export const AddFunds: React.FC = () => {
   const fundingInvalidReason = usePositionConfigState((state) => state.fundingInvalidReason)
   const setFundingAmount = usePositionConfigState((state) => state.setFundingAmount)
   const outs = usePositionConfigState((state) => state.outs)
+  const { onDepositTreasury, pending } = useDepositTreasury()
   const maxGasPrice = usePositionConfigState((state) => state.maxGasPrice)
   const gas = useGasPrice()
 
@@ -69,6 +72,22 @@ export const AddFunds: React.FC = () => {
     setFundingAmount(fullBalance, fullBalance)
   }, [setFundingAmount, fullBalance])
 
+  // TREASURY
+  const treasury = useMemo(
+    () => bnDisplay(userTreasury, nativeToken?.decimals),
+    [nativeToken?.decimals, userTreasury],
+  )
+
+  const treasuryUsd = useMemo(() => {
+    if (treasury == null || nativeToken?.price == null) return null
+    return bn(treasury).times(nativeToken.price).toFixed(2)
+  }, [nativeToken?.price, treasury])
+
+  const handleDepositTreasury = useCallback(
+    () => onDepositTreasury(fundingAmount, nativeToken?.decimals),
+    [nativeToken?.decimals, onDepositTreasury, fundingAmount],
+  )
+
   return (
     <StepContentWrapper expanded={expanded}>
       <Text small>
@@ -78,7 +97,7 @@ export const AddFunds: React.FC = () => {
         <br />
         <br />
         <i>
-          Set how much <b>{getNativeTokenSymbol()}</b> to fund below.
+          Deposit <b>{getNativeTokenSymbol()}</b> below to fund your account.
           <br />
           (10 FTM should cover you for a while)
         </i>
@@ -95,10 +114,20 @@ export const AddFunds: React.FC = () => {
         invalid={fundingInvalidReason != null && fundingAmount !== ''}
       />
       { fundingInvalidReason != null && <Text red italic mt='-12px'>{fundingInvalidReason}</Text>}
+      <SummitButton
+        disabled={fundingInvalidReason != null}
+        isLoading={pending}
+        onClick={handleDepositTreasury}
+        activeText="Add Funds"
+        loadingText="Adding"
+      />
       <br />
+      <Text bold underline>
+        Funded: {treasury} FTM (${treasuryUsd})
+      </Text>
       <Column alignItems='flex-start'>
         <Text small italic mb='4px'>
-          Select max DCA gas price:
+          OPTIONAL: Select max DCA gas price:
           <br/>
           (Will wait to execute DCA until gas price {'<'} max)
         </Text>

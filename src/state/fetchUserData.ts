@@ -41,7 +41,7 @@ const userDataFields: Record<string, ParseFieldConfig> = {
   swapsAmountOutMin: { type: ParseFieldType.bignumberArr },
 }
 
-const fetchUserData = async (account): Promise<UserData> => {
+const fetchUserData = async (account): Promise<UserData | null> => {
   const fetcher = getFetcherAddress()
   const calls = [
     {
@@ -51,7 +51,14 @@ const fetchUserData = async (account): Promise<UserData> => {
     },
   ]
 
-  const [userData] = await multicallAndParse(FetcherABI, calls, userDataFields)
+  const res = await multicallAndParse(FetcherABI, calls, userDataFields)
+  if (res == null) return null
+
+  const userData = res[0]
+
+  console.log({
+    userData
+  })
 
   return {
     ...userData,

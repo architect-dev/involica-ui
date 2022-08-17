@@ -4,7 +4,9 @@ import { SummitButton, Text } from 'uikit'
 import {
   IntroStep,
   useIntroActiveStep,
+  usePositionConfig,
   usePositionConfigState,
+  useSubmissionReadyPositionConfig,
 } from './introStore'
 import { ethers } from 'ethers'
 import { useInvolicaStore } from 'state/zustand'
@@ -13,6 +15,7 @@ import {
   PositionExpectedAndDurationOverview,
   PositionSwapsOverview,
 } from './PositionOverviewElements'
+import { useSetPosition } from 'hooks/useExecute'
 
 export const Finalize: React.FC = () => {
   const introStep = useIntroActiveStep()
@@ -23,12 +26,12 @@ export const Finalize: React.FC = () => {
   const userTokenData = useInvolicaStore(
     (state) => state.userData?.userTokensData?.[tokenIn],
   )
-
-  const pending = false
+  const submissionReadyPosition = useSubmissionReadyPositionConfig()
+  const { pending, onSetPosition } = useSetPosition()
 
   const handleCreatePosition = useCallback(() => {
-    console.log('CreatePosition')
-  }, [])
+    onSetPosition(submissionReadyPosition, true)
+  }, [onSetPosition, submissionReadyPosition])
 
   const limitedDCAs = useMemo(() => {
     if (amountDCA === '' || amountDCA === '0' || isNaN(parseFloat(amountDCA)))
@@ -78,6 +81,7 @@ export const Finalize: React.FC = () => {
         note: Your first DCA will execute immediately after
         <br />
         your position is created:
+        <br />
       </Text>
       <SummitButton
         isLoading={pending}

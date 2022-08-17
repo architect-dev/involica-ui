@@ -48,12 +48,12 @@ const presets: Array<Preset> = [
       {
         token: '0x321162Cd933E2Be498Cd2267a90534A804051b11',
         weight: 65,
-        maxSlippage: 10,
+        maxSlippage: 1.5,
       },
       {
         token: '0x74b23882a30290451A17c44f4F05243b6b58C76d',
         weight: 35,
-        maxSlippage: 10,
+        maxSlippage: 1.5,
       },
     ],
   },
@@ -62,33 +62,28 @@ const presets: Array<Preset> = [
     outs: [
       {
         token: '0x74b23882a30290451A17c44f4F05243b6b58C76d',
-        weight: 40,
-        maxSlippage: 10,
+        weight: 33,
+        maxSlippage: 1.5,
       },
       {
         token: '0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83',
         weight: 25,
-        maxSlippage: 10,
+        maxSlippage: 1.5,
       },
       {
         token: '0xD67de0e0a0Fd7b15dC8348Bb9BE742F3c5850454',
-        weight: 15,
-        maxSlippage: 10,
+        weight: 19,
+        maxSlippage: 1.5,
       },
       {
         token: '0x40DF1Ae6074C35047BFF66675488Aa2f9f6384F3',
-        weight: 10,
-        maxSlippage: 10,
+        weight: 13,
+        maxSlippage: 1.5,
       },
       {
         token: '0x511D35c52a3C244E7b8bd92c0C297755FbD89212',
-        weight: 6,
-        maxSlippage: 10,
-      },
-      {
-        token: '0xb3654dc3D10Ea7645f8319668E8F54d2574FBdC8',
-        weight: 4,
-        maxSlippage: 10,
+        weight: 10,
+        maxSlippage: 1.5,
       },
     ],
   },

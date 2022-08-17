@@ -19,7 +19,7 @@ export const revertReasonMap = {
   'Wallet balance for at least 1 DCA': 'Your wallet doesnt have enough funds to cover a DCA',
   'Same token both sides of pair': 'You cannot swap for your input token',
   'Pair is blacklisted': 'One of your swaps is blacklisted',
-  'Invalid slippage': 'Invalid slippage amount',
+  'Invalid slippage': 'Invalid Token max slippage amount, must be >= 0.25%',
   'Non zero weight': 'Token weight cannot be 0',
   'Invalid route': 'Swap route is invalid for one of your tokens',
   'Weights do not sum to 10000': 'Your position doesnt add up to 100%',

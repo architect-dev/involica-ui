@@ -59,8 +59,8 @@ export const callWithEstimateGas = async (
     overrides: PayableOverrides = {},
     gasMarginPer10000 = 1000,
 ): Promise<TransactionResponse> => {
-    const gasEstimation = estimateGas(contract, methodName, methodArgs, overrides, gasMarginPer10000)
     try {
+        const gasEstimation = await estimateGas(contract, methodName, methodArgs, overrides, gasMarginPer10000)
         console.log({
             methodName,
             args: [...methodArgs, { gasLimit: gasEstimation, ...overrides }]

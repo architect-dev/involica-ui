@@ -102,9 +102,11 @@ const EmptyOutIndicator: React.FC = () => (
 
 export const PositionSwapsOverview: React.FC = () => {
   const outs = usePositionConfigState((state) => state.outs)
-  return <PositionSwapsOverviewOverride outs={outs}/>
+  return <PositionSwapsOverviewOverride outs={outs} />
 }
-export const PositionSwapsOverviewOverride: React.FC<{ outs: PositionOut[] }> = ({ outs }) => {
+export const PositionSwapsOverviewOverride: React.FC<{
+  outs: PositionOut[]
+}> = ({ outs }) => {
   const tokenIn = usePositionConfigState((state) => state.tokenIn)
   const tokenData = useInvolicaStore((state) => state.tokens?.[tokenIn])
   const amountDCA = usePositionConfigState((state) => state.amountDCA)
@@ -136,10 +138,15 @@ export const PositionSwapsOverviewOverride: React.FC<{ outs: PositionOut[] }> = 
           <Text bold>
             {amountDCA == null ? '-' : bnDisplay(amountDCA, 0, 3)}
           </Text>
-          {tokenIn ?
-          <TokenSymbolImage symbol={tokenData?.symbol} width={24} height={24} /> :
-          <EmptySymbolImage>?</EmptySymbolImage>
-          }
+          {tokenIn ? (
+            <TokenSymbolImage
+              symbol={tokenData?.symbol}
+              width={24}
+              height={24}
+            />
+          ) : (
+            <EmptySymbolImage>?</EmptySymbolImage>
+          )}
           <Text>{tokenIn ? tokenData?.symbol : '----'}</Text>
         </TokenRow>
         <TextWrap>
@@ -151,8 +158,8 @@ export const PositionSwapsOverviewOverride: React.FC<{ outs: PositionOut[] }> = 
       <OutsColumn>
         {outs.length === 0 && (
           <>
-          <EmptyOutIndicator key='0'/>
-          <EmptyOutIndicator key='1'/>
+            <EmptyOutIndicator key="0" />
+            <EmptyOutIndicator key="1" />
           </>
         )}
         {sortedOuts.map((out) => (
@@ -224,8 +231,24 @@ export const PositionExpectedAndDurationOverview: React.FC = () => {
       return `${((intervalDCA * limitedDCAs) / (3600 * 24)).toFixed(1)} days`
     if (intervalDCA * limitedDCAs > 3600)
       return `${((intervalDCA * limitedDCAs) / 3600).toFixed(1)} hours`
-    return '-'
+    return '1 hour'
   }, [intervalDCA, limitedDCAs])
+
+  const totalAmountDcaUsd = useMemo(() => {
+    if (
+      limitedDCAs === 0 ||
+      amountDCA === '' ||
+      amountDCA === '0' ||
+      isNaN(parseFloat(amountDCA)) ||
+      tokenData?.price == null
+    )
+      return '-'
+    return bnDisplay(
+      bn(amountDCA).times(limitedDCAs).times(tokenData?.price),
+      0,
+      2,
+    )
+  }, [amountDCA, limitedDCAs, tokenData?.price])
 
   return (
     <SwapRow>
@@ -246,7 +269,8 @@ export const PositionExpectedAndDurationOverview: React.FC = () => {
         </Row>
         <Text bold>
           <u>Expected:</u> {balanceLimited ? balanceDCAs : allowanceDCAs} DCAs
-          before {balanceLimited ? 'Balance' : 'Allowance'} runs out
+          (${totalAmountDcaUsd}) before{' '}
+          {balanceLimited ? 'Balance' : 'Allowance'} runs out
           <br />
           <u>Duration:</u> {balanceLimited ? balanceDCAs : allowanceDCAs} DCAs
           will take approx. {approxDuration}

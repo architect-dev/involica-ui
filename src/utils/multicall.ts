@@ -43,7 +43,20 @@ export interface ParseFieldConfig {
 }
 
 const multicallAndParse = async (abi: any[], calls: Call[], parseFields: Record<string, ParseFieldConfig>) => {
-  return (await multicall(abi, calls)).map((item) => parseFieldRecord(item, parseFields))
+  let res = null
+  try {
+    res = await multicall(abi, calls)
+  } catch (error: any) {
+    console.error("Error in multicall", error.message)
+    return null
+  }
+  try {
+    return res.map((item) => parseFieldRecord(item, parseFields))
+  } catch (error: any) {
+    console.error("Error in multicall parse", error.message)
+    return null
+  }
+
 }
 
 const parseFieldRecord = (value: any, fields: Record<string, ParseFieldConfig>) => {
