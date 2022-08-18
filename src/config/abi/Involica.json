@@ -35,6 +35,25 @@
         "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "taskId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ClearTask",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
         "indexed": true,
         "internalType": "uint256",
         "name": "amount",
@@ -116,31 +135,6 @@
       }
     ],
     "name": "FinalizeDCA",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "taskId",
-        "type": "bytes32"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "reason",
-        "type": "string"
-      }
-    ],
-    "name": "FinalizeTask",
     "type": "event"
   },
   {
@@ -388,6 +382,12 @@
         "internalType": "uint256",
         "name": "maxGasPrice",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "manualExecutionOnly",
+        "type": "bool"
       }
     ],
     "name": "SetPosition",
@@ -483,6 +483,95 @@
         "internalType": "bool",
         "name": "",
         "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_tokenIn",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "weight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxSlippage",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IInvolica.PositionOut[]",
+        "name": "_outs",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amountDCA",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_intervalDCA",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxGasPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_executeImmediately",
+        "type": "bool"
+      }
+    ],
+    "name": "createAndFundPosition",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_opsFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "dcaRevertCondition",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "reverted",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "revertMsg",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -655,14 +744,14 @@
             "type": "bytes32"
           },
           {
-            "internalType": "string",
-            "name": "finalizationReason",
-            "type": "string"
-          },
-          {
             "internalType": "address",
             "name": "recipient",
             "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "manualExecutionOnly",
+            "type": "bool"
           }
         ],
         "internalType": "struct IInvolica.Position",
@@ -889,30 +978,17 @@
         "type": "bytes32"
       },
       {
-        "internalType": "string",
-        "name": "finalizationReason",
-        "type": "string"
-      },
-      {
         "internalType": "address",
         "name": "recipient",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
         "internalType": "bool",
-        "name": "_executeImmediately",
+        "name": "manualExecutionOnly",
         "type": "bool"
       }
     ],
-    "name": "reInitPosition",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1075,6 +1151,11 @@
       {
         "internalType": "bool",
         "name": "_executeImmediately",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "_manualExecutionOnly",
         "type": "bool"
       }
     ],

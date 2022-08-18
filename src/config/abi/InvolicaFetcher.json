@@ -154,14 +154,14 @@
             "type": "bytes32"
           },
           {
-            "internalType": "string",
-            "name": "finalizationReason",
-            "type": "string"
-          },
-          {
             "internalType": "address",
             "name": "recipient",
             "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "manualExecutionOnly",
+            "type": "bool"
           }
         ],
         "internalType": "struct IInvolica.Position",
@@ -182,6 +182,11 @@
         "internalType": "uint256",
         "name": "dcasRemaining",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "dcaRevertReason",
+        "type": "string"
       },
       {
         "components": [
