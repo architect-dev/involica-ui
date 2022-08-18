@@ -49,7 +49,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
 
 const StyledNumericInput = styled.div`
   position: relative;
-  width: 120px;
+  width: 110px;
 `
 
 

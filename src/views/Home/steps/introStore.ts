@@ -156,9 +156,9 @@ export const usePositionConfigState = create<
 export enum IntroStep {
   NotStarted,
   TokenIn,
+  Amount,
   Outs,
   Interval,
-  Amount,
   Approve,
   Treasury,
   Finalize,
@@ -221,13 +221,13 @@ export const useIntroActiveStep = () => {
 
   if (tokenIn == null) return IntroStep.TokenIn
 
-  if (outs.length === 0) return IntroStep.Outs
-
-  if (intervalDCA == null || intervalDCA <= 30 * 60) return IntroStep.Interval
-
   if (amountDCA == null || amountDCA === '' || amountDCA === '0')
     return IntroStep.Amount
   if (minSwapDcaUsd < 1) return IntroStep.Amount
+
+  if (outs.length === 0) return IntroStep.Outs
+
+  if (intervalDCA == null || intervalDCA <= 30 * 60) return IntroStep.Interval
 
   if (tokenInAllowance == null) return IntroStep.Approve
   if (dcasCount === 'Inf') {

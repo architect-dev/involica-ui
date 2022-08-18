@@ -127,7 +127,7 @@ const PresetButton: React.FC<{ preset: Preset }> = ({ preset }) => {
         <ModalWrapper>
           <Text bold>Preset Position:</Text>
           <Text italic small textAlign="center" px="48px">
-            The preset tokens and percentages can be edited after it has been
+            The preset tokens and percentages can be edited after they've been
             imported.
           </Text>
           <PositionSwapsOverviewOverride outs={preset.outs} />

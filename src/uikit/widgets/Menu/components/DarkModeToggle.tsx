@@ -25,6 +25,7 @@ const BGSunIcon = styled(SunIcon)`
   height: 20px;
   top: 6px;
   right: 6px;
+  color: ${({ theme }) => theme.colors.text};
 `
 const BGMoonIcon = styled(MoonIcon)`
   position: absolute;
@@ -32,17 +33,19 @@ const BGMoonIcon = styled(MoonIcon)`
   height: 20px;
   top: 6px;
   left: 6px;
+  color: ${({ theme }) => theme.colors.text};
 `
 
 const StyledSummitButton = styled(SummitButton)<{ visible: boolean }>`
   position: absolute;
-  width: 28px;
-  height: 28px;
-  top: 2px;
-  left: ${({ visible }) => (visible ? 28 : 2)}px;
+  width: 32px;
+  height: 32px;
+  top: 0px;
+  left: ${({ visible }) => (visible ? 26 : 0)}px;
   padding: 0px;
 
   pointer-events: none;
+  box-shadow: none;
 `
 
 const StyledSunIcon = styled(SunIcon)<{ visible: boolean }>`
@@ -55,6 +58,7 @@ const StyledSunIcon = styled(SunIcon)<{ visible: boolean }>`
   right: 0px;
   margin: auto;
   opacity: ${({ visible }) => (visible ? 1 : 0)};
+  color: ${({ theme }) => theme.colors.text};
 `
 const StyledMoonIcon = styled(MoonIcon)<{ visible: boolean }>`
   position: absolute;
@@ -66,16 +70,17 @@ const StyledMoonIcon = styled(MoonIcon)<{ visible: boolean }>`
   right: 0px;
   margin: auto;
   opacity: ${({ visible }) => (visible ? 1 : 0)};
+  color: ${({ theme }) => theme.colors.text};
 `
 
 const DarkModeToggle: React.FC<Props> = ({ isDark, toggleTheme }) => {
   return (
     <ToggleWrapper onClick={toggleTheme}>
-      <BGSunIcon color="white" />
-      <BGMoonIcon color="#575757" />
+      <BGSunIcon />
+      <BGMoonIcon />
       <StyledSummitButton visible={!isDark}>
-        <StyledSunIcon color="white" visible={!isDark} />
-        <StyledMoonIcon color="white" visible={isDark} />
+        <StyledSunIcon visible={!isDark} />
+        <StyledMoonIcon visible={isDark} />
       </StyledSummitButton>
     </ToggleWrapper>
   )

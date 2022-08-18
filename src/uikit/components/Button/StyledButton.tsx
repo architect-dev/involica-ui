@@ -67,7 +67,7 @@ const StyledButton = styled.button<BaseButtonProps>`
   ${pressableMixin}
 
   &:hover:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled):not(:active) {
-    box-shadow: 2px 2px 6px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+    box-shadow: 2px 2px 8px ${({ theme }) => transparentize(0.4, theme.colors.text)};
   }
   
   &:active:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled) {

@@ -10,7 +10,8 @@ import { getSymbol } from 'config/tokens'
 const SliderWrapper = styled.div`
   height: 60px;
   display: flex;
-  width: 100%;
+  width: calc(100% + 36px);
+  margin-left: -18px;
   position: relative;
   align-items: center;
   justify-content: center;

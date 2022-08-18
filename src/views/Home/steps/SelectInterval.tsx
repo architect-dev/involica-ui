@@ -1,16 +1,9 @@
 import React, { useCallback, useMemo } from 'react'
-import { StepContentWrapper } from './StepContentWrapper'
 import { Text, RowStart } from 'uikit'
-import {
-  IntroStep,
-  useIntroActiveStep,
-  usePositionConfigState,
-} from './introStore'
+import { usePositionConfigState } from './introStore'
 import NumericInput from 'components/Input/NumericInput'
 
 export const SelectInterval: React.FC = () => {
-  const introStep = useIntroActiveStep()
-  const expanded = introStep >= IntroStep.Interval
   const {
     intervalDCA,
     weeks,
@@ -66,7 +59,7 @@ export const SelectInterval: React.FC = () => {
   }, [intervalDCA])
 
   return (
-    <StepContentWrapper expanded={expanded}>
+    <>
       <Text small>
         Choose how often you want your DCA to execute.
         <br />
@@ -75,21 +68,22 @@ export const SelectInterval: React.FC = () => {
         but costs more gas (still only pennies per transaction).
         <br />
       </Text>
-      <RowStart gap="12px">
+      <RowStart gap="6px">
+        <Text small>Every: </Text>
         <NumericInput
           value={weeks}
           onChange={handleSetWeeks}
           endText="weeks"
           placeholder="0"
         />
-        <Text small>-</Text>
+        <Text small>, </Text>
         <NumericInput
           value={days}
           onChange={handleSetDays}
           endText="days"
           placeholder="0"
         />
-        <Text small>-</Text>
+        <Text small> and </Text>
         <NumericInput
           value={hours}
           onChange={handleSetHours}
@@ -97,10 +91,10 @@ export const SelectInterval: React.FC = () => {
           placeholder="0"
         />
       </RowStart>
-      <Text italic>
-        Interval:{' '}
-        {intervalDCA === 0 ? '-' : `DCA executes every ${intervalString}`}
+      <Text italic bold>
+        <br />
+        {intervalDCA === 0 ? '-' : `DCA will execute every ${intervalString}`}
       </Text>
-    </StepContentWrapper>
+    </>
   )
 }

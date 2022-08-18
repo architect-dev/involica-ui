@@ -1,54 +1,64 @@
 import React from 'react'
 import styled from 'styled-components'
-import { RowBetween, SummitButton, Text } from 'uikit'
+import { SummitButton, Text } from 'uikit'
 import { AddFunds } from './AddFunds'
 import { AmountIn } from './AmountIn'
 import { ApproveIn } from './ApproveIn'
 import { ConfigPreview } from './ConfigPreview'
 import { Finalize } from './Finalize'
-import { IntroStep, usePositionConfigState } from './introStore'
+import { IntroStep, useIntroActiveStep, usePositionConfigState } from './introStore'
 import { SelectInterval } from './SelectInterval'
 import { SelectOuts } from './SelectOuts'
 import { SelectTokenIn } from './SelectTokenIn'
-
-const HoverableText = styled(Text)<{ active: boolean }>`
-  text-decoration: ${({ active }) => active && 'underline'};
-`
 
 const IntroText = styled(Text)`
   max-width: 500px;
 `
 
-const FixedDiv = styled.div`
-  position: sticky;
-  top: 45px;
-  margin-left: auto;
-  width: 100px;
-  z-index: 10;
-  margin-bottom: -28px;
+const StepsRowWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
 `
 
-const StepHeader: React.FC<{
-  text: string
-  index: number
-  active: boolean
-}> = ({ text, index, active }) => {
-  return (
-    <HoverableText bold={active} active={active}>
-      {index + 1}. {text}
-    </HoverableText>
-  )
-}
+const StyledFieldset = styled.fieldset<{ halfWidth: boolean, expanded: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 18px;
+  padding: ${({ expanded }) => (expanded ? '32px' : '2px 36px')};
+  transition: padding 200ms;
+  border: dashed ${({ theme }) => theme.colors.text};
+  border-width: ${({ expanded }) => (expanded ? '1px' : '1px 0 0 1px')};
+  min-width: 100%;
+  width: 100%;
+  ${({ theme }) => theme.mediaQueries.nav} {
+    min-width: ${({ halfWidth }) => halfWidth ? 'calc(50% - 12px)' : '100%'};
+    width: ${({ halfWidth }) => halfWidth ? 'calc(50% - 12px)' : '100%'};
+  }
+`
 
 const stepTitle: Record<IntroStep, string> = {
   [IntroStep.NotStarted]: '',
-  [IntroStep.TokenIn]: 'Choose which token you want to DCA with.',
-  [IntroStep.Outs]: 'Select multiple tokens to DCA into to create a portfolio.',
-  [IntroStep.Interval]: 'Select how often to execute the DCA.',
-  [IntroStep.Amount]: 'Select the amount to use for each DCA.',
-  [IntroStep.Approve]: 'Approve your DCA token.',
-  [IntroStep.Treasury]: 'Fund your account.',
-  [IntroStep.Finalize]: 'Finalize.',
+  [IntroStep.TokenIn]: '1a. Choose which token to spend.',
+  [IntroStep.Amount]: '1b. Choose how much to DCA.',
+  [IntroStep.Outs]: '2. Choose which tokens to buy.',
+  [IntroStep.Interval]: '3. Select how often to DCA.',
+  [IntroStep.Approve]: '4a. Approve your DCA token spend.',
+  [IntroStep.Treasury]: '4b. Fund your account.',
+  [IntroStep.Finalize]: '5. Finalize.',
+}
+const stepHalfWidth: Record<IntroStep, boolean> = {
+  [IntroStep.NotStarted]: true,
+  [IntroStep.TokenIn]: true,
+  [IntroStep.Amount]: true,
+  [IntroStep.Outs]: false,
+  [IntroStep.Interval]: false,
+  [IntroStep.Approve]: true,
+  [IntroStep.Treasury]: true,
+  [IntroStep.Finalize]: false,
 }
 
 const stepContent: Record<IntroStep, JSX.Element | null> = {
@@ -63,6 +73,7 @@ const stepContent: Record<IntroStep, JSX.Element | null> = {
 }
 
 export const IntroSteps: React.FC = () => {
+  const introStep = useIntroActiveStep()
   const getStarted = usePositionConfigState((state) => state.getStarted)
   return (
     <>
@@ -85,7 +96,7 @@ export const IntroSteps: React.FC = () => {
         and secure.
         <br />
         <br />
-        <b>In</b>sulate from the bear market <b>voli</b>tility with D<b>CA</b>
+        <b>In</b>sulate from market <b>voli</b>tility with D<b>CA</b>
       </IntroText>
       <br />
       <br />
@@ -97,29 +108,25 @@ export const IntroSteps: React.FC = () => {
       <br />
       <br />
       <br />
-      {[
-        IntroStep.TokenIn,
-        IntroStep.Outs,
-        IntroStep.Interval,
-        IntroStep.Amount,
-        IntroStep.Approve,
-        IntroStep.Treasury,
-        IntroStep.Finalize,
-      ].map((step, stepIndex) => (
-        <>
-          {step === IntroStep.Outs && (
-            <FixedDiv>
-              <ConfigPreview />
-            </FixedDiv>
-          )}
-          <div key={step}>
-            <RowBetween>
-              <StepHeader index={stepIndex} text={stepTitle[step]} active />
-            </RowBetween>
-            {stepContent[step]}
-          </div>
-        </>
-      ))}
+      <StepsRowWrap>
+        {[
+          IntroStep.TokenIn,
+          IntroStep.Amount,
+          IntroStep.Outs,
+          IntroStep.Interval,
+          IntroStep.Approve,
+          IntroStep.Treasury,
+          IntroStep.Finalize,
+        ].map((step) => (
+          <>
+            <StyledFieldset key={step} halfWidth={stepHalfWidth[step]} expanded={introStep >= step}>
+              <legend><Text bold px='12px'>{stepTitle[step]}</Text></legend>
+              {introStep >= step && stepContent[step]}
+            </StyledFieldset>
+            {step === IntroStep.Outs && <ConfigPreview />}
+          </>
+        ))}
+      </StepsRowWrap>
     </>
   )
 }

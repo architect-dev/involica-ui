@@ -1,19 +1,12 @@
 import React, { useCallback, useMemo } from 'react'
-import { StepContentWrapper } from './StepContentWrapper'
 import { Text } from 'uikit'
 import TokenInput from 'components/TokenInput'
 import { useInvolicaStore } from 'state/zustand'
 import { bn, bnDisplay } from 'utils'
-import {
-  IntroStep,
-  useIntroActiveStep,
-  usePositionConfigState,
-} from './introStore'
+import { usePositionConfigState } from './introStore'
 import { getSymbol } from 'config/tokens'
 
 export const AmountIn: React.FC = () => {
-  const introStep = useIntroActiveStep()
-  const expanded = introStep >= IntroStep.Amount
   const tokenIn = usePositionConfigState((state) => state.tokenIn)
   const tokenInData = useInvolicaStore((state) => state.tokens?.[tokenIn])
   const outs = usePositionConfigState((state) => state.outs)
@@ -60,9 +53,9 @@ export const AmountIn: React.FC = () => {
   }, [tokenInData, amountDCAInvalidReason, amountDCA])
 
   return (
-    <StepContentWrapper expanded={expanded}>
+    <>
       <Text small italic>
-        Set the amount of <b>{tokenInData?.symbol}</b> each DCA will pull.
+        Set the amount of <b>{tokenInData?.symbol}</b> to use for DCA.
       </Text>
       <TokenInput
         symbol={tokenInData?.symbol}
@@ -80,7 +73,7 @@ export const AmountIn: React.FC = () => {
       )}
       {minOut != null &&
         amountDCAInvalidReason == null &&
-        (Math.floor(amountDcaUsd * minOut.weight) / 100) < 0.1 && (
+        Math.floor(amountDcaUsd * minOut.weight) / 100 < 0.1 && (
           <Text red italic mt="-12px">
             <b>
               At this amount, your swap for {getSymbol(minOut.token)} will be $
@@ -97,6 +90,6 @@ export const AmountIn: React.FC = () => {
       <Text italic>
         DCA amount USD: ${amountDcaUsd === 0 ? '-' : amountDcaUsd}
       </Text>
-    </StepContentWrapper>
+    </>
   )
 }

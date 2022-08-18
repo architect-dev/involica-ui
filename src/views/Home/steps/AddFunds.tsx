@@ -1,23 +1,21 @@
 import React, { useCallback, useMemo } from 'react'
-import { StepContentWrapper } from './StepContentWrapper'
 import { Column, Text } from 'uikit'
 import TokenInput from 'components/TokenInput'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useInvolicaStore } from 'state/zustand'
 import { bnDisplay } from 'utils'
-import {
-  IntroStep,
-  useIntroActiveStep,
-  usePositionConfigState,
-} from './introStore'
+import { usePositionConfigState } from './introStore'
 import MaxGasPriceSelector from './MaxGasPriceSelector'
+import styled from 'styled-components'
 
 const baseGasPrice = 450000
 const perSwapGasPrice = 195000
 
+const IntroText = styled(Text)`
+  max-width: 500px;
+`
+
 export const AddFunds: React.FC = () => {
-  const introStep = useIntroActiveStep()
-  const expanded = introStep >= IntroStep.Treasury
   const nativeToken = useInvolicaStore((state) => state.nativeToken)
   const userNativeToken = useInvolicaStore(
     (state) => state.userData?.userNativeTokenData,
@@ -72,10 +70,9 @@ export const AddFunds: React.FC = () => {
   }, [setFundingAmount, fullBalance])
 
   return (
-    <StepContentWrapper expanded={expanded}>
-      <Text small>
+    <>
+      <IntroText small>
         Funds are only used to pay for the gas of each DCA transaction,
-        <br />
         and can be removed at any time.
         <br />
         <br />
@@ -84,7 +81,7 @@ export const AddFunds: React.FC = () => {
           <br />
           (10 FTM should cover you for a while)
         </i>
-      </Text>
+      </IntroText>
       <TokenInput
         symbol={getNativeTokenSymbol()}
         balanceText="Wallet Balance"
@@ -126,6 +123,6 @@ export const AddFunds: React.FC = () => {
           </Text>
         )}
       </Column>
-    </StepContentWrapper>
+    </>
   )
 }

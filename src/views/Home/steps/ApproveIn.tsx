@@ -1,20 +1,19 @@
 import React, { useCallback, useMemo } from 'react'
-import { StepContentWrapper } from './StepContentWrapper'
 import { Column, RowStart, SummitButton, Text } from 'uikit'
 import { useInvolicaStore } from 'state/zustand'
 import { bn, bnDisplay, eN } from 'utils'
 import {
-  IntroStep,
-  useIntroActiveStep,
   usePositionConfigState,
 } from './introStore'
 import { useApprove } from 'hooks/useExecute'
 import NumericInput from 'components/Input/NumericInput'
+import styled from 'styled-components'
+
+const IntroText = styled(Text)`
+  max-width: 500px;
+`
 
 export const ApproveIn: React.FC = () => {
-  const introStep = useIntroActiveStep()
-  const expanded = introStep >= IntroStep.Approve
-
   const tokenInAdd = usePositionConfigState((state) => state.tokenIn)
   const tokenIn = useInvolicaStore((state) => state.tokens?.[tokenInAdd])
   const tokenInUserData = useInvolicaStore(
@@ -75,23 +74,21 @@ export const ApproveIn: React.FC = () => {
   }, [dcasCount, setDcasCount])
 
   return (
-    <StepContentWrapper expanded={expanded}>
-      <Text small>
-        Involica only pulls your in token during a DCA transaction.
-        <br />
-        The amount you approve determines how many times your DCA will run.
+    <>
+      <IntroText small>
+        Involica withdraws your spend token when you DCA.
+        Your approval amount determines how many times you will DCA.
         <br />
         <br />
         <i>
           Enter the amount of DCA transactions you want to run,
-          <br />
           and then approve your <b>{tokenIn?.symbol}</b> spends:
-          <br />
+          <br/>
+          <br/>
           (Infinite Approval will continue to DCA until your wallet
-          <br />
           balance runs out or Involica manually stopped)
         </i>
-      </Text>
+      </IntroText>
       <RowStart gap="8px">
         <NumericInput
           value={dcasCount}
@@ -137,6 +134,6 @@ export const ApproveIn: React.FC = () => {
         }
         loadingText="Approving"
       />
-    </StepContentWrapper>
+    </>
   )
 }

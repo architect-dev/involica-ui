@@ -1,10 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
-import { StepContentWrapper } from './StepContentWrapper'
 import { SummitButton, Text } from 'uikit'
 import {
-  IntroStep,
-  useIntroActiveStep,
-  usePositionConfig,
   usePositionConfigState,
   useSubmissionReadyPositionConfig,
 } from './introStore'
@@ -18,8 +14,6 @@ import {
 import { useSetPosition } from 'hooks/useExecute'
 
 export const Finalize: React.FC = () => {
-  const introStep = useIntroActiveStep()
-  const expanded = introStep >= IntroStep.Finalize
   const tokenIn = usePositionConfigState((state) => state.tokenIn)
   const tokenData = useInvolicaStore((state) => state.tokens?.[tokenIn])
   const amountDCA = usePositionConfigState((state) => state.amountDCA)
@@ -32,8 +26,17 @@ export const Finalize: React.FC = () => {
   const { pending, onSetPosition } = useSetPosition()
 
   const handleCreatePosition = useCallback(() => {
-    onSetPosition(submissionReadyPosition, eN(fundingAmount, nativeToken?.decimals), true)
-  }, [onSetPosition, submissionReadyPosition, nativeToken?.decimals, fundingAmount])
+    onSetPosition(
+      submissionReadyPosition,
+      eN(fundingAmount, nativeToken?.decimals),
+      true,
+    )
+  }, [
+    onSetPosition,
+    submissionReadyPosition,
+    nativeToken?.decimals,
+    fundingAmount,
+  ])
 
   const limitedDCAs = useMemo(() => {
     if (amountDCA === '' || amountDCA === '0' || isNaN(parseFloat(amountDCA)))
@@ -64,7 +67,7 @@ export const Finalize: React.FC = () => {
   ])
 
   return (
-    <StepContentWrapper expanded={expanded}>
+    <>
       <Text small italic>
         Confirm the setup of your Involica Position:
       </Text>
@@ -82,15 +85,16 @@ export const Finalize: React.FC = () => {
       <Text small italic>
         note: Your first DCA will execute immediately after
         <br />
-        your position is created:
+        your position is created
         <br />
       </Text>
+      <br/>
       <SummitButton
         isLoading={pending}
         onClick={handleCreatePosition}
         activeText="Create Position"
         loadingText="Creating"
       />
-    </StepContentWrapper>
+    </>
   )
 }
