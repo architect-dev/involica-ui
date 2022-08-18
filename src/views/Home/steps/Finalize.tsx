@@ -26,12 +26,14 @@ export const Finalize: React.FC = () => {
   const userTokenData = useInvolicaStore(
     (state) => state.userData?.userTokensData?.[tokenIn],
   )
+  const nativeToken = useInvolicaStore((state) => state.nativeToken)
+  const fundingAmount = usePositionConfigState((state) => state.fundingAmount)
   const submissionReadyPosition = useSubmissionReadyPositionConfig()
   const { pending, onSetPosition } = useSetPosition()
 
   const handleCreatePosition = useCallback(() => {
-    onSetPosition(submissionReadyPosition, true)
-  }, [onSetPosition, submissionReadyPosition])
+    onSetPosition(submissionReadyPosition, eN(fundingAmount, nativeToken?.decimals), true)
+  }, [onSetPosition, submissionReadyPosition, nativeToken?.decimals, fundingAmount])
 
   const limitedDCAs = useMemo(() => {
     if (amountDCA === '' || amountDCA === '0' || isNaN(parseFloat(amountDCA)))

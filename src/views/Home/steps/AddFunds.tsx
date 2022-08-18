@@ -1,18 +1,16 @@
 import React, { useCallback, useMemo } from 'react'
 import { StepContentWrapper } from './StepContentWrapper'
-import { Column, SummitButton, Text } from 'uikit'
+import { Column, Text } from 'uikit'
 import TokenInput from 'components/TokenInput'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useInvolicaStore } from 'state/zustand'
-import { bn, bnDisplay } from 'utils'
+import { bnDisplay } from 'utils'
 import {
   IntroStep,
   useIntroActiveStep,
   usePositionConfigState,
 } from './introStore'
-import { useGasPrice } from 'utils/gasPrice'
 import MaxGasPriceSelector from './MaxGasPriceSelector'
-import { useDepositTreasury } from 'hooks/useExecute'
 
 const baseGasPrice = 450000
 const perSwapGasPrice = 195000
@@ -20,27 +18,28 @@ const perSwapGasPrice = 195000
 export const AddFunds: React.FC = () => {
   const introStep = useIntroActiveStep()
   const expanded = introStep >= IntroStep.Treasury
-  const userTreasury = useInvolicaStore((state) => state.userData?.userTreasury)
   const nativeToken = useInvolicaStore((state) => state.nativeToken)
   const userNativeToken = useInvolicaStore(
     (state) => state.userData?.userNativeTokenData,
   )
   const fundingAmount = usePositionConfigState((state) => state.fundingAmount)
-  const fundingInvalidReason = usePositionConfigState((state) => state.fundingInvalidReason)
-  const setFundingAmount = usePositionConfigState((state) => state.setFundingAmount)
+  const fundingInvalidReason = usePositionConfigState(
+    (state) => state.fundingInvalidReason,
+  )
+  const setFundingAmount = usePositionConfigState(
+    (state) => state.setFundingAmount,
+  )
   const outs = usePositionConfigState((state) => state.outs)
-  const { onDepositTreasury, pending } = useDepositTreasury()
+  const minGasPrice = '100'
   const maxGasPrice = usePositionConfigState((state) => state.maxGasPrice)
-  const gas = useGasPrice()
 
-  const txPrice = useMemo(() => {
-    if (gas == null) return null
+  const minTxPrice = useMemo(() => {
     return bnDisplay(
-      (baseGasPrice + outs.length * perSwapGasPrice) * parseFloat(gas),
+      (baseGasPrice + outs.length * perSwapGasPrice) * parseFloat(minGasPrice),
       9,
       4,
     )
-  }, [gas, outs.length])
+  }, [minGasPrice, outs.length])
 
   const maxTxPrice = useMemo(() => {
     if (maxGasPrice == null) return null
@@ -65,28 +64,12 @@ export const AddFunds: React.FC = () => {
 
   const handleSelectPreset = useCallback(
     () => setFundingAmount('10', fullBalance),
-    [fullBalance, setFundingAmount]
+    [fullBalance, setFundingAmount],
   )
 
   const handleSelectMax = useCallback(() => {
     setFundingAmount(fullBalance, fullBalance)
   }, [setFundingAmount, fullBalance])
-
-  // TREASURY
-  const treasury = useMemo(
-    () => bnDisplay(userTreasury, nativeToken?.decimals),
-    [nativeToken?.decimals, userTreasury],
-  )
-
-  const treasuryUsd = useMemo(() => {
-    if (treasury == null || nativeToken?.price == null) return null
-    return bn(treasury).times(nativeToken.price).toFixed(2)
-  }, [nativeToken?.price, treasury])
-
-  const handleDepositTreasury = useCallback(
-    () => onDepositTreasury(fundingAmount, nativeToken?.decimals),
-    [nativeToken?.decimals, onDepositTreasury, fundingAmount],
-  )
 
   return (
     <StepContentWrapper expanded={expanded}>
@@ -107,43 +90,39 @@ export const AddFunds: React.FC = () => {
         balanceText="Wallet Balance"
         onChange={handleChange}
         onSelectPreset={handleSelectPreset}
-        presetValue='10'
+        presetValue="10"
         onSelectMax={handleSelectMax}
         value={fundingAmount}
         max={fullBalance}
         invalid={fundingInvalidReason != null && fundingAmount !== ''}
       />
-      { fundingInvalidReason != null && <Text red italic mt='-12px'>{fundingInvalidReason}</Text>}
-      <SummitButton
-        disabled={fundingInvalidReason != null}
-        isLoading={pending}
-        onClick={handleDepositTreasury}
-        activeText="Add Funds"
-        loadingText="Adding"
-      />
+      {fundingInvalidReason != null && (
+        <Text red italic mt="-12px">
+          {fundingInvalidReason}
+        </Text>
+      )}
       <br />
-      <Text bold underline>
-        Funded: {treasury} FTM (${treasuryUsd})
-      </Text>
-      <Column alignItems='flex-start'>
-        <Text small italic mb='4px'>
+      <Column alignItems="flex-start">
+        <Text small italic mb="4px">
+          Minimum Gas Price is hard coded by Gelato to be 100 gwei
+          <br />
+          <Text small italic bold>
+            Min DCA execution price: {minTxPrice ?? '-'} FTM (@{' '}
+            {minGasPrice !== null ? Number(minGasPrice).toFixed(0) : '-'} gwei)
+          </Text>
+          <br />
+          <br />
           OPTIONAL: Select max DCA gas price:
-          <br/>
-          (Will wait to execute DCA until gas price {'<'} max)
+          <br />
+          (Will wait to execute DCA until gas price {'<='} max)
         </Text>
         <MaxGasPriceSelector />
-        <br/>
+        <br />
 
-        {txPrice != null && (
-          <Text small italic>
-            Estimated DCA gas price: {txPrice} FTM (@ {Number(gas).toFixed(1)}{' '}
-            gwei)
-          </Text>
-        )}
-        {maxTxPrice != null && (
-          <Text small italic>
-            Max DCA gas price: {maxTxPrice} FTM (@ {Number(maxGasPrice).toFixed(1)}{' '}
-            gwei)
+        {maxGasPrice !== '100' && (
+          <Text small italic bold>
+            Max DCA execution price: {maxTxPrice ?? '-'} FTM (@{' '}
+            {maxGasPrice !== null ? Number(maxGasPrice).toFixed(0) : '-'} gwei)
           </Text>
         )}
       </Column>

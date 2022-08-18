@@ -62,23 +62,16 @@ const StyledButton = styled.button<BaseButtonProps>`
   letter-spacing: 0.03em;
   line-height: 1;
   outline: 0;
+  box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
 
-  ${({ theme, disabled }) => pressableMixin({
-    theme,
-    disabled,
-    hoverStyles: css`
-      filter: none;
-      > * {
-        text-decoration: underline;
-      }
-    `
-  })}
+  ${pressableMixin}
 
   &:hover:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled):not(:active) {
-    transform: translateY(-1px);
+    box-shadow: 2px 2px 6px ${({ theme }) => transparentize(0.4, theme.colors.text)};
   }
-
+  
   &:active:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled) {
+    box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
   }
 
   ${getDisabledStyles}

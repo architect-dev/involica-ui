@@ -128,12 +128,13 @@ export const useSetPosition = () => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onSetPosition = useCallback(
-    (config: any[], isNewPosition: boolean) => {
+    (config: any[], treasuryValue: string, isNewPosition: boolean) => {
+      console.log(...config, { value: treasuryValue })
       handleExecute(
         involica,
         'setPosition',
         config,
-        undefined,
+        { value: treasuryValue },
         isNewPosition ? 'Position Created' : 'Position Updated',
         isNewPosition ? 'Error Creating Position' : 'Error Updating Position',
       )

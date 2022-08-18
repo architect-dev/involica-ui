@@ -49,6 +49,7 @@ export const lightColors: Colors = {
   card: '#FFFFFF',
   ROADMAP: '#575757',
   selectorBackground: '#cacaca',
+  button: '#adadad',
   gradients: {
     bubblegum: 'linear-gradient(139.73deg, #E6FDFF 0%, #F3EFFF 100%)',
   },
@@ -75,6 +76,7 @@ export const darkColors: Colors = {
   card: '#0F152A',
   ROADMAP: '#E5E5E5',
   selectorBackground: '#41495f',
+  button: '#adadad', // TODO: Update to dark mode color
   DASH: '#3e7fa2',
   gradients: {
     bubblegum: 'linear-gradient(139.73deg, #313D5C 0%, #3D2A54 100%)',

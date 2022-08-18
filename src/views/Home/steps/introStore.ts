@@ -1,13 +1,13 @@
 import { PositionOut } from 'state/types'
 import { useInvolicaStore } from 'state/zustand'
-import { bn, bnExp, CHAIN_ID, eN } from 'utils'
+import { bn, CHAIN_ID, eN } from 'utils'
 import { ethers } from 'ethers'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useMemo } from 'react'
 import { getChainGwei } from 'config/tokens'
 
-type MaxGasPriceOptions = '5' | '15' | '50'
+type MaxGasPriceOptions = '100' | '200' | '500'
 interface PositionConfig {
   tokenIn?: string
   outs: PositionOut[]
@@ -66,7 +66,7 @@ export const usePositionConfigState = create<
       amountDCA: null,
       amountDCAInvalidReason: 'DCA Amount required',
       intervalDCA: null,
-      maxGasPrice: '50',
+      maxGasPrice: '100',
       executeImmediately: true,
       startIntro: false,
       fundingAmount: '',
@@ -195,7 +195,6 @@ export const useSubmissionReadyPositionConfig = (): any[] => {
 }
 
 export const useIntroActiveStep = () => {
-  const userTreasury = useInvolicaStore((state) => state.userData?.userTreasury)
   const startIntro = usePositionConfigState((state) => state.startIntro)
   const { tokenIn, outs, amountDCA, intervalDCA } = usePositionConfig()
   const tokenInData = useInvolicaStore((state) => state.tokens?.[tokenIn])
@@ -203,6 +202,8 @@ export const useIntroActiveStep = () => {
     (state) => state.userData?.userTokensData?.[tokenIn]?.allowance,
   )
   const dcasCount = usePositionConfigState((state) => state.dcasCount)
+  const fundingAmount = usePositionConfigState((state) => state.fundingAmount)
+  const fundingInvalidReason = usePositionConfigState((state) => state.fundingInvalidReason)
 
   const minOutWeight = useMemo(
     () => outs.reduce((min, out) => Math.min(min, out.weight), 101),
@@ -240,7 +241,7 @@ export const useIntroActiveStep = () => {
   )
     return IntroStep.Approve
 
-  if (userTreasury == null || bn(userTreasury).toNumber() === 0)
+  if (fundingAmount == null || fundingAmount === '' || fundingAmount === '0' || fundingInvalidReason != null)
     return IntroStep.Treasury
 
   return IntroStep.Finalize

@@ -18,7 +18,6 @@ export const pressableMixin = ({
   if (disabled) return css`
     cursor: not-allowed;
     opacity: 0.5;
-    box-shadow: none;
 
     ${disabledStyles}
   `
@@ -26,19 +25,14 @@ export const pressableMixin = ({
   return css`
     cursor: pointer;
     opacity: 1;
+    transition: opacity 150ms ease-in-out, box-shadow 150ms ease-in-out;
 
     ${theme.mediaQueries.nav} {
       &:hover {
         font-weight: bold;
-        ${$translate === true && 'transform: translateY(-1px)'};
         ${hoverStyles}
       }
-    }
-
-
-    ${theme.mediaQueries.nav} {
       &:active {
-        ${$translate === true && 'transform: translateY(0px)'};
         opacity: 0.5;
       }
     }

@@ -50,29 +50,29 @@ const TextButton = styled.div<{ selected: boolean }>`
 const MaxGasPriceSelector = () => {
   const maxGasPrice = usePositionConfigState((state) => state.maxGasPrice)
   const setMaxGasPrice = usePositionConfigState((state) => state.setMaxGasPrice)
-  const selectedIndex = maxGasPrice === '5' ? 0 : maxGasPrice === '15' ? 1 : 2
+  const selectedIndex = maxGasPrice === '100' ? 0 : maxGasPrice === '200' ? 1 : 2
   return (
     <SelectorWrapper>
       <SelectedSummitButton selectedIndex={selectedIndex} padding="0px">
         {maxGasPrice} gwei
       </SelectedSummitButton>
       <TextButton
-        onClick={() => setMaxGasPrice('5')}
+        onClick={() => setMaxGasPrice('100')}
         selected={selectedIndex === 0}
       >
-        5 gwei
+        100 gwei
       </TextButton>
       <TextButton
-        onClick={() => setMaxGasPrice('15')}
+        onClick={() => setMaxGasPrice('200')}
         selected={selectedIndex === 1}
       >
-        15 gwei
+        200 gwei
       </TextButton>
       <TextButton
-        onClick={() => setMaxGasPrice('50')}
+        onClick={() => setMaxGasPrice('500')}
         selected={selectedIndex === 2}
       >
-        50 gwei
+        500 gwei
       </TextButton>
     </SelectorWrapper>
   )

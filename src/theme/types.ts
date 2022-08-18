@@ -55,6 +55,7 @@ export type Colors = {
   borderColor: string
   card: string
   selectorBackground: string
+  button: string
 
   textGold: string
 
