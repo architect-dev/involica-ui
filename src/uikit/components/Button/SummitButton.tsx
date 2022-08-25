@@ -7,7 +7,7 @@ import React, {
 import styled from 'styled-components'
 import getExternalLinkProps from '../../util/getExternalLinkProps'
 import { Dots } from '../Dots'
-import { Lock, Spinner } from '../Svg'
+import { Lock } from '../Svg'
 import SummitStyledButton from './SummitStyledButton'
 import { ButtonProps, scales, variants } from './types'
 
@@ -17,30 +17,6 @@ const StyledLock = styled(Lock)`
   transform: rotate(20deg);
   fill: white;
   filter: drop-shadow(1px 1px 4px black);
-`
-const StyledSpinner = styled(Spinner)`
-  position: absolute;
-  align-self: center;
-  filter: drop-shadow(0px 0px 4px black);
-`
-
-const SecondaryInset = styled.div<{ insetColor?: string }>`
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  left: 2px;
-  bottom: 2px;
-  border-radius: 50px;
-  background-color: ${({ theme, insetColor }) =>
-    theme.colors[insetColor || 'cardHover']};
-`
-
-const ChildWrapper = styled.div`
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
 `
 
 const SummitButton = <E extends ElementType = 'button'>(

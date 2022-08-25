@@ -189,6 +189,7 @@ export const useSubmissionReadyPositionConfig = (): any[] => {
       eN(config.amountDCA, tokenInData?.decimals),
       config.intervalDCA,
       getChainGwei(config.maxGasPrice),
+      true, // Execute Immediately
     ],
     [config, tokenInData],
   )

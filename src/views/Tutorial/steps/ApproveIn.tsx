@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo } from 'react'
 import { Column, RowStart, SummitButton, Text } from 'uikit'
 import { useInvolicaStore } from 'state/zustand'
+import { MaxUint256 } from 'ethers/constants'
 import { bn, bnDisplay, eN } from 'utils'
-import {
-  usePositionConfigState,
-} from './introStore'
+import { usePositionConfigState } from './introStore'
 import { useApprove } from 'hooks/useExecute'
 import NumericInput from 'components/Input/NumericInput'
 import styled from 'styled-components'
@@ -26,7 +25,10 @@ export const ApproveIn: React.FC = () => {
   )
 
   const allowance = useMemo(
-    () => bnDisplay(tokenInUserData?.allowance, tokenIn?.decimals),
+    () => {
+      if (bn(tokenInUserData?.allowance).gte(bn(MaxUint256.toString()).div(2))) return 'Inf'
+      return bnDisplay(tokenInUserData?.allowance, tokenIn?.decimals)
+    },
     [tokenIn?.decimals, tokenInUserData?.allowance],
   )
 
@@ -57,11 +59,11 @@ export const ApproveIn: React.FC = () => {
   }, [amountDCA, dcasCount, tokenIn?.decimals, tokenInUserData?.allowance])
 
   const alreadyApproved = useMemo(
-    () =>
-      bn(tokenInUserData?.allowance ?? 0).gte(
-        bn(amountDCA).times(dcasCount === '' ? '0' : parseInt(dcasCount)),
-      ),
-    [amountDCA, dcasCount, tokenInUserData?.allowance],
+    () => {
+      if (approvalAmount === 'Inf') return allowance === 'Inf'
+      return bn(approvalAmount).lte(0)
+    },
+    [allowance, approvalAmount]
   )
 
   const handleApprove = useCallback(() => {
@@ -76,17 +78,17 @@ export const ApproveIn: React.FC = () => {
   return (
     <>
       <IntroText small>
-        Involica withdraws your spend token when you DCA.
-        Your approval amount determines how many times you will DCA.
+        Involica withdraws your spend token when you DCA. Your approval amount
+        determines how many times you will DCA.
         <br />
         <br />
         <i>
-          Enter the amount of DCA transactions you want to run,
-          and then approve your <b>{tokenIn?.symbol}</b> spends:
-          <br/>
-          <br/>
-          (Infinite Approval will continue to DCA until your wallet
-          balance runs out or Involica manually stopped)
+          Enter the amount of DCA transactions you want to run, and then approve
+          your <b>{tokenIn?.symbol}</b> spends:
+          <br />
+          <br />
+          (Infinite Approval will continue to DCA until your wallet balance runs
+          out or Involica manually stopped)
         </i>
       </IntroText>
       <RowStart gap="8px">
@@ -128,7 +130,7 @@ export const ApproveIn: React.FC = () => {
         isLoading={pending}
         onClick={handleApprove}
         activeText={
-          alreadyApproved && dcasCount != null && parseInt(dcasCount) > 0
+          alreadyApproved && dcasCount != null && (dcasCount === 'Inf' || parseInt(dcasCount) > 0)
             ? 'Approved'
             : `${dcasCount === 'Inf' ? 'Inf ' : ''}Approve`
         }

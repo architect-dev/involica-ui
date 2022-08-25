@@ -11,7 +11,7 @@ import {
   PositionExpectedAndDurationOverview,
   PositionSwapsOverview,
 } from './PositionOverviewElements'
-import { useSetPosition } from 'hooks/useExecute'
+import { useCreateAndFundPosition } from 'hooks/useExecute'
 
 export const Finalize: React.FC = () => {
   const tokenIn = usePositionConfigState((state) => state.tokenIn)
@@ -23,16 +23,15 @@ export const Finalize: React.FC = () => {
   const nativeToken = useInvolicaStore((state) => state.nativeToken)
   const fundingAmount = usePositionConfigState((state) => state.fundingAmount)
   const submissionReadyPosition = useSubmissionReadyPositionConfig()
-  const { pending, onSetPosition } = useSetPosition()
+  const { pending, onCreateAndFundPosition } = useCreateAndFundPosition()
 
   const handleCreatePosition = useCallback(() => {
-    onSetPosition(
+    onCreateAndFundPosition(
       submissionReadyPosition,
       eN(fundingAmount, nativeToken?.decimals),
-      true,
     )
   }, [
-    onSetPosition,
+    onCreateAndFundPosition,
     submissionReadyPosition,
     nativeToken?.decimals,
     fundingAmount,

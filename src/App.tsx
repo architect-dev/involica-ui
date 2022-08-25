@@ -12,6 +12,7 @@ import { useFetchPublicData, useFetchUserData } from 'state/hooks'
 import useEagerConnect from 'hooks/useEagerConnect'
 
 const Home = lazy(() => import('./views/Home'))
+const Tutorial = lazy(() => import('./views/Tutorial'))
 const NotFound = lazy(() => import('./views/NotFound'))
 
 const StyledRouter = styled(Router)`
@@ -49,6 +50,9 @@ const App: React.FC = () => {
           <Switch>
             <Route path="/" exact>
               <Home />
+            </Route>
+            <Route path="/tutorial" exact>
+              <Tutorial />
             </Route>
             <Route component={NotFound} />
           </Switch>

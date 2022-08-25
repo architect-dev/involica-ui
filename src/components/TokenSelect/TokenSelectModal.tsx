@@ -27,7 +27,6 @@ const TokenRowButton = styled(RowBetween)<{ disabled }>`
     pressableMixin({
       theme,
       disabled,
-      $translate: false,
       hoverStyles: css`
         background-color: ${transparentize(0.9, theme.colors.text)};
       `,

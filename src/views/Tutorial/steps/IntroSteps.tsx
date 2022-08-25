@@ -28,10 +28,11 @@ const StyledFieldset = styled.fieldset<{ halfWidth: boolean, expanded: boolean }
   align-items: flex-start;
   justify-content: flex-start;
   gap: 18px;
+  border-radius: 4px;
   padding: ${({ expanded }) => (expanded ? '32px' : '2px 36px')};
   transition: padding 200ms;
   border: dashed ${({ theme }) => theme.colors.text};
-  border-width: ${({ expanded }) => (expanded ? '1px' : '1px 0 0 1px')};
+  border-width: 1px;
   min-width: 100%;
   width: 100%;
   ${({ theme }) => theme.mediaQueries.nav} {
@@ -105,6 +106,7 @@ export const IntroSteps: React.FC = () => {
         onClick={getStarted}
         activeText="I Understand, Get Started"
       />
+      <ConfigPreview key='' />
       <br />
       <br />
       <br />
@@ -118,13 +120,10 @@ export const IntroSteps: React.FC = () => {
           IntroStep.Treasury,
           IntroStep.Finalize,
         ].map((step) => (
-          <>
-            <StyledFieldset key={step} halfWidth={stepHalfWidth[step]} expanded={introStep >= step}>
-              <legend><Text bold px='12px'>{stepTitle[step]}</Text></legend>
-              {introStep >= step && stepContent[step]}
-            </StyledFieldset>
-            {step === IntroStep.Outs && <ConfigPreview />}
-          </>
+          <StyledFieldset halfWidth={stepHalfWidth[step]} expanded={introStep >= step}>
+            <legend><Text bold px='12px'>{stepTitle[step]}</Text></legend>
+            {introStep >= step && stepContent[step]}
+          </StyledFieldset>
         ))}
       </StepsRowWrap>
     </>

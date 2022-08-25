@@ -8,6 +8,12 @@ export const getMenuItems = (): MenuEntry[] => [
     keyPaths: ['']
   },
   {
+    label: 'TUTORIAL',
+    href: `/tutorial`,
+    external: false,
+    keyPaths: ['tutorial']
+  },
+  {
     label: 'STATS',
     href: '/stats',
     external: false,

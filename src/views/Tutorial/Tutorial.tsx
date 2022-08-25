@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
+import { IntroSteps } from './steps/IntroSteps'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -23,7 +24,7 @@ const StyledHighlightedText = styled(HighlightedText)<{
   text-shadow: none;
 `
 
-const Home: React.FC = () => {
+const Tutorial: React.FC = () => {
   return (
     <Page>
       <Hero>
@@ -36,8 +37,9 @@ const Home: React.FC = () => {
         </StyledHighlightedText>
       </Hero>
 
+      <IntroSteps />
     </Page>
   )
 }
 
-export default Home
+export default Tutorial

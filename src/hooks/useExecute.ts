@@ -123,18 +123,39 @@ export const useWithdrawTreasury = () => {
   return { onWithdrawTreasury, pending }
 }
 
+export const useCreateAndFundPosition = () => {
+  const involica = useInvolica()
+  const { handleExecute, pending } = useExecuteTx()
+
+  const onCreateAndFundPosition = useCallback(
+    (config: any[], treasuryValue: string) => {
+      console.log({config}, { value: treasuryValue })
+      handleExecute(
+        involica,
+        'createAndFundPosition',
+        config,
+        { value: treasuryValue },
+        'Position Created',
+        'Error Creating Position',
+      )
+    },
+    [handleExecute, involica],
+  )
+
+  return { onCreateAndFundPosition, pending }
+}
+
 export const useSetPosition = () => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
 
   const onSetPosition = useCallback(
-    (config: any[], treasuryValue: string, isNewPosition: boolean) => {
-      console.log(...config, { value: treasuryValue })
+    (config: any[], isNewPosition: boolean) => {
       handleExecute(
         involica,
         'setPosition',
         config,
-        { value: treasuryValue },
+        undefined,
         isNewPosition ? 'Position Created' : 'Position Updated',
         isNewPosition ? 'Error Creating Position' : 'Error Updating Position',
       )
