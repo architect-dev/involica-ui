@@ -1,3 +1,4 @@
+import { Card } from 'components/Card'
 import React from 'react'
 import styled from 'styled-components'
 import { SummitButton, Text } from 'uikit'
@@ -6,7 +7,11 @@ import { AmountIn } from './AmountIn'
 import { ApproveIn } from './ApproveIn'
 import { ConfigPreview } from './ConfigPreview'
 import { Finalize } from './Finalize'
-import { IntroStep, useIntroActiveStep, usePositionConfigState } from './introStore'
+import {
+  IntroStep,
+  useIntroActiveStep,
+  usePositionConfigState,
+} from './introStore'
 import { SelectInterval } from './SelectInterval'
 import { SelectOuts } from './SelectOuts'
 import { SelectTokenIn } from './SelectTokenIn'
@@ -20,25 +25,6 @@ const StepsRowWrap = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   gap: 24px;
-`
-
-const StyledFieldset = styled.fieldset<{ halfWidth: boolean, expanded: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 18px;
-  border-radius: 4px;
-  padding: ${({ expanded }) => (expanded ? '32px' : '2px 36px')};
-  transition: padding 200ms;
-  border: dashed ${({ theme }) => theme.colors.text};
-  border-width: 1px;
-  min-width: 100%;
-  width: 100%;
-  ${({ theme }) => theme.mediaQueries.nav} {
-    min-width: ${({ halfWidth }) => halfWidth ? 'calc(50% - 12px)' : '100%'};
-    width: ${({ halfWidth }) => halfWidth ? 'calc(50% - 12px)' : '100%'};
-  }
 `
 
 const stepTitle: Record<IntroStep, string> = {
@@ -106,7 +92,7 @@ export const IntroSteps: React.FC = () => {
         onClick={getStarted}
         activeText="I Understand, Get Started"
       />
-      <ConfigPreview key='' />
+      <ConfigPreview key="" />
       <br />
       <br />
       <br />
@@ -120,10 +106,14 @@ export const IntroSteps: React.FC = () => {
           IntroStep.Treasury,
           IntroStep.Finalize,
         ].map((step) => (
-          <StyledFieldset halfWidth={stepHalfWidth[step]} expanded={introStep >= step}>
-            <legend><Text bold px='12px'>{stepTitle[step]}</Text></legend>
+          <Card
+            halfWidth={stepHalfWidth[step]}
+            key={step}
+            expanded={introStep >= step}
+            title={stepTitle[step]}
+          >
             {introStep >= step && stepContent[step]}
-          </StyledFieldset>
+          </Card>
         ))}
       </StepsRowWrap>
     </>

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import SummitButton from 'uikit/components/Button/SummitButton'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 
 const UnlockButton = ({ summitPalette = null, ...props}) => {
   const setConnectModalOpen = useInvolicaStore((state) => state.setConnectModalOpen)

@@ -1,5 +1,5 @@
 import { PositionOut } from 'state/types'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 import { bn, CHAIN_ID, eN } from 'utils'
 import { ethers } from 'ethers'
 import create from 'zustand'

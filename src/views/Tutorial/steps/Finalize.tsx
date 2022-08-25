@@ -5,7 +5,7 @@ import {
   useSubmissionReadyPositionConfig,
 } from './introStore'
 import { ethers } from 'ethers'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 import { bn, eN } from 'utils'
 import {
   PositionExpectedAndDurationOverview,

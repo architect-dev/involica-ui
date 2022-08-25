@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { Column, RowStart, SummitButton, Text } from 'uikit'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 import { MaxUint256 } from 'ethers/constants'
 import { bn, bnDisplay, eN } from 'utils'
 import { usePositionConfigState } from './introStore'

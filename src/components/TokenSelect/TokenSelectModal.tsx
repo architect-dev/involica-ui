@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { keys } from 'lodash'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 import {
   Column,
   Row,

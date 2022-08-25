@@ -13,7 +13,7 @@ import { ConnectorNames, connectorLocalStorageKey } from 'uikit'
 import { connectorsByName } from 'utils/web3React'
 import { setupNetwork } from 'utils/wallet'
 import useToast from 'hooks/useToast'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 
 const useAuth = () => {
     const clearActiveAccount = useInvolicaStore((state) => state.clearActiveAccount)

@@ -43,14 +43,14 @@ export interface PositionOut {
   weight: number
   maxSlippage: number
 }
-export interface Position {
+export interface Position extends PositionConfig {
   user: string
   tokenIn: string
-  outs: PositionOut
-  amountDCA: BigNumber
+  outs: PositionOut[]
+  amountDCA: string
   intervalDCA: number
   lastDCA: number
-  maxGasPrice: number
+  maxGasPrice: MaxGasPriceOptions
   taskId: string
   finalizationReason: string
 }
@@ -81,6 +81,43 @@ interface Loaded {
   publicDataLoaded: boolean
 }
 
+// POSITION CONFIG
+export type MaxGasPriceOptions = '100' | '200' | '500'
+export interface PositionConfig {
+  tokenIn?: string
+  outs: PositionOut[]
+  amountDCA?: string
+  intervalDCA?: number
+  maxGasPrice?: MaxGasPriceOptions
+  executeImmediately?: boolean
+}
+export interface PositionConfigSupplements {
+  startIntro: boolean
+  amountDCAInvalidReason: string | null
+  fundingAmount: string | null
+  fundingInvalidReason: string | null
+  dcasCount: string
+  weeks: string
+  days: string
+  hours: string
+}
+export interface PositionConfigMutators {
+  getStarted: () => void
+  setTokenIn: (tokenIn: string) => void
+  setOutsFromPreset: (outs: PositionOut[]) => void
+  addOut: (token: string, weight: number, maxSlippage: number) => void
+  removeOut: (index: number) => void
+  updateWeights: (weights: number[]) => void
+  updateOutMaxSlippage: (token: string, maxSlippage: number) => void
+  setAmountDCA: (amountDCA: string, fullBalance: string | null) => void
+  setFundingAmount: (fundingAmount: string, fullBalance: string | null) => void
+  setMaxGasPrice: (maxGasPrice: MaxGasPriceOptions) => void
+  setDcasCount: (dcasCount: string) => void
+  setWeeks: (weeks: string) => void
+  setDays: (days: string) => void
+  setHours: (hours: string) => void
+}
+
 // Global state
 export interface State
   extends Ecosystem,
@@ -89,4 +126,6 @@ export interface State
     PublicDataMutators,
     UserDataState,
     UserDataMutators,
-    Loaded {}
+    Loaded {
+  config: PositionConfig & PositionConfigSupplements & PositionConfigMutators
+}

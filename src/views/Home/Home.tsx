@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
+import { PositionCard } from './Components/PositionCard'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -11,6 +12,14 @@ const Hero = styled.div`
   margin: auto;
   margin-bottom: 32px;
   text-align: center;
+`
+
+const CardsWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
+  width: 100%;
 `
 
 const StyledHighlightedText = styled(HighlightedText)<{
@@ -34,6 +43,9 @@ const Home: React.FC = () => {
         >
           INVOLICA
         </StyledHighlightedText>
+        <CardsWrapper>
+          <PositionCard/>
+        </CardsWrapper>
       </Hero>
 
     </Page>

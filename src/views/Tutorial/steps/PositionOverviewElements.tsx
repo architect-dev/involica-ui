@@ -1,7 +1,7 @@
 import { linearGradient, transparentize } from 'polished'
 import React, { useMemo } from 'react'
 import { PositionOut } from 'state/types'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 import styled from 'styled-components'
 import { TokenSymbolImage, Text, Column, Row } from 'uikit'
 import { bn, bnDisplay, eN } from 'utils'

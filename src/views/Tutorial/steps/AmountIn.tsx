@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 import { Text } from 'uikit'
 import TokenInput from 'components/TokenInput'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 import { bn, bnDisplay } from 'utils'
 import { usePositionConfigState } from './introStore'
 import { getSymbol } from 'config/tokens'

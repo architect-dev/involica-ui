@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { usePositionConfigState } from './introStore'
+import { usePositionConfigState } from '../views/Tutorial/steps/introStore'
 import { transparentize } from 'polished'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'

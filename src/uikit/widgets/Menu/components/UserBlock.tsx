@@ -9,7 +9,7 @@ import ConnectPopUp from 'uikit/widgets/WalletModal/ConnectPopUp'
 import AccountPopUp from 'uikit/widgets/WalletModal/AccountPopUp'
 import { ChainIcon } from 'uikit/components/Svg'
 import { CHAIN_ID } from 'utils'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 
 const UserBlockFlex = styled.div`
   display: flex;

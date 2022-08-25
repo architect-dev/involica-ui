@@ -1,8 +1,8 @@
 import { TokenButton } from 'components/TokenButton'
 import React, { useCallback, useMemo, useState } from 'react'
 import { AddressRecord } from 'state/types'
-import { useInvolicaStore } from 'state/zustand'
-import { Text } from 'uikit'
+import { useInvolicaStore } from 'state/store'
+import { Column, Text } from 'uikit'
 import { SummitPopUp } from 'uikit/widgets/Popup'
 import { bn, bnDisplay } from 'utils'
 import TokenSelectModal, { ModalVariant } from './TokenSelectModal'
@@ -42,7 +42,7 @@ export const TokenSelectButton: React.FC<{
   )
 
   return (
-    <>
+    <Column gap='18px'>
       <SummitPopUp
         open={tokenSelectModalOpen}
         callOnDismiss={hideSelectTokenModal}
@@ -73,6 +73,6 @@ export const TokenSelectButton: React.FC<{
           )}
         </Text>
       )}
-    </>
+    </Column>
   )
 }

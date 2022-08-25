@@ -30,6 +30,7 @@ export const Text = styled.div<TextProps>`
   font-style: ${({ italic }) => (italic ? 'italic' : 'default')};
   text-decoration: ${({ underline }) => (underline ? 'underline' : 'default')};
   line-height: 1.5;
+  text-align: left;
   font-family: monospace;
   ${({ textTransform }) => textTransform && `text-transform: ${textTransform};`}
   ${space}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useInvolicaStore } from 'state/zustand'
+import { useInvolicaStore } from 'state/store'
 import { SummitButton, RowBetween, TokenSymbolImage } from 'uikit'
 
 export const TokenButton: React.FC<{

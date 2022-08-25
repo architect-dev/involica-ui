@@ -1,7 +1,8 @@
-import { useWeb3React } from "@web3-react/core"
-import useRefresh from "hooks/useRefresh"
-import { useEffect } from "react"
-import { useInvolicaStore } from "./zustand"
+import { useWeb3React } from '@web3-react/core'
+import useRefresh from 'hooks/useRefresh'
+import { useEffect, useMemo } from 'react'
+import { useInvolicaStore } from './store'
+import { PositionConfig, PositionConfigMutators, PositionConfigSupplements } from './types'
 
 export const useFetchPublicData = () => {
   const { slowRefresh } = useRefresh()
@@ -15,9 +16,9 @@ export const useFetchPublicData = () => {
 export const useFetchUserData = () => {
   const { account } = useWeb3React()
   const { slowRefresh } = useRefresh()
-  const {setActiveAccount, fetchUserData} = useInvolicaStore((state) => ({
+  const { setActiveAccount, fetchUserData } = useInvolicaStore((state) => ({
     setActiveAccount: state.setActiveAccount,
-    fetchUserData: state.fetchUserData
+    fetchUserData: state.fetchUserData,
   }))
 
   useEffect(() => {
@@ -26,3 +27,98 @@ export const useFetchUserData = () => {
     fetchUserData(account)
   }, [account, fetchUserData, setActiveAccount, slowRefresh])
 }
+
+export type WithDirty<T extends keyof PositionConfig> = { dirty: boolean } & Pick<PositionConfig, T>
+
+export const useConfigSupplements = <S extends Array<keyof PositionConfigSupplements>>(
+  supplements: S,
+): Pick<PositionConfigSupplements, S[0]> => {
+  return useInvolicaStore((state) => {
+    const supps: Pick<PositionConfigSupplements, S[0]> = {} as any
+    supplements.forEach((supp) => {
+      supps[supp] = state.config[supp]
+    })
+    return supps
+  })
+}
+export const useDirtyablePositionValue = <K extends keyof PositionConfig>(key: K): WithDirty<K> => {
+  const positionVal = useInvolicaStore((state) => state.userData?.position?.[key])
+  const configVal = useInvolicaStore((state) => state.config[key])
+  return useMemo(
+    () =>
+      ({
+        [key]: configVal ?? positionVal,
+        dirty: JSON.stringify(configVal) !== JSON.stringify(positionVal),
+      } as WithDirty<K>),
+    [key, positionVal, configVal],
+  )
+}
+
+export const usePositionSetters = <M extends Array<keyof PositionConfigMutators>>(
+  mutators: M,
+): Pick<PositionConfigMutators, M[0]> => {
+  return useInvolicaStore((state) => {
+    const setters: Pick<PositionConfigMutators, M[0]> = {} as any
+    mutators.forEach((mutator) => {
+      setters[mutator] = state.config[mutator]
+    })
+    return setters
+  })
+}
+export const useConfigurablePositionValue = <
+  K extends keyof PositionConfig,
+  M extends Array<keyof PositionConfigMutators>
+>(
+  key: K,
+  mutators: M,
+) => ({
+  ...useDirtyablePositionValue(key),
+  ...usePositionSetters(mutators),
+})
+
+export const usePositionTokenIn = () => ({ ...useDirtyablePositionValue('tokenIn') })
+export const useConfigurableTokenIn = () => ({ ...useConfigurablePositionValue('tokenIn', ['setTokenIn']) })
+
+export const usePositionOuts = () => ({ ...useDirtyablePositionValue('outs') })
+export const useConfigurableOuts = () => ({
+  ...useConfigurablePositionValue('outs', [
+    'setOutsFromPreset',
+    'addOut',
+    'removeOut',
+    'updateWeights',
+    'updateOutMaxSlippage',
+  ]),
+})
+
+export const usePositionAmountDCA = () => ({ ...useDirtyablePositionValue('amountDCA') })
+export const useConfigurableAmountDCA = () => ({
+  ...useConfigurablePositionValue('amountDCA', ['setAmountDCA']),
+  ...useConfigSupplements(['amountDCAInvalidReason']),
+})
+
+export const usePositionIntervalDCA = () => ({ ...useDirtyablePositionValue('intervalDCA') })
+export const useConfigurableIntervalDCA = () => ({
+  ...useConfigurablePositionValue('intervalDCA', ['setWeeks', 'setDays', 'setHours']),
+  ...useConfigSupplements(['weeks', 'days', 'hours']),
+})
+
+export const usePositionMaxGasPrice = () => ({ ...useDirtyablePositionValue('maxGasPrice') })
+export const useConfigurableMaxGasPrice = () => ({ ...useConfigurablePositionValue('maxGasPrice', ['setMaxGasPrice']) })
+
+export const useConfigurableDcasCount = () => ({
+  ...useInvolicaStore((state) => ({ dcasCount: state.config.dcasCount })),
+  ...usePositionSetters(['setDcasCount']),
+})
+
+export const useConfigurableFundingAmount = () => ({
+  ...useInvolicaStore((state) => ({
+    fundingAmount: state.config.fundingAmount,
+    fundingInvalidReason: state.config.fundingInvalidReason,
+  })),
+  ...usePositionSetters(['setFundingAmount']),
+})
+
+export const useConfigurableStartIntro = () => ({
+  ...useInvolicaStore((state) => ({ startIntro: state.config.startIntro })),
+  ...usePositionSetters(['getStarted']),
+})
