@@ -99,7 +99,7 @@ export const useConfigurableAmountDCA = () => ({
 export const usePositionIntervalDCA = () => ({ ...useDirtyablePositionValue('intervalDCA') })
 export const useConfigurableIntervalDCA = () => ({
   ...useConfigurablePositionValue('intervalDCA', ['setWeeks', 'setDays', 'setHours']),
-  ...useConfigSupplements(['weeks', 'days', 'hours']),
+  ...useConfigSupplements(['weeks', 'weeksInvalidReason', 'days', 'daysInvalidReason', 'hours', 'hoursInvalidReason']),
 })
 
 export const usePositionMaxGasPrice = () => ({ ...useDirtyablePositionValue('maxGasPrice') })

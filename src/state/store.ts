@@ -71,8 +71,11 @@ export const useInvolicaStore = create<State>()(
         dcasCountInvalidReason: null,
 
         weeks: '',
+        weeksInvalidReason: null,
         days: '',
+        daysInvalidReason: null,
         hours: '',
+        hoursInvalidReason: null,
       },
 
       // Config Mutators
@@ -165,21 +168,39 @@ export const useInvolicaStore = create<State>()(
         })
       },
       setWeeks: (weeks: string) => {
+        let invReason = null
+        if (weeks === '') invReason = null
+        else if (isNaN(parseFloat(weeks))) invReason = 'Not a number'
+        else if (parseFloat(weeks) < 0) invReason = 'Must be >= 0'
+
         set((state) => {
           state.config.weeks = weeks
           state.config.intervalDCA = wdhToSec(weeks, get().config.days, get().config.hours)
+          state.config.weeksInvalidReason = invReason
         })
       },
       setDays: (days: string) => {
+        let invReason = null
+        if (days === '') invReason = null
+        else if (isNaN(parseFloat(days))) invReason = 'Not a number'
+        else if (parseFloat(days) < 0) invReason = 'Must be >= 0'
+
         set((state) => {
           state.config.days = days
           state.config.intervalDCA = wdhToSec(get().config.weeks, days, get().config.hours)
+          state.config.daysInvalidReason = invReason
         })
       },
       setHours: (hours: string) => {
+        let invReason = null
+        if (hours === '') invReason = null
+        else if (isNaN(parseFloat(hours))) invReason = 'Not a number'
+        else if (parseFloat(hours) < 0) invReason = 'Must be >= 0'
+
         set((state) => {
           state.config.hours = hours
           state.config.intervalDCA = wdhToSec(get().config.weeks, get().config.days, hours)
+          state.config.hoursInvalidReason = invReason
         })
       },
 
@@ -210,8 +231,11 @@ export const useInvolicaStore = create<State>()(
             dcasCount: '1',
             dcasCountInvalidReason: null,
             weeks: Math.floor(position.intervalDCA / (3600 * 24 * 7)).toString(),
+            weeksInvalidReason: null,
             days: Math.floor((position.intervalDCA % (3600 * 24 * 7)) / (3600 * 24)).toString(),
+            daysInvalidReason: null,
             hours: Math.floor((position.intervalDCA % (3600 * 24)) / 3600).toString(),
+            hoursInvalidReason: null,
           },
         })
       },
@@ -232,8 +256,11 @@ export const useInvolicaStore = create<State>()(
             dcasCount: '',
             dcasCountInvalidReason: null,
             weeks: '',
+            weeksInvalidReason: null,
             days: '',
+            daysInvalidReason: null,
             hours: '',
+            hoursInvalidReason: null,
           }
         })
       }

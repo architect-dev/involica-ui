@@ -110,8 +110,11 @@ export interface PositionConfigSupplements {
   dcasCount: string
   dcasCountInvalidReason: string | null
   weeks: string
+  weeksInvalidReason: string | null
   days: string
+  daysInvalidReason: string | null
   hours: string
+  hoursInvalidReason: string | null
 }
 export interface PositionConfigMutators {
   getStarted: () => void

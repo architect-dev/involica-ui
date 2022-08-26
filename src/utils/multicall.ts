@@ -29,6 +29,7 @@ export enum ParseFieldType {
   string,
   bignumber,
   bignumberArr,
+  numberBp,
   number,
   numberRaw,
   numberArr,
@@ -86,6 +87,8 @@ const parseField = (
 
     case ParseFieldType.bignumber:
       return new BigNumber(value._hex).toJSON()
+    case ParseFieldType.numberBp:
+      return Number(new BigNumber(value._hex).div(100))
     case ParseFieldType.number:
       return Number(new BigNumber(value._hex))
     case ParseFieldType.numberRaw:
