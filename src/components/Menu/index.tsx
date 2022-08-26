@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import useTheme from 'hooks/useTheme'
 import { Menu as UikitMenu } from 'uikit'
 import { getMenuItems } from './config'
-import { getLinks } from '../../config/constants'
 import useAuth from 'hooks/useAuth'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 
@@ -11,7 +10,6 @@ const Menu = (props) => {
   const { account } = useActiveWeb3React()
 
   const { isDark, toggleTheme } = useTheme()
-  const links = getLinks()
   const menuLinks = useMemo(() => {
     return getMenuItems()
   }, [])
