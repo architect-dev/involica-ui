@@ -2,11 +2,11 @@ import React, { useCallback, useMemo } from 'react'
 import { Column, Text } from 'uikit'
 import TokenInput from 'components/TokenInput'
 import { getNativeTokenSymbol } from 'config/constants'
-import { useInvolicaStore } from 'state/store'
 import { bnDisplay } from 'utils'
-import { usePositionConfigState } from './introStore'
 import MaxGasPriceSelector from './MaxGasPriceSelector'
 import styled from 'styled-components'
+import { useConfigurableFundingAmount, useNativeTokenFullData, usePositionMaxGasPrice, usePositionOuts } from 'state/hooks'
+import { MaxGasPriceOptions } from 'state/types'
 
 const baseGasPrice = 450000
 const perSwapGasPrice = 195000
@@ -16,20 +16,12 @@ const IntroText = styled(Text)`
 `
 
 export const AddFunds: React.FC = () => {
-  const nativeToken = useInvolicaStore((state) => state.nativeToken)
-  const userNativeToken = useInvolicaStore(
-    (state) => state.userData?.userNativeTokenData,
-  )
-  const fundingAmount = usePositionConfigState((state) => state.fundingAmount)
-  const fundingInvalidReason = usePositionConfigState(
-    (state) => state.fundingInvalidReason,
-  )
-  const setFundingAmount = usePositionConfigState(
-    (state) => state.setFundingAmount,
-  )
-  const outs = usePositionConfigState((state) => state.outs)
-  const minGasPrice = '100'
-  const maxGasPrice = usePositionConfigState((state) => state.maxGasPrice)
+  const { nativeTokenData, nativeTokenUserData } = useNativeTokenFullData()
+  const { fundingAmount, fundingInvalidReason, setFundingAmount } = useConfigurableFundingAmount()
+  const { outs } = usePositionOuts()
+  
+  const { maxGasPrice } = usePositionMaxGasPrice()
+  const minGasPrice: MaxGasPriceOptions = '100'
 
   const minTxPrice = useMemo(() => {
     return bnDisplay(
@@ -49,8 +41,8 @@ export const AddFunds: React.FC = () => {
   }, [maxGasPrice, outs.length])
 
   const fullBalance = useMemo(
-    () => bnDisplay(userNativeToken?.balance, nativeToken?.decimals),
-    [nativeToken?.decimals, userNativeToken?.balance],
+    () => bnDisplay(nativeTokenUserData?.balance, nativeTokenData?.decimals),
+    [nativeTokenData?.decimals, nativeTokenUserData?.balance],
   )
 
   const handleChange = useCallback(

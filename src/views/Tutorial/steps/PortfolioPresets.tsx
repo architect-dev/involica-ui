@@ -1,5 +1,6 @@
 import { getSymbol } from 'config/tokens'
 import React, { useCallback, useState } from 'react'
+import { useConfigurableOuts } from 'state/hooks'
 import { PositionOut } from 'state/types'
 import styled from 'styled-components'
 import {
@@ -10,7 +11,6 @@ import {
   TokenSymbolImage,
 } from 'uikit'
 import { SummitPopUp } from 'uikit/widgets/Popup'
-import { usePositionConfigState } from './introStore'
 import { PositionSwapsOverviewOverride } from './PositionOverviewElements'
 
 const ModalWrapper = styled.div`
@@ -90,9 +90,7 @@ const presets: Array<Preset> = [
 ]
 
 const PresetButton: React.FC<{ preset: Preset }> = ({ preset }) => {
-  const setOutsFromPreset = usePositionConfigState(
-    (state) => state.setOutsFromPreset,
-  )
+  const { setOutsFromPreset } = useConfigurableOuts()
   const [open, setOpen] = useState(false)
   const show = useCallback(() => setOpen(true), [setOpen])
   const hide = useCallback(() => setOpen(false), [setOpen])

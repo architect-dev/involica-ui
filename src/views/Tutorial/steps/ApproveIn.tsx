@@ -1,41 +1,32 @@
 import React, { useCallback, useMemo } from 'react'
 import { Column, RowStart, SummitButton, Text } from 'uikit'
-import { useInvolicaStore } from 'state/store'
 import { MaxUint256 } from 'ethers/constants'
 import { bn, bnDisplay, eN } from 'utils'
-import { usePositionConfigState } from './introStore'
 import { useApprove } from 'hooks/useExecute'
 import NumericInput from 'components/Input/NumericInput'
 import styled from 'styled-components'
+import { useConfigurableDcasCount, usePositionAmountDCA, usePositionTokenInWithData } from 'state/hooks'
 
 const IntroText = styled(Text)`
   max-width: 500px;
 `
 
 export const ApproveIn: React.FC = () => {
-  const tokenInAdd = usePositionConfigState((state) => state.tokenIn)
-  const tokenIn = useInvolicaStore((state) => state.tokens?.[tokenInAdd])
-  const tokenInUserData = useInvolicaStore(
-    (state) => state.userData?.userTokensData?.[tokenInAdd],
-  )
-  const amountDCA = usePositionConfigState((state) => state.amountDCA)
+  const { tokenIn, tokenInData, tokenInUserData } = usePositionTokenInWithData()
+  const { amountDCA } = usePositionAmountDCA()
   const { onApprove, onInfApprove, pending } = useApprove(
-    tokenIn?.symbol,
-    tokenInAdd,
+    tokenInData?.symbol,
+    tokenIn,
   )
+  const { dcasCount, setDcasCount } = useConfigurableDcasCount()
 
   const allowance = useMemo(
     () => {
       if (bn(tokenInUserData?.allowance).gte(bn(MaxUint256.toString()).div(2))) return 'Inf'
-      return bnDisplay(tokenInUserData?.allowance, tokenIn?.decimals)
+      return bnDisplay(tokenInUserData?.allowance, tokenInData?.decimals)
     },
-    [tokenIn?.decimals, tokenInUserData?.allowance],
+    [tokenInData?.decimals, tokenInUserData?.allowance],
   )
-
-  const { dcasCount, setDcasCount } = usePositionConfigState((state) => ({
-    dcasCount: state.dcasCount,
-    setDcasCount: state.setDcasCount,
-  }))
 
   const handleSetDcasCount = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -50,13 +41,13 @@ export const ApproveIn: React.FC = () => {
     if (dcasCount === '' || dcasCount === '' || isNaN(parseInt(dcasCount)))
       return '-'
     return bnDisplay(
-      bn(eN(amountDCA, tokenIn?.decimals))
+      bn(eN(amountDCA, tokenInData?.decimals))
         .times(dcasCount === '' ? '0' : parseInt(dcasCount))
         .minus(tokenInUserData?.allowance ?? 0),
-      tokenIn?.decimals,
+      tokenInData?.decimals,
       3,
     )
-  }, [amountDCA, dcasCount, tokenIn?.decimals, tokenInUserData?.allowance])
+  }, [amountDCA, dcasCount, tokenInData?.decimals, tokenInUserData?.allowance])
 
   const alreadyApproved = useMemo(
     () => {
@@ -68,8 +59,8 @@ export const ApproveIn: React.FC = () => {
 
   const handleApprove = useCallback(() => {
     if (dcasCount === 'Inf') onInfApprove()
-    else onApprove(bn(amountDCA).times(dcasCount).toString(), tokenIn?.decimals)
-  }, [amountDCA, dcasCount, onApprove, onInfApprove, tokenIn?.decimals])
+    else onApprove(bn(amountDCA).times(dcasCount).toString(), tokenInData?.decimals)
+  }, [amountDCA, dcasCount, onApprove, onInfApprove, tokenInData?.decimals])
 
   const clearIfInf = useCallback(() => {
     if (dcasCount === 'Inf') setDcasCount('')
@@ -84,7 +75,7 @@ export const ApproveIn: React.FC = () => {
         <br />
         <i>
           Enter the amount of DCA transactions you want to run, and then approve
-          your <b>{tokenIn?.symbol}</b> spends:
+          your <b>{tokenInData?.symbol}</b> spends:
           <br />
           <br />
           (Infinite Approval will continue to DCA until your wallet balance runs
@@ -111,11 +102,11 @@ export const ApproveIn: React.FC = () => {
       <Column>
         <Text>
           Amount to approve: {alreadyApproved ? 0 : approvalAmount}{' '}
-          {tokenIn?.symbol}
+          {tokenInData?.symbol}
         </Text>
         {bn(tokenInUserData?.allowance).toNumber() > 0 && (
           <Text small italic>
-            Current allowance: ({allowance} {tokenIn?.symbol})
+            Current allowance: ({allowance} {tokenInData?.symbol})
             {!alreadyApproved && ' subtracted'}
           </Text>
         )}

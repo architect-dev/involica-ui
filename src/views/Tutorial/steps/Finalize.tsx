@@ -1,69 +1,39 @@
 import React, { useCallback, useMemo } from 'react'
 import { SummitButton, Text } from 'uikit'
-import {
-  usePositionConfigState,
-  useSubmissionReadyPositionConfig,
-} from './introStore'
 import { ethers } from 'ethers'
-import { useInvolicaStore } from 'state/store'
 import { bn, eN } from 'utils'
-import {
-  PositionExpectedAndDurationOverview,
-  PositionSwapsOverview,
-} from './PositionOverviewElements'
+import { PositionExpectedAndDurationOverview, PositionSwapsOverview } from './PositionOverviewElements'
 import { useCreateAndFundPosition } from 'hooks/useExecute'
+import {
+  useNativeTokenPublicData,
+  usePositionAmountDCA,
+  useConfigFundingAmount,
+  usePositionTokenInWithData,
+} from 'state/hooks'
+import { useSubmissionReadyPositionConfig } from 'state/introHooks'
 
 export const Finalize: React.FC = () => {
-  const tokenIn = usePositionConfigState((state) => state.tokenIn)
-  const tokenData = useInvolicaStore((state) => state.tokens?.[tokenIn])
-  const amountDCA = usePositionConfigState((state) => state.amountDCA)
-  const userTokenData = useInvolicaStore(
-    (state) => state.userData?.userTokensData?.[tokenIn],
-  )
-  const nativeToken = useInvolicaStore((state) => state.nativeToken)
-  const fundingAmount = usePositionConfigState((state) => state.fundingAmount)
+  const { tokenInData, tokenInUserData } = usePositionTokenInWithData()
+  const { nativeTokenData } = useNativeTokenPublicData()
+  const { amountDCA } = usePositionAmountDCA()
+  const { fundingAmount } = useConfigFundingAmount()
+
   const submissionReadyPosition = useSubmissionReadyPositionConfig()
   const { pending, onCreateAndFundPosition } = useCreateAndFundPosition()
 
   const handleCreatePosition = useCallback(() => {
-    onCreateAndFundPosition(
-      submissionReadyPosition,
-      eN(fundingAmount, nativeToken?.decimals),
-    )
-  }, [
-    onCreateAndFundPosition,
-    submissionReadyPosition,
-    nativeToken?.decimals,
-    fundingAmount,
-  ])
+    onCreateAndFundPosition(submissionReadyPosition, eN(fundingAmount, nativeTokenData?.decimals))
+  }, [onCreateAndFundPosition, submissionReadyPosition, nativeTokenData?.decimals, fundingAmount])
 
   const limitedDCAs = useMemo(() => {
-    if (amountDCA === '' || amountDCA === '0' || isNaN(parseFloat(amountDCA)))
-      return '-'
-    const infAllowance = bn(userTokenData?.allowance).gt(
-      bn(ethers.constants.MaxUint256.div(2).toString()),
-    )
-    const bDCAs = Math.floor(
-      bn(userTokenData?.balance)
-        .div(eN(amountDCA, tokenData?.decimals))
-        .toNumber(),
-    )
+    if (amountDCA === '' || amountDCA === '0' || isNaN(parseFloat(amountDCA))) return '-'
+    const infAllowance = bn(tokenInUserData?.allowance).gt(bn(ethers.constants.MaxUint256.div(2).toString()))
+    const bDCAs = Math.floor(bn(tokenInUserData?.balance).div(eN(amountDCA, tokenInData?.decimals)).toNumber())
     const aDCAs = infAllowance
       ? 'Inf'
-      : Math.floor(
-          bn(userTokenData?.allowance)
-            .div(eN(amountDCA, tokenData?.decimals))
-            .toNumber(),
-        )
-    return bn(userTokenData?.balance).lt(userTokenData?.allowance)
-      ? bDCAs
-      : aDCAs
-  }, [
-    amountDCA,
-    tokenData?.decimals,
-    userTokenData?.allowance,
-    userTokenData?.balance,
-  ])
+      : Math.floor(bn(tokenInUserData?.allowance).div(eN(amountDCA, tokenInData?.decimals)).toNumber())
+    return bn(tokenInUserData?.balance).lt(tokenInUserData?.allowance) ? bDCAs : aDCAs
+  }, [amountDCA, tokenInData?.decimals, tokenInUserData?.allowance, tokenInUserData?.balance])
 
   return (
     <>
@@ -87,7 +57,7 @@ export const Finalize: React.FC = () => {
         your position is created
         <br />
       </Text>
-      <br/>
+      <br />
       <SummitButton
         isLoading={pending}
         onClick={handleCreatePosition}

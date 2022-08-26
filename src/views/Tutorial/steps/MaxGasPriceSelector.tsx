@@ -1,9 +1,9 @@
 import React from 'react'
+import { useConfigurableMaxGasPrice } from 'state/hooks'
 import styled from 'styled-components'
 import SummitButton from 'uikit/components/Button/SummitButton'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
-import { usePositionConfigState } from './introStore'
 
 const buttonWidth = 100
 const buttonHeight = 28
@@ -48,8 +48,7 @@ const TextButton = styled.div<{ selected: boolean }>`
 `
 
 const MaxGasPriceSelector = () => {
-  const maxGasPrice = usePositionConfigState((state) => state.maxGasPrice)
-  const setMaxGasPrice = usePositionConfigState((state) => state.setMaxGasPrice)
+  const { maxGasPrice, setMaxGasPrice } = useConfigurableMaxGasPrice()
   const selectedIndex = maxGasPrice === '100' ? 0 : maxGasPrice === '200' ? 1 : 2
   return (
     <SelectorWrapper>

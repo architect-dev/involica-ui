@@ -7,6 +7,17 @@ export const NamedChainId = {
   POLYGON: '137',
 }
 
+export enum IntroStep {
+  NotStarted,
+  TokenIn,
+  Amount,
+  Outs,
+  Interval,
+  Approve,
+  Treasury,
+  Finalize,
+}
+
 export type AddressRecord<T> = Record<string, T>
 
 // ECOSYSTEM
@@ -119,6 +130,9 @@ export interface PositionConfigMutators {
 }
 
 // Global state
+interface ConfigState {
+  config: PositionConfig & PositionConfigSupplements
+}
 export interface State
   extends Ecosystem,
     EcosystemMutators,
@@ -126,6 +140,6 @@ export interface State
     PublicDataMutators,
     UserDataState,
     UserDataMutators,
-    Loaded {
-  config: PositionConfig & PositionConfigSupplements & PositionConfigMutators
-}
+    Loaded,
+    ConfigState,
+    PositionConfigMutators {}

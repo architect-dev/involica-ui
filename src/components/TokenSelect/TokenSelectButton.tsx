@@ -11,9 +11,10 @@ export const TokenSelectButton: React.FC<{
   token: string | null
   noTokenString: string
   setToken: (token: string) => void
+  selectedTokens?: string[]
   disabledTokens?: AddressRecord<string>
   modalVariant: ModalVariant
-}> = ({ token, setToken, noTokenString, disabledTokens, modalVariant }) => {
+}> = ({ token, setToken, noTokenString, selectedTokens, disabledTokens, modalVariant }) => {
   const tokenData = useInvolicaStore((state) => state.tokens?.[token])
   const userTokenData = useInvolicaStore(
     (state) => state.userData?.userTokensData?.[token],
@@ -57,6 +58,7 @@ export const TokenSelectButton: React.FC<{
         popUpContent={
           <TokenSelectModal
             setToken={setToken}
+            selectedTokens={selectedTokens ?? [token]}
             disabledTokens={disabledTokens}
             variant={modalVariant}
           />

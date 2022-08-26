@@ -1,9 +1,10 @@
 import React, { useCallback, useState } from 'react'
+import { useIntroActiveStep } from 'state/introHooks'
+import { IntroStep } from 'state/types'
 import styled from 'styled-components'
 import { SummitButton } from 'uikit'
 import { SummitPopUp } from 'uikit/widgets/Popup'
 import { ConfigPreviewModal } from './ConfigPreviewModal'
-import { IntroStep, useIntroActiveStep } from './introStore'
 
 const FixedDiv = styled.div`
   position: sticky;

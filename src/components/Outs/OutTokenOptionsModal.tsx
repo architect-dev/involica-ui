@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
+import { useConfigurableOuts } from 'state/hooks'
 import { Flex, SummitButton, Text } from 'uikit'
-import { usePositionConfigState } from 'views/Tutorial/steps/introStore'
 
 // TODO: Add max slippage setting
 export const OutTokenOptionsModal: React.FC<{
@@ -8,7 +8,7 @@ export const OutTokenOptionsModal: React.FC<{
   index: number
   onDismiss?: () => void
 }> = ({ index, onDismiss }) => {
-  const removeOut = usePositionConfigState((state) => state.removeOut)
+  const { removeOut } = useConfigurableOuts()
   const handleRemove = useCallback(() => {
     removeOut(index)
     onDismiss()

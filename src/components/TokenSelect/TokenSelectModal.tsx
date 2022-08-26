@@ -15,6 +15,7 @@ import styled, { css } from 'styled-components'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { bnDisplay } from 'utils'
 import { getIsStable } from 'config/tokens'
+import { Check } from 'react-feather'
 
 export type ModalVariant = 'tokenIn' | 'tokenOut'
 
@@ -23,6 +24,7 @@ const TokenRowButton = styled(RowBetween)<{ disabled }>`
   padding: 0 18px;
   height: 48px;
   min-height: 48px;
+  color: ${({ theme }) => theme.colors.text};
   ${({ theme, disabled }) =>
     pressableMixin({
       theme,
@@ -39,10 +41,11 @@ const TokenRowButton = styled(RowBetween)<{ disabled }>`
 const TokenSelectRow: React.FC<{
   token: Token
   userData?: UserTokenData
+  selected: boolean
   disabledReason: string | null
   variant: ModalVariant
   setToken: (string) => void
-}> = ({ token, userData, variant, disabledReason, setToken }) => {
+}> = ({ token, userData, variant, selected, disabledReason, setToken }) => {
   const balance = useMemo(() => {
     switch (variant) {
       case 'tokenOut': {
@@ -60,6 +63,7 @@ const TokenSelectRow: React.FC<{
       onClick={() => disabledReason != null ? null : setToken(token.address)}
     >
       <Row gap="6px">
+        { selected && <Check size={16} /> }
         <TokenSymbolImage symbol={token.symbol} width={24} height={24} />
         <Column>
           <Text bold>{token.symbol}</Text>
@@ -101,11 +105,13 @@ const HeaderRow = styled(RowBetween)`
 `
 
 const TokenSelectModal: React.FC<{
+  selectedTokens?: string[]
   disabledTokens?: AddressRecord<string>
   variant: ModalVariant
   onDismiss?: () => void
   setToken: (string) => void
 }> = ({
+  selectedTokens,
   disabledTokens,
   variant = 'tokenIn',
   setToken,
@@ -156,6 +162,7 @@ const TokenSelectModal: React.FC<{
             key={addr}
             token={tokens[addr]}
             userData={userTokensData?.[addr]}
+            selected={selectedTokens?.includes(addr)}
             disabledReason={disabledTokens?.[addr]}
             setToken={handleSelect}
             variant={variant}

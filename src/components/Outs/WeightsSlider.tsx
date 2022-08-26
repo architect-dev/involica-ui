@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo } from 'react'
-import { usePositionConfigState } from '../views/Tutorial/steps/introStore'
 import { transparentize } from 'polished'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 import styled from 'styled-components'
 import { Row, Text, TokenSymbolImage } from 'uikit'
 import { getSymbol } from 'config/tokens'
+import { useConfigurableOuts } from 'state/hooks'
 
 const SliderWrapper = styled.div`
   height: 60px;
@@ -94,8 +94,7 @@ const StyledSlider = styled(Slider)`
 `
 
 export const WeightsSlider: React.FC = () => {
-  const outs = usePositionConfigState((state) => state.outs)
-  const updateWeights = usePositionConfigState((state) => state.updateWeights)
+  const { outs, updateWeights } = useConfigurableOuts()
 
   const weightValues = useMemo(() => {
     const weights = []

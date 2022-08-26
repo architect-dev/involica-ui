@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { CHAIN_ID } from 'utils'
 import create from 'zustand'
-import { immer } from 'zustand/middleware/immer'
 import { persist } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
 import fetchPublicData from './fetchPublicData'
 import fetchUserData from './fetchUserData'
 import { State, MaxGasPriceOptions, PositionOut } from './types'
@@ -66,132 +66,110 @@ export const useInvolicaStore = create<State>()(
         startIntro: false,
         fundingAmount: '',
         fundingInvalidReason: 'Funding required',
-        getStarted: () =>
-          set((state) => {
-            state.config.startIntro = true
-          }),
-        setTokenIn: (tokenIn: string) =>
-          set((state) => {
-            state.config.tokenIn = tokenIn
-          }),
-        setOutsFromPreset: (outs: PositionOut[]) =>
-          set((state) => {
-            state.config.outs = outs
-          }),
-        addOut: (token: string) => {
-          const w = weights[get().config.outs.length + 1]
-          set((state) => {
-            state.config.outs = get()
-              .config.outs.concat({
-                token,
-                weight: 0,
-                maxSlippage: 1,
-              })
-              .map((out, i) => ({ ...out, weight: w[i] }))
-          })
-        },
-        removeOut: (index: number) => {
-          const w = weights[get().config.outs.length - 1]
-          set((state) => {
-            state.config.outs = get()
-              .config.outs.filter((_, i) => index !== i)
-              .map((out, i) => ({ ...out, weight: w[i] }))
-          })
-        },
-        updateWeights: (w: number[]) =>
-          set((state) => {
-            state.config.outs = get().config.outs.map((out, i) => ({
-              ...out,
-              weight: w[i],
-            }))
-          }),
-        updateOutMaxSlippage: (token: string, maxSlippage: number) =>
-          set((state) => {
-            state.config.outs = get().config.outs.map((out) =>
-              out.token === token ? { ...out, maxSlippage } : out,
-            )
-          }),
-        setAmountDCA: (amountDCA: string, fullBalance: string | null) => {
-          let amountDCAInvalidReason = null
-          if (amountDCA === '') amountDCAInvalidReason = 'Funding required'
-          else if (isNaN(parseFloat(amountDCA)))
-            amountDCAInvalidReason = 'Not a number'
-          else if (parseFloat(amountDCA) === 0)
-            amountDCAInvalidReason = 'Must be greater than 0'
-          else if (
-            parseFloat(amountDCA ?? '0') > parseFloat(fullBalance ?? '0')
-          )
-            amountDCAInvalidReason =
-              'Insufficient wallet balance to cover 1 DCA'
-          set((state) => {
-            state.config.amountDCA = amountDCA
-            state.config.amountDCAInvalidReason = amountDCAInvalidReason
-          })
-        },
-        setFundingAmount: (
-          fundingAmount: string,
-          fullBalance: string | null,
-        ) => {
-          let fundingInvalidReason = null
-          if (fundingAmount === '') fundingInvalidReason = 'Funding required'
-          else if (isNaN(parseFloat(fundingAmount)))
-            fundingInvalidReason = 'Not a number'
-          else if (parseFloat(fundingAmount) === 0)
-            fundingInvalidReason = 'Must be greater than 0'
-          else if (
-            parseFloat(fundingAmount ?? '0') > parseFloat(fullBalance ?? '0')
-          )
-            fundingInvalidReason = 'Insufficient balance'
 
-          set((state) => {
-            state.config.fundingAmount = fundingAmount
-            state.config.fundingInvalidReason = fundingInvalidReason
-          })
-        },
-        setMaxGasPrice: (maxGasPrice: MaxGasPriceOptions) =>
-          set((state) => {
-            state.config.maxGasPrice = maxGasPrice
-          }),
-
-        // TRANSIENT
         dcasCount: '',
-        setDcasCount: (dcasCount: string) =>
-          set((state) => {
-            state.config.dcasCount = dcasCount
-          }),
         weeks: '',
-        setWeeks: (weeks: string) => {
-          set((state) => {
-            state.config.weeks = weeks
-            state.config.intervalDCA = wdhToSec(
-              weeks,
-              get().config.days,
-              get().config.hours,
-            )
-          })
-        },
         days: '',
-        setDays: (days: string) => {
-          set((state) => {
-            state.config.days = days
-            state.config.intervalDCA = wdhToSec(
-              get().config.weeks,
-              days,
-              get().config.hours,
-            )
-          })
-        },
         hours: '',
-        setHours: (hours: string) => {
-          set((state) => {
-            state.config.hours = hours
-            state.config.intervalDCA = wdhToSec(
-              get().config.weeks,
-              get().config.days,
-              hours,
-            )
-          })
-        },
+      },
+
+      // Config Mutators
+      getStarted: () => {
+        set((state) => {
+          state.config.startIntro = true
+        })
+      },
+      setTokenIn: (tokenIn: string) =>
+        set((state) => {
+          state.config.tokenIn = tokenIn
+        }),
+      setOutsFromPreset: (outs: PositionOut[]) =>
+        set((state) => {
+          state.config.outs = outs
+        }),
+      addOut: (token: string) => {
+        const w = weights[get().config.outs.length + 1]
+        set((state) => {
+          state.config.outs = get()
+            .config.outs.concat({
+              token,
+              weight: 0,
+              maxSlippage: 1,
+            })
+            .map((out, i) => ({ ...out, weight: w[i] }))
+        })
+      },
+      removeOut: (index: number) => {
+        const w = weights[get().config.outs.length - 1]
+        set((state) => {
+          state.config.outs = get()
+            .config.outs.filter((_, i) => index !== i)
+            .map((out, i) => ({ ...out, weight: w[i] }))
+        })
+      },
+      updateWeights: (w: number[]) =>
+        set((state) => {
+          state.config.outs = get().config.outs.map((out, i) => ({
+            ...out,
+            weight: w[i],
+          }))
+        }),
+      updateOutMaxSlippage: (token: string, maxSlippage: number) =>
+        set((state) => {
+          state.config.outs = get().config.outs.map((out) => (out.token === token ? { ...out, maxSlippage } : out))
+        }),
+      setAmountDCA: (amountDCA: string, fullBalance: string | null) => {
+        let amountDCAInvalidReason = null
+        if (amountDCA === '') amountDCAInvalidReason = 'Funding required'
+        else if (isNaN(parseFloat(amountDCA))) amountDCAInvalidReason = 'Not a number'
+        else if (parseFloat(amountDCA) === 0) amountDCAInvalidReason = 'Must be greater than 0'
+        else if (parseFloat(amountDCA ?? '0') > parseFloat(fullBalance ?? '0'))
+          amountDCAInvalidReason = 'Insufficient wallet balance to cover 1 DCA'
+        set((state) => {
+          state.config.amountDCA = amountDCA
+          state.config.amountDCAInvalidReason = amountDCAInvalidReason
+        })
+      },
+      setFundingAmount: (fundingAmount: string, fullBalance: string | null) => {
+        let fundingInvalidReason = null
+        if (fundingAmount === '') fundingInvalidReason = 'Funding required'
+        else if (isNaN(parseFloat(fundingAmount))) fundingInvalidReason = 'Not a number'
+        else if (parseFloat(fundingAmount) === 0) fundingInvalidReason = 'Must be greater than 0'
+        else if (parseFloat(fundingAmount ?? '0') > parseFloat(fullBalance ?? '0'))
+          fundingInvalidReason = 'Insufficient balance'
+
+        set((state) => {
+          state.config.fundingAmount = fundingAmount
+          state.config.fundingInvalidReason = fundingInvalidReason
+        })
+      },
+      setMaxGasPrice: (maxGasPrice: MaxGasPriceOptions) =>
+        set((state) => {
+          state.config.maxGasPrice = maxGasPrice
+        }),
+
+      // TRANSIENT
+      setDcasCount: (dcasCount: string) =>
+        set((state) => {
+          state.config.dcasCount = dcasCount
+        }),
+      setWeeks: (weeks: string) => {
+        set((state) => {
+          state.config.weeks = weeks
+          state.config.intervalDCA = wdhToSec(weeks, get().config.days, get().config.hours)
+        })
+      },
+      setDays: (days: string) => {
+        set((state) => {
+          state.config.days = days
+          state.config.intervalDCA = wdhToSec(get().config.weeks, days, get().config.hours)
+        })
+      },
+      setHours: (hours: string) => {
+        set((state) => {
+          state.config.hours = hours
+          state.config.intervalDCA = wdhToSec(get().config.weeks, get().config.days, hours)
+        })
       },
     })),
     {

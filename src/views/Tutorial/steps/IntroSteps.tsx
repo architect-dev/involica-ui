@@ -1,5 +1,8 @@
 import { Card } from 'components/Card'
 import React from 'react'
+import { useConfigurableGetStarted } from 'state/hooks'
+import { useIntroActiveStep } from 'state/introHooks'
+import { IntroStep } from 'state/types'
 import styled from 'styled-components'
 import { SummitButton, Text } from 'uikit'
 import { AddFunds } from './AddFunds'
@@ -7,11 +10,6 @@ import { AmountIn } from './AmountIn'
 import { ApproveIn } from './ApproveIn'
 import { ConfigPreview } from './ConfigPreview'
 import { Finalize } from './Finalize'
-import {
-  IntroStep,
-  useIntroActiveStep,
-  usePositionConfigState,
-} from './introStore'
 import { SelectInterval } from './SelectInterval'
 import { SelectOuts } from './SelectOuts'
 import { SelectTokenIn } from './SelectTokenIn'
@@ -61,7 +59,10 @@ const stepContent: Record<IntroStep, JSX.Element | null> = {
 
 export const IntroSteps: React.FC = () => {
   const introStep = useIntroActiveStep()
-  const getStarted = usePositionConfigState((state) => state.getStarted)
+  const { getStarted } = useConfigurableGetStarted()
+  console.log({
+    getStarted
+  })
   return (
     <>
       <Text>

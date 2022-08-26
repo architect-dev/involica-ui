@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { TokenSymbolImage, Text, Column, Row } from 'uikit'
 import { bn, bnDisplay, eN } from 'utils'
 import { ethers } from 'ethers'
-import { usePositionConfigState } from './introStore'
+import { usePositionAmountDCA, usePositionIntervalDCA, usePositionOuts, usePositionTokenInWithData } from 'state/hooks'
 
 const SwapRow = styled.div`
   display: flex;
@@ -101,16 +101,15 @@ const EmptyOutIndicator: React.FC = () => (
 )
 
 export const PositionSwapsOverview: React.FC = () => {
-  const outs = usePositionConfigState((state) => state.outs)
+  const {outs} = usePositionOuts()
   return <PositionSwapsOverviewOverride outs={outs} />
 }
 export const PositionSwapsOverviewOverride: React.FC<{
   outs: PositionOut[]
 }> = ({ outs }) => {
-  const tokenIn = usePositionConfigState((state) => state.tokenIn)
-  const tokenData = useInvolicaStore((state) => state.tokens?.[tokenIn])
-  const amountDCA = usePositionConfigState((state) => state.amountDCA)
-  const intervalDCA = usePositionConfigState((state) => state.intervalDCA)
+  const { tokenIn, tokenInData } = usePositionTokenInWithData()
+  const { amountDCA } = usePositionAmountDCA()
+  const { intervalDCA } = usePositionIntervalDCA()
 
   const sortedOuts = [...outs].sort((a, b) => (a.weight > b.weight ? -1 : 1))
 
@@ -140,14 +139,14 @@ export const PositionSwapsOverviewOverride: React.FC<{
           </Text>
           {tokenIn ? (
             <TokenSymbolImage
-              symbol={tokenData?.symbol}
+              symbol={tokenInData?.symbol}
               width={24}
               height={24}
             />
           ) : (
             <EmptySymbolImage>?</EmptySymbolImage>
           )}
-          <Text>{tokenIn ? tokenData?.symbol : '----'}</Text>
+          <Text>{tokenIn ? tokenInData?.symbol : '----'}</Text>
         </TokenRow>
         <TextWrap>
           <Text small italic>
@@ -171,13 +170,9 @@ export const PositionSwapsOverviewOverride: React.FC<{
 }
 
 export const PositionExpectedAndDurationOverview: React.FC = () => {
-  const tokenIn = usePositionConfigState((state) => state.tokenIn)
-  const tokenData = useInvolicaStore((state) => state.tokens?.[tokenIn])
-  const intervalDCA = usePositionConfigState((state) => state.intervalDCA)
-  const amountDCA = usePositionConfigState((state) => state.amountDCA)
-  const userTokenData = useInvolicaStore(
-    (state) => state.userData?.userTokensData?.[tokenIn],
-  )
+  const { tokenInData, tokenInUserData } = usePositionTokenInWithData()
+  const { amountDCA } = usePositionAmountDCA()
+  const { intervalDCA } = usePositionIntervalDCA()
 
   const [
     allowance,
@@ -187,34 +182,34 @@ export const PositionExpectedAndDurationOverview: React.FC = () => {
     balanceLimited,
     limitedDCAs,
   ] = useMemo(() => {
-    const b = bnDisplay(userTokenData?.balance, tokenData?.decimals, 3)
-    const infAllowance = bn(userTokenData?.allowance).gt(
+    const b = bnDisplay(tokenInUserData?.balance, tokenInData?.decimals, 3)
+    const infAllowance = bn(tokenInUserData?.allowance).gt(
       bn(ethers.constants.MaxUint256.div(2).toString()),
     )
     const a = infAllowance
       ? 'Inf'
-      : bnDisplay(userTokenData?.allowance, tokenData?.decimals, 3)
+      : bnDisplay(tokenInUserData?.allowance, tokenInData?.decimals, 3)
     const bDCAs = Math.floor(
-      bn(userTokenData?.balance)
-        .div(eN(amountDCA, tokenData?.decimals))
+      bn(tokenInUserData?.balance)
+        .div(eN(amountDCA, tokenInData?.decimals))
         .toNumber(),
     )
-    const bLimited = bn(userTokenData?.balance).lt(userTokenData?.allowance)
+    const bLimited = bn(tokenInUserData?.balance).lt(tokenInUserData?.allowance)
     if (amountDCA === '' || amountDCA === '0' || isNaN(parseFloat(amountDCA)))
       return [a, 0, b, 0, bLimited, 0]
     const aDCAs = infAllowance
       ? 'Inf'
       : Math.floor(
-          bn(userTokenData?.allowance)
-            .div(eN(amountDCA, tokenData?.decimals))
+          bn(tokenInUserData?.allowance)
+            .div(eN(amountDCA, tokenInData?.decimals))
             .toNumber(),
         )
     return [a, aDCAs, b, bDCAs, bLimited, (bLimited ? bDCAs : aDCAs) as number]
   }, [
     amountDCA,
-    tokenData?.decimals,
-    userTokenData?.allowance,
-    userTokenData?.balance,
+    tokenInData?.decimals,
+    tokenInUserData?.allowance,
+    tokenInUserData?.balance,
   ])
 
   const approxDuration = useMemo(() => {
@@ -240,15 +235,15 @@ export const PositionExpectedAndDurationOverview: React.FC = () => {
       amountDCA === '' ||
       amountDCA === '0' ||
       isNaN(parseFloat(amountDCA)) ||
-      tokenData?.price == null
+      tokenInData?.price == null
     )
       return '-'
     return bnDisplay(
-      bn(amountDCA).times(limitedDCAs).times(tokenData?.price),
+      bn(amountDCA).times(limitedDCAs).times(tokenInData?.price),
       0,
       2,
     )
-  }, [amountDCA, limitedDCAs, tokenData?.price])
+  }, [amountDCA, limitedDCAs, tokenInData?.price])
 
   return (
     <SwapRow>
@@ -257,13 +252,13 @@ export const PositionExpectedAndDurationOverview: React.FC = () => {
           <Text bold={!balanceLimited}>
             <u>Allowance:</u>
             <br />
-            {allowance} {tokenData?.symbol}
+            {allowance} {tokenInData?.symbol}
             <br />({allowanceDCAs} DCAs)
           </Text>
           <Text bold={balanceLimited}>
             <u>Balance:</u>
             <br />
-            {balance} {tokenData?.symbol}
+            {balance} {tokenInData?.symbol}
             <br />({balanceDCAs} DCAs)
           </Text>
         </Row>
