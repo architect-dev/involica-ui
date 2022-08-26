@@ -1,12 +1,9 @@
 import React, { useCallback, useMemo } from 'react'
 import styled, { css } from 'styled-components'
-import BigNumber from 'bignumber.js/bignumber'
-import TextInput, { InputProps } from '../Input'
-import { Text, SummitButton, HighlightedText } from 'uikit'
-import { Dots } from 'uikit/components/Dots'
+import { Text } from 'uikit'
 import { TokenSelectButton } from 'components/TokenSelect/TokenSelectButton'
 import { AddressRecord } from 'state/types'
-import { useConfigurableAmountDCA, usePositionOuts, useTokenFullData } from 'state/hooks'
+import { useTokenFullData } from 'state/hooks'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 import { bn, bnDisplay } from 'utils'
 import { pressableMixin } from 'uikit/util/styledMixins'
@@ -153,12 +150,7 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
   const handleSelectMax = useCallback(() => {
     setValue(fullBalance, fullBalance)
   }, [setValue, fullBalance])
-
-  // {/* <StyledMaxText bold monospace>
-  //   {balanceText}:{' '}
-  //   {max == null ? <Dots /> : parseFloat(max.toLocaleString()).toFixed(3)}{' '}
-  //   {symbol}
-  // </StyledMaxText> */}
+  
   return (
     <StyledInputWrapper disabled={disabled} isLocked={isLocked} invalid={invalid}>
       <ThinRow>
