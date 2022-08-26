@@ -38,9 +38,6 @@ export const DebugModal: React.FC<{
         <ItemFlex
           key={key}
           onClick={() => {
-            console.log({
-              action
-            })
             action()
             onDismiss()
           }}

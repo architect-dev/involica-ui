@@ -2,8 +2,9 @@ import BigNumber from 'bignumber.js'
 
 export { default as formatAddress } from './formatAddress'
 
-export const bnToDec = (bn: BigNumber, decimals = 18): number => {
-  return bn.dividedBy(new BigNumber(10).pow(decimals)).toNumber()
+export const decOffset = (ish: BigNumberish | null, decimals: number | null = 18): number => {
+  if (ish == null || decimals == null) return null
+  return bn(ish).dividedBy(bnExp(decimals)).toNumber()
 }
 
 export const bnZero = new BigNumber(0)

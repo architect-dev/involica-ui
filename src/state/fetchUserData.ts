@@ -1,5 +1,6 @@
 import FetcherABI from 'config/abi/InvolicaFetcher.json'
-import { ParseFieldConfig, ParseFieldType, getFetcherAddress, groupByAndMap } from 'utils'
+import { getDecimals } from 'config/tokens'
+import { ParseFieldConfig, ParseFieldType, getFetcherAddress, groupByAndMap, decOffset } from 'utils'
 import multicallAndParse from 'utils/multicall'
 import { UserData, UserTokenData } from './types'
 
@@ -36,7 +37,7 @@ const userDataFields: Record<string, ParseFieldConfig> = {
       token: { type: ParseFieldType.address, stateField: 'address' },
       allowance: { type: ParseFieldType.bignumber },
       balance: { type: ParseFieldType.bignumber },
-    }
+    },
   },
   swapsAmountOutMin: { type: ParseFieldType.bignumberArr },
 }
@@ -56,18 +57,17 @@ const fetchUserData = async (account): Promise<UserData | null> => {
 
   const userData = res[0]
 
-  console.log({
-    userData
-  })
+  // Offset amountDCA decimals
+  userData.position.amountDCA = decOffset(userData.position.amountDCA, getDecimals(userData.position.tokenIn)).toString()
 
   return {
     ...userData,
     userTokensData: groupByAndMap(
       userData.userTokensData.slice(0, -1),
       (token: UserTokenData) => token.address,
-      (token: UserTokenData) => token
+      (token: UserTokenData) => token,
     ),
-    userNativeTokenData: userData.userTokensData[userData.userTokensData.length - 1]
+    userNativeTokenData: userData.userTokensData[userData.userTokensData.length - 1],
   }
 }
 

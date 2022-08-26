@@ -208,11 +208,8 @@ export const useInvolicaStore = create<State>()(
       // DEBUG
       hydrateConfig: () => {
         const position = get().userData?.position
-        console.log({
-          positionToHydrate: position,
-        })
         if (position == null) {
-          console.log('No position to hydrate')
+          console.error('No position to hydrate')
           return
         }
         set({

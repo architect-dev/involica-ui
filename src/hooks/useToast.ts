@@ -23,10 +23,6 @@ export const useTransactionToasts = () => {
 
   const transactionToastError: ToastSignature = useCallback(
     (title: Toast['title'], description: Toast['description']) => {
-      console.log({
-        title,
-        description
-      })
       const errorTitle = isInvolicaRevertReason(description) ? title : 'Wallet / Chain Error'
       toastError(errorTitle, description.split('_').join(' '))
     },
