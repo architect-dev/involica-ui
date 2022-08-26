@@ -5,15 +5,15 @@ import { Text } from 'uikit'
 import { bnDisplay, bn } from 'utils'
 import TokenInput from './TokenInput'
 
-export const AmountInSelector: React.FC = () => {
+export const AmountInSelector: React.FC<{ intro?: boolean }> = ({ intro = false }) => {
   const { tokenInData, tokenInUserData } = usePositionTokenInWithData()
   const { outs } = usePositionOuts()
   const { amountDCA, amountDCAInvalidReason, setAmountDCA } = useConfigurableAmountDCA()
 
-  const fullBalance = useMemo(
-    () => bnDisplay(tokenInUserData?.balance, tokenInData?.decimals),
-    [tokenInData?.decimals, tokenInUserData?.balance],
-  )
+  const fullBalance = useMemo(() => bnDisplay(tokenInUserData?.balance, tokenInData?.decimals), [
+    tokenInData?.decimals,
+    tokenInUserData?.balance,
+  ])
 
   const handleChange = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -28,23 +28,15 @@ export const AmountInSelector: React.FC = () => {
 
   const minOut = useMemo(() => {
     if (outs.length === 0) return null
-    return outs.reduce(
-      (minO, out) => (out.weight < minO.weight ? out : minO),
-      outs[0],
-    )
+    return outs.reduce((minO, out) => (out.weight < minO.weight ? out : minO), outs[0])
   }, [outs])
   const amountDcaUsd = useMemo(() => {
-    if (
-      tokenInData == null ||
-      amountDCAInvalidReason != null ||
-      isNaN(parseFloat(amountDCA))
-    )
-      return 0
+    if (tokenInData == null || amountDCAInvalidReason != null || isNaN(parseFloat(amountDCA))) return 0
     return bn(parseFloat(amountDCA)).times(tokenInData.price).toNumber()
   }, [tokenInData, amountDCAInvalidReason, amountDCA])
   return (
     <>
-    <TokenInput
+      <TokenInput
         symbol={tokenInData?.symbol}
         balanceText="Wallet Balance"
         onChange={handleChange}
@@ -58,25 +50,24 @@ export const AmountInSelector: React.FC = () => {
           {amountDCAInvalidReason}
         </Text>
       )}
-      {minOut != null &&
-        amountDCAInvalidReason == null &&
-        Math.floor(amountDcaUsd * minOut.weight) / 100 < 0.1 && (
-          <Text color='warning' italic mt="-12px">
-            <b>
-              At this amount, your swap for {getSymbol(minOut.token)} will be $
-              {(Math.floor(amountDcaUsd * minOut.weight) / 100).toFixed(2)}
-            </b>
-            <br />
-            Each swap in your position is recommended to be {'>='} $0.10.
-            <br />
-            Increase portfolio % {getSymbol(minOut.token)} or increase DCA
-            amount.
-          </Text>
-        )}
-      <br />
-      <Text italic>
-        DCA amount USD: ${amountDcaUsd === 0 ? '-' : amountDcaUsd}
-      </Text>
-      </>
+      {minOut != null && amountDCAInvalidReason == null && Math.floor(amountDcaUsd * minOut.weight) / 100 < 0.1 && (
+        <Text color="warning" italic mt="-12px">
+          <b>
+            At this amount, your swap for {getSymbol(minOut.token)} will be $
+            {(Math.floor(amountDcaUsd * minOut.weight) / 100).toFixed(2)}
+          </b>
+          <br />
+          Each swap in your position is recommended to be {'>='} $0.10.
+          <br />
+          Increase portfolio % {getSymbol(minOut.token)} or increase DCA amount.
+        </Text>
+      )}
+      {intro && (
+        <>
+          <br />
+          <Text italic>DCA amount USD: ${amountDcaUsd === 0 ? '-' : amountDcaUsd}</Text>
+        </>
+      )}
+    </>
   )
 }

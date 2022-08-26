@@ -11,7 +11,7 @@ export const AmountIn: React.FC = () => {
       <Text small italic>
         Set the amount of <b>{tokenInData?.symbol}</b> to use for DCA.
       </Text>
-      <AmountInSelector/>
+      <AmountInSelector intro/>
     </>
   )
 }

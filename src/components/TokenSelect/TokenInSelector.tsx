@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { useConfigurableTokenIn, usePositionOuts } from 'state/hooks'
 import { TokenSelectButton } from './TokenSelectButton'
 
-export const TokenInSelector: React.FC = () => {
+export const TokenInSelector: React.FC<{ intro?: boolean }> = ({ intro = false }) => {
   const { tokenIn, setTokenIn } = useConfigurableTokenIn()
   const { outs } = usePositionOuts()
 
@@ -22,6 +22,7 @@ export const TokenInSelector: React.FC = () => {
       noTokenString="Select"
       disabledTokens={disabledReasons}
       modalVariant="tokenIn"
+      intro={intro}
     />
   )
 }

@@ -13,7 +13,7 @@ export const SelectTokenIn: React.FC = () => {
         <br />
         <i>Select your input token:</i>
       </Text>
-      <TokenInSelector />
+      <TokenInSelector intro />
     </>
   )
 }

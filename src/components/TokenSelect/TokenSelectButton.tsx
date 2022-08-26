@@ -14,7 +14,9 @@ export const TokenSelectButton: React.FC<{
   selectedTokens?: string[]
   disabledTokens?: AddressRecord<string>
   modalVariant: ModalVariant
-}> = ({ token, setToken, noTokenString, selectedTokens, disabledTokens, modalVariant }) => {
+  intro?: boolean
+  className?: string
+}> = ({ token, setToken, noTokenString, selectedTokens, disabledTokens, modalVariant, intro, className }) => {
   const tokenData = useInvolicaStore((state) => state.tokens?.[token])
   const userTokenData = useInvolicaStore(
     (state) => state.userData?.userTokensData?.[token],
@@ -43,7 +45,7 @@ export const TokenSelectButton: React.FC<{
   )
 
   return (
-    <Column gap='18px'>
+    <Column gap='18px' className={className}>
       <SummitPopUp
         open={tokenSelectModalOpen}
         callOnDismiss={hideSelectTokenModal}
@@ -64,7 +66,7 @@ export const TokenSelectButton: React.FC<{
           />
         }
       />
-      {selectedTokenBalance != null && (
+      {intro && selectedTokenBalance != null && (
         <Text>
           Balance: <b>{selectedTokenBalance}</b>
           <br />
