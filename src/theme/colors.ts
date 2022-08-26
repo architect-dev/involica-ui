@@ -53,6 +53,7 @@ export const lightColors: Colors = {
   gradients: {
     bubblegum: 'linear-gradient(139.73deg, #E6FDFF 0%, #F3EFFF 100%)',
   },
+  warning: '#d78400',
 }
 
 export const darkColors: Colors = {

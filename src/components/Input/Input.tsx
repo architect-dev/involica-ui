@@ -27,7 +27,7 @@ const Input: React.FC<InputProps> = ({
   invalid = false,
 }) => {
   return (
-    <StyledInputWrapper disabled={disabled} isLocked={isLocked}>
+    <StyledInputWrapper disabled={disabled} isLocked={isLocked} invalid={invalid}>
       {!!startAdornment && startAdornment}
       <InputWrapper>
         <StyledInput

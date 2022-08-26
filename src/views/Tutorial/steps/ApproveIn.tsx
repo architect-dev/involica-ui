@@ -18,7 +18,7 @@ export const ApproveIn: React.FC = () => {
     tokenInData?.symbol,
     tokenIn,
   )
-  const { dcasCount, setDcasCount } = useConfigurableDcasCount()
+  const { dcasCount, dcasCountInvalidReason, setDcasCount } = useConfigurableDcasCount()
 
   const allowance = useMemo(
     () => {
@@ -89,6 +89,7 @@ export const ApproveIn: React.FC = () => {
           endText="dcas"
           onFocus={clearIfInf}
           placeholder="0"
+          invalid={dcasCountInvalidReason != null}
         />
         <Text small>- or -</Text>
         <SummitButton
@@ -98,6 +99,9 @@ export const ApproveIn: React.FC = () => {
           onClick={handleSetInf}
         />
       </RowStart>
+      {dcasCountInvalidReason != null && (
+        <Text red italic mt='-12px'>{dcasCountInvalidReason}</Text>
+      )}
       <br />
       <Column>
         <Text>

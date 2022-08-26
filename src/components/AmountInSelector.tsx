@@ -61,13 +61,13 @@ export const AmountInSelector: React.FC = () => {
       {minOut != null &&
         amountDCAInvalidReason == null &&
         Math.floor(amountDcaUsd * minOut.weight) / 100 < 0.1 && (
-          <Text red italic mt="-12px">
+          <Text color='warning' italic mt="-12px">
             <b>
               At this amount, your swap for {getSymbol(minOut.token)} will be $
               {(Math.floor(amountDcaUsd * minOut.weight) / 100).toFixed(2)}
             </b>
             <br />
-            Each swap in your position must be at least $0.10 usd.
+            Each swap in your position is recommended to be {'>='} $0.10.
             <br />
             Increase portfolio % {getSymbol(minOut.token)} or increase DCA
             amount.

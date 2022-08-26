@@ -44,11 +44,6 @@ export const useConfigSupplements = <S extends Array<keyof PositionConfigSupplem
 export const useDirtyablePositionValue = <K extends keyof PositionConfig>(key: K): WithDirty<K> => {
   const positionVal = useInvolicaStore((state) => state.userData?.position?.[key])
   const configVal = useInvolicaStore((state) => state.config[key])
-
-  console.log({
-    positionVal,
-    configVal
-  })
   return useMemo(
     () =>
       ({
@@ -111,7 +106,7 @@ export const usePositionMaxGasPrice = () => ({ ...useDirtyablePositionValue('max
 export const useConfigurableMaxGasPrice = () => ({ ...useConfigurablePositionValue('maxGasPrice', ['setMaxGasPrice']) })
 
 export const useConfigurableDcasCount = () => ({
-  ...useInvolicaStore((state) => ({ dcasCount: state.config.dcasCount })),
+  ...useConfigSupplements(['dcasCount', 'dcasCountInvalidReason']),
   ...usePositionSetters(['setDcasCount']),
 })
 

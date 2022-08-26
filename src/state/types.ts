@@ -108,6 +108,7 @@ export interface PositionConfigSupplements {
   fundingAmount: string | null
   fundingInvalidReason: string | null
   dcasCount: string
+  dcasCountInvalidReason: string | null
   weeks: string
   days: string
   hours: string
@@ -129,6 +130,12 @@ export interface PositionConfigMutators {
   setHours: (hours: string) => void
 }
 
+// DEBUG
+export interface DebugMutators {
+  hydrateConfig: () => void
+  resetConfig: () => void
+}
+
 // Global state
 interface ConfigState {
   config: PositionConfig & PositionConfigSupplements
@@ -142,4 +149,5 @@ export interface State
     UserDataMutators,
     Loaded,
     ConfigState,
-    PositionConfigMutators {}
+    PositionConfigMutators,
+    DebugMutators {}

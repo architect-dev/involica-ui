@@ -25,7 +25,7 @@ const ItemFlex = styled.div<{ selected: boolean, index: number }>`
     justify-content: center;
     position: relative;
     height: 100%;
-    ${({ theme, index }) => pressableMixin({
+    ${({ theme }) => pressableMixin({
         theme,
         hoverStyles: css`
             .item-label {
@@ -35,7 +35,7 @@ const ItemFlex = styled.div<{ selected: boolean, index: number }>`
         `
     })}
 
-    ${({ selected, index }) => selected && css`
+    ${({ selected }) => selected && css`
         .item-label {
             font-weight: bold;
             text-decoration: underline;

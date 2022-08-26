@@ -60,9 +60,6 @@ const stepContent: Record<IntroStep, JSX.Element | null> = {
 export const IntroSteps: React.FC = () => {
   const introStep = useIntroActiveStep()
   const { getStarted } = useConfigurableGetStarted()
-  console.log({
-    getStarted
-  })
   return (
     <>
       <Text>

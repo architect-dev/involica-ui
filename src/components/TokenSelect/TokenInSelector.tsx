@@ -15,11 +15,6 @@ export const TokenInSelector: React.FC = () => {
     return reasons
   }, [outs, tokenIn])
 
-  console.log({
-    disabledReasons,
-    tokenIn
-  })
-
   return (
     <TokenSelectButton
       token={tokenIn}

@@ -28,7 +28,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
 
   return (
     <StyledNumericInput>
-      <StyledInputWrapper disabled={disabled}>
+      <StyledInputWrapper disabled={disabled} invalid={invalid}>
         <InputWrapper>
           <StyledInput
             disabled={disabled}
@@ -40,7 +40,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
           />
         </InputWrapper>
         {endText != null &&
-          <Text small italic>{endText}</Text>
+          <Text small italic red={invalid}>{endText}</Text>
         }
       </StyledInputWrapper>
     </StyledNumericInput>

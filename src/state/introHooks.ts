@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
-import ethers from 'ethers'
+import { ethers } from 'ethers'
 import { getChainGwei } from 'config/tokens'
 import { eN, bn } from 'utils'
-import { useConfigSupplements, useConfigurableGetStarted, useTokenFullData, useTokenPublicData } from './hooks'
+import { useConfigSupplements, useConfigurableGetStarted, useTokenPublicData, useTokenUserData } from './hooks'
 import { useInvolicaStore } from './store'
 import { IntroStep, PositionConfig } from './types'
 
@@ -41,45 +41,31 @@ export const useIntroActiveStep = () => {
   const { startIntro } = useConfigurableGetStarted()
 
   const { tokenIn, outs, amountDCA, intervalDCA } = usePositionConfig()
-  const { data: tokenInData, userData: tokenInUserData } = useTokenFullData(tokenIn)
+  const { userData: tokenInUserData } = useTokenUserData(tokenIn)
   const tokenInAllowance = tokenInUserData?.allowance
 
-  const { dcasCount, fundingAmount, fundingInvalidReason } = useConfigSupplements(['dcasCount', 'fundingAmount', 'fundingInvalidReason'])
+  const { dcasCount, dcasCountInvalidReason, fundingAmount, fundingInvalidReason } = useConfigSupplements([
+    'dcasCount',
+    'dcasCountInvalidReason',
+    'fundingAmount',
+    'fundingInvalidReason',
+  ])
 
-  console.log({
-    startIntro
-  })
-
-  const minOutWeight = useMemo(() => outs.reduce((min, out) => Math.min(min, out.weight), 101), [outs])
-  const minSwapDcaUsd = useMemo(() => {
-    if (amountDCA == null || tokenInData == null || isNaN(parseFloat(amountDCA))) return 0
-    return bn(parseFloat(amountDCA))
-      .times(minOutWeight / 10)
-      .times(tokenInData.price)
-      .toNumber()
-  }, [tokenInData, amountDCA, minOutWeight])
-
-  if (!startIntro) return IntroStep.NotStarted
+    if (!startIntro) return IntroStep.NotStarted
 
   if (tokenIn == null) return IntroStep.TokenIn
 
   if (amountDCA == null || amountDCA === '' || amountDCA === '0') return IntroStep.Amount
-  if (minSwapDcaUsd < 1) return IntroStep.Amount
 
   if (outs.length === 0) return IntroStep.Outs
 
   if (intervalDCA == null || intervalDCA <= 30 * 60) return IntroStep.Interval
 
   if (tokenInAllowance == null) return IntroStep.Approve
+  if (dcasCountInvalidReason != null) return IntroStep.Approve
   if (dcasCount === 'Inf') {
     if (bn(tokenInAllowance).lt(bn(ethers.constants.MaxUint256.toString()))) return IntroStep.Approve
-  } else if (
-    dcasCount === '0' ||
-    dcasCount === '' ||
-    isNaN(parseInt(dcasCount)) ||
-    bn(tokenInAllowance).lt(bn(amountDCA).times(dcasCount))
-  )
-    return IntroStep.Approve
+  } else if (bn(tokenInAllowance).lt(bn(amountDCA).times(dcasCount))) return IntroStep.Approve
 
   if (fundingAmount == null || fundingAmount === '' || fundingAmount === '0' || fundingInvalidReason != null)
     return IntroStep.Treasury

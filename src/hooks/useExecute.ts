@@ -129,7 +129,6 @@ export const useCreateAndFundPosition = () => {
 
   const onCreateAndFundPosition = useCallback(
     (config: any[], treasuryValue: string) => {
-      console.log({config}, { value: treasuryValue })
       handleExecute(
         involica,
         'createAndFundPosition',

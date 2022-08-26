@@ -10,6 +10,7 @@ const StyledFieldset = styled.fieldset<{ halfWidth: boolean, expanded: boolean }
   gap: 18px;
   border-radius: 4px;
   padding: ${({ expanded }) => (expanded ? '32px' : '2px 36px')};
+  margin-bottom: ${({ expanded }) => expanded ? '0px' : 'auto'};
   transition: padding 200ms;
   border: dashed ${({ theme }) => theme.colors.text};
   border-width: 1px;

@@ -68,6 +68,8 @@ export const useInvolicaStore = create<State>()(
         fundingInvalidReason: 'Funding required',
 
         dcasCount: '',
+        dcasCountInvalidReason: null,
+
         weeks: '',
         days: '',
         hours: '',
@@ -122,7 +124,7 @@ export const useInvolicaStore = create<State>()(
         let amountDCAInvalidReason = null
         if (amountDCA === '') amountDCAInvalidReason = 'Funding required'
         else if (isNaN(parseFloat(amountDCA))) amountDCAInvalidReason = 'Not a number'
-        else if (parseFloat(amountDCA) === 0) amountDCAInvalidReason = 'Must be greater than 0'
+        else if (parseFloat(amountDCA) <= 0) amountDCAInvalidReason = 'Must be greater than 0'
         else if (parseFloat(amountDCA ?? '0') > parseFloat(fullBalance ?? '0'))
           amountDCAInvalidReason = 'Insufficient wallet balance to cover 1 DCA'
         set((state) => {
@@ -134,7 +136,7 @@ export const useInvolicaStore = create<State>()(
         let fundingInvalidReason = null
         if (fundingAmount === '') fundingInvalidReason = 'Funding required'
         else if (isNaN(parseFloat(fundingAmount))) fundingInvalidReason = 'Not a number'
-        else if (parseFloat(fundingAmount) === 0) fundingInvalidReason = 'Must be greater than 0'
+        else if (parseFloat(fundingAmount) <= 0) fundingInvalidReason = 'Must be greater than 0'
         else if (parseFloat(fundingAmount ?? '0') > parseFloat(fullBalance ?? '0'))
           fundingInvalidReason = 'Insufficient balance'
 
@@ -149,10 +151,19 @@ export const useInvolicaStore = create<State>()(
         }),
 
       // TRANSIENT
-      setDcasCount: (dcasCount: string) =>
+      setDcasCount: (dcasCount: string) => {
+        let dcasCountInvalidReason = null
+        if (dcasCount !== 'Inf') {
+          if (dcasCount === '') dcasCountInvalidReason = 'DCA Count or Inf required'
+          else if (isNaN(parseFloat(dcasCount))) dcasCountInvalidReason = 'Not a number'
+          else if (parseFloat(dcasCount) <= 0) dcasCountInvalidReason = 'Must be greater than 0'
+        }
+
         set((state) => {
           state.config.dcasCount = dcasCount
-        }),
+          state.config.dcasCountInvalidReason = dcasCountInvalidReason
+        })
+      },
       setWeeks: (weeks: string) => {
         set((state) => {
           state.config.weeks = weeks
@@ -171,6 +182,61 @@ export const useInvolicaStore = create<State>()(
           state.config.intervalDCA = wdhToSec(get().config.weeks, get().config.days, hours)
         })
       },
+
+
+      // DEBUG
+      hydrateConfig: () => {
+        const position = get().userData?.position
+        console.log({
+          positionToHydrate: position,
+        })
+        if (position == null) {
+          console.log('No position to hydrate')
+          return
+        }
+        set({
+          config: {
+            tokenIn: position.tokenIn,
+            outs: position.outs,
+            amountDCA: position.amountDCA,
+            intervalDCA: position.intervalDCA,
+            maxGasPrice: position.maxGasPrice,
+            executeImmediately: position.executeImmediately,
+            
+            amountDCAInvalidReason: null,
+            startIntro: true,
+            fundingAmount: '1',
+            fundingInvalidReason: null,
+            dcasCount: '1',
+            dcasCountInvalidReason: null,
+            weeks: Math.floor(position.intervalDCA / (3600 * 24 * 7)).toString(),
+            days: Math.floor((position.intervalDCA % (3600 * 24 * 7)) / (3600 * 24)).toString(),
+            hours: Math.floor((position.intervalDCA % (3600 * 24)) / 3600).toString(),
+          },
+        })
+      },
+      resetConfig: () => {
+        set({
+          config: {
+            tokenIn: null,
+            outs: [],
+            amountDCA: null,
+            amountDCAInvalidReason: 'DCA Amount required',
+            intervalDCA: null,
+            maxGasPrice: '100',
+            executeImmediately: true,
+            startIntro: false,
+            fundingAmount: '',
+            fundingInvalidReason: 'Funding required',
+
+            dcasCount: '',
+            dcasCountInvalidReason: null,
+            weeks: '',
+            days: '',
+            hours: '',
+          }
+        })
+      }
     })),
     {
       name: `involica_${CHAIN_ID}`,
