@@ -1,7 +1,6 @@
-import React from 'react';
-import styled, { DefaultTheme } from 'styled-components'
+import React from 'react'
+import styled, { css, DefaultTheme } from 'styled-components'
 import { space, typography } from 'styled-system'
-import getThemeValue from 'uikit/util/getThemeValue';
 import { TextProps } from './types'
 
 export interface ThemedProps extends TextProps {
@@ -11,8 +10,7 @@ export interface ThemedProps extends TextProps {
 const getColor = ({ color, gold, red, theme }: ThemedProps) => {
   if (red) return theme.colors.failure
   if (gold) return theme.colors.textGold
-  // return theme.colors[color]
-  return getThemeValue(`colors.${color}`, color)(theme)
+  return theme.colors[color] || theme.colors.text
 }
 
 const getFontSize = ({ fontSize, small }: TextProps) => {
@@ -33,8 +31,36 @@ export const Text = styled.div<TextProps>`
   text-align: left;
   font-family: monospace;
   ${({ textTransform }) => textTransform && `text-transform: ${textTransform};`}
-  ${space}
-  ${typography}
+  ${space};
+  ${typography};
+`
+
+export const TextWithChanged = styled(Text)<{ changed?: boolean; asterisk?: boolean, asteriskPosition?: string }>`
+  display: flex;
+  position: relative;
+  ${({ changed, asterisk, asteriskPosition, theme }) =>
+    changed &&
+    (asterisk
+      ? css`
+          :after {
+            content: '*';
+            color: ${theme.colors.warning};
+            font-size: 14px;
+            font-weight: bold;
+            font-family: Courier Prime, monospace;
+            position: absolute;
+            top: ${asteriskPosition ? asteriskPosition.split(' ')[0] : '-6px'};
+            right: ${asteriskPosition ? asteriskPosition.split(' ')[1] : '-8px'};
+          }
+        `
+      : css`
+          :after {
+            color: ${theme.colors.warning};
+            content: '(changed)';
+            margin-left: 4px;
+            font-weight: bold;
+          }
+        `)}
 `
 
 Text.defaultProps = {

@@ -5,9 +5,8 @@ import StyledButton from './StyledButton'
 const SummitStyledButton = styled(StyledButton)<{
   height?: number
   padding?: number
-  $summitPalette?: string
   $isLocked: boolean
-  $freezeSummitButton?: boolean
+  changed?: boolean
 }>`
   display: flex;
   align-items: center;
@@ -36,19 +35,17 @@ const SummitStyledButton = styled(StyledButton)<{
     fill: white;
     animation: ${SpinnerKeyframes} 1.4s infinite linear;
   }
-
-  ${({ $freezeSummitButton }) => $freezeSummitButton && css`
-    &::after {
-        content: ' ';
-        position: absolute;
-        width: 215px;
-        height: 100px;
-        pointer-events: none;
-        background-image: url("/images/summit/SummitFreezeOverlay.png");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        transform: scaleY(0.95);
+  
+  ${({ changed, theme }) => changed && css`
+    :after {
+      content: '*';
+      color: ${theme.colors.warning};
+      font-size: 14px;
+      font-weight: bold;
+      font-family: Courier Prime, monospace;
+      position: absolute;
+      top: -4px;
+      right: -8px;
     }
   `}
 `

@@ -6,7 +6,8 @@ export const TokenButton: React.FC<{
   onClick?: () => void
   token: string | null
   noTokenString: string
-}> = ({ onClick, token, noTokenString }) => {
+  changed?: boolean
+}> = ({ onClick, token, noTokenString, changed }) => {
   const tokenData = useInvolicaStore((state) => state.tokens?.[token])
 
   return (
@@ -14,6 +15,7 @@ export const TokenButton: React.FC<{
       onClick={onClick}
       padding={tokenData == null ? '0px 12px' : '0 12px 0 2px'}
       width="100px"
+      changed={changed}
     >
       {tokenData != null ? (
         <RowBetween>

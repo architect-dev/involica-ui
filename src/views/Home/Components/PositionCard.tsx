@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react'
 import { Card } from 'components/Card'
 import styled from 'styled-components'
-import { Text } from 'uikit'
+import { TextWithChanged } from 'uikit'
 import { OutsSelectionColumn } from 'components/Outs/OutsSelectionColumn'
 import TokenAndAmountSelector from 'components/TokenAndAmountSelector'
 import { useConfigurableAmountDCA, useConfigurableTokenIn, usePositionOuts } from 'state/hooks'
+import { IntervalSelector } from 'components/IntervalSelector'
+import { transparentize } from 'polished'
 
 const CellRow = styled.div`
   display: flex;
@@ -15,12 +17,18 @@ const CellRow = styled.div`
   width: 100%;
 `
 
-const Cell = styled.div`
+const CellCol = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+`
+
+const CellWithChanged = styled(CellCol)<{ changed?: boolean }>`
+  background-color: ${({ theme, changed }) => (changed ? transparentize(0.8, theme.colors.warning) : 'transparent')};
+  padding: 12px;
+  width: 100%;
   gap: 24px;
 `
 
@@ -39,23 +47,38 @@ export const PositionCard: React.FC = () => {
   }, [outs, tokenIn])
 
   return (
-    <Card title="In">
+    <Card title="Position" padding='24px'>
       <CellRow>
-        <Cell>
-          <Text small italic>DCA:</Text>
-          <TokenAndAmountSelector
-            token={tokenIn}
-            setToken={setTokenIn}
-            value={amountDCA}
-            setValue={setAmountDCA}
-            disabledReasons={disabledReasons}
-          />
-          <Text small italic>Every:</Text>
-        </Cell>
-        <Cell>
-          <Text small italic ml='6px'><pre>{'           Into:'}</pre></Text>
-          <OutsSelectionColumn />
-        </Cell>
+        <CellCol>
+          <CellWithChanged>
+            <TextWithChanged small italic changed>
+              DCA:
+            </TextWithChanged>
+            <TokenAndAmountSelector
+              token={tokenIn}
+              setToken={setTokenIn}
+              value={amountDCA}
+              setValue={setAmountDCA}
+              disabledReasons={disabledReasons}
+              tokenChanged
+              amountChanged
+            />
+          </CellWithChanged>
+          <CellWithChanged changed>
+            <TextWithChanged small italic>
+              Every:
+            </TextWithChanged>
+            <IntervalSelector />
+          </CellWithChanged>
+        </CellCol>
+        <CellCol>
+          <CellWithChanged>
+            <TextWithChanged small italic ml="6px" changed>
+              <pre>{'           '}</pre>Into:
+            </TextWithChanged>
+            <OutsSelectionColumn />
+          </CellWithChanged>
+        </CellCol>
       </CellRow>
     </Card>
   )

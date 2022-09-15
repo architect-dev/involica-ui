@@ -27,6 +27,9 @@ export const RowBetween = styled(Row)`
 export const Column = styled(Flex)`
   flex-direction: column;
 `
+export const ColumnStart = styled(Column)`
+  justify-content: flex-start;
+`
 
 export const MobileColumnFlex = styled(Flex)`
   flex-direction: column;

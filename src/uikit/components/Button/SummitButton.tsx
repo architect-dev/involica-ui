@@ -35,7 +35,7 @@ const SummitButton = <E extends ElementType = 'button'>(
     onClick,
     activeText,
     loadingText,
-    freezeSummitButton,
+    changed,
     ...rest
   } = props
   const internalProps = external ? getExternalLinkProps() : {}
@@ -63,7 +63,7 @@ const SummitButton = <E extends ElementType = 'button'>(
       $secondary={secondary}
       disabled={isDisabled || isLocked}
       onClick={handleClick}
-      $freezeSummitButton={freezeSummitButton}
+      changed={changed}
       {...internalProps}
       {...rest}
     >

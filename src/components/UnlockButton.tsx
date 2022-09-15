@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import SummitButton from 'uikit/components/Button/SummitButton'
 import { useInvolicaStore } from 'state/store'
 
-const UnlockButton = ({ summitPalette = null, ...props}) => {
+const UnlockButton = (props) => {
   const setConnectModalOpen = useInvolicaStore((state) => state.setConnectModalOpen)
   const onPresentConnectModal = useCallback(
     () => setConnectModalOpen(true),
@@ -10,7 +10,7 @@ const UnlockButton = ({ summitPalette = null, ...props}) => {
   )
 
   return (
-    <SummitButton onClick={onPresentConnectModal} summitPalette={summitPalette} {...props}>
+    <SummitButton onClick={onPresentConnectModal} {...props}>
       CONNECT WALLET
     </SummitButton>
   )

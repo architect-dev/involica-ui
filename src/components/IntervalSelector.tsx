@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import { useConfigurableIntervalDCA } from 'state/hooks'
-import { Column, RowStart, Text } from 'uikit'
+import { useIntervalStrings } from 'state/uiHooks'
+import { Column, ColumnStart, RowStart, Text } from 'uikit'
 import NumericInput from './Input/NumericInput'
 
-export const IntervalSelector: React.FC = () => {
+export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false }) => {
   const {
     intervalDCA,
     weeks,
@@ -16,6 +17,7 @@ export const IntervalSelector: React.FC = () => {
     setDays,
     setHours,
   } = useConfigurableIntervalDCA()
+  const { intervalString, intervalStringly } = useIntervalStrings()
 
   const handleSetWeeks = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -36,55 +38,38 @@ export const IntervalSelector: React.FC = () => {
     [setHours],
   )
 
-  const intervalString = useMemo(() => {
-    if (intervalDCA == null) return '-'
-    if (intervalDCA === 3600 * 24 * 28) return 'month'
-    if (intervalDCA === 3600 * 24 * 14) return 'other week'
-    if (intervalDCA === 3600 * 24 * 7) return 'week'
-    if (intervalDCA === 3600 * 24 * 2) return 'other day'
-    if (intervalDCA === 3600 * 24) return 'day'
-    if (intervalDCA === 3600 * 2) return 'other hour'
-    if (intervalDCA === 3600) return 'hour'
-    if (intervalDCA % (3600 * 24 * 7) === 0) return `${intervalDCA / (3600 * 24 * 7)} weeks`
-    if (intervalDCA % (3600 * 24) === 0) return `${intervalDCA / (3600 * 24)} days`
-    if (intervalDCA % 3600 === 0) return `${intervalDCA / 3600} hours`
-    return '-'
-  }, [intervalDCA])
-
-  const anyError = weeksInvalidReason != null ||
-    daysInvalidReason != null ||
-    hoursInvalidReason != null ||
-    intervalDCA === 0
-
   return (
-    <>
-      <RowStart gap="6px">
-        <Text small>Every: </Text>
+    <ColumnStart gap={intro ? 'inherit' : '4px'}>
+      <RowStart>
+        { intro && <Text small mr='6px'>Every: </Text> }
         <NumericInput
           value={weeks}
           onChange={handleSetWeeks}
-          endText="weeks"
+          endText="wk"
           placeholder="0"
           invalid={weeksInvalidReason != null}
+          rightBlend
+          changed
         />
-        <Text small>, </Text>
         <NumericInput
           value={days}
           onChange={handleSetDays}
-          endText="days"
+          endText="d"
           placeholder="0"
           invalid={daysInvalidReason != null}
+          leftBlend
+          rightBlend
         />
-        <Text small> and </Text>
         <NumericInput
           value={hours}
           onChange={handleSetHours}
-          endText="hours"
+          endText="h"
           placeholder="0"
           invalid={hoursInvalidReason != null}
+          leftBlend
         />
       </RowStart>
-      <Column mt="-12px">
+      <Column mt={intro ? '-12px' : '0'}>
         {weeksInvalidReason != null && (
           <Text red italic>
             Weeks: {weeksInvalidReason}
@@ -106,10 +91,10 @@ export const IntervalSelector: React.FC = () => {
           </Text>
         )}
       </Column>
-      <Text italic bold>
-        <br />
-        {intervalDCA === 0 ? '-' : `DCA will execute every ${anyError ? '-' : intervalString}`}
+      <Text italic bold={intro}>
+        {intro && <br />}
+        {intervalDCA === 0 ? '-' : intro ? intervalString : intervalStringly}
       </Text>
-    </>
+    </ColumnStart>
   )
 }

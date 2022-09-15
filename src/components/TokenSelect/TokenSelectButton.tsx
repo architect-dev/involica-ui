@@ -16,7 +16,8 @@ export const TokenSelectButton: React.FC<{
   modalVariant: ModalVariant
   intro?: boolean
   className?: string
-}> = ({ token, setToken, noTokenString, selectedTokens, disabledTokens, modalVariant, intro, className }) => {
+  changed?: boolean
+}> = ({ token, setToken, noTokenString, selectedTokens, disabledTokens, modalVariant, intro, className, changed }) => {
   const tokenData = useInvolicaStore((state) => state.tokens?.[token])
   const userTokenData = useInvolicaStore(
     (state) => state.userData?.userTokensData?.[token],
@@ -55,6 +56,7 @@ export const TokenSelectButton: React.FC<{
             token={token}
             onClick={showSelectTokenModal}
             noTokenString={noTokenString}
+            changed={changed}
           />
         }
         popUpContent={

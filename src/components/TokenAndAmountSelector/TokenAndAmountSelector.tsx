@@ -57,12 +57,27 @@ const InputRow = styled(ThinRow)`
   padding: 0px 12px;
 `
 
-const InputWrapper = styled.div`
+const InputWrapper = styled.div<{ changed?: boolean }>`
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+  position: relative;
+  height: 28px;
+
+  ${({ changed, theme }) => changed && css`
+    :after {
+      content: '*';
+      color: ${theme.colors.warning};
+      font-size: 14px;
+      font-weight: bold;
+      font-family: Courier Prime, monospace;
+      position: absolute;
+      top: -4px;
+      right: -8px;
+    }
+  `}
 `
 
 export const StyledInput = styled.input<{ invalid?: boolean }>`
@@ -79,7 +94,8 @@ export const StyledInput = styled.input<{ invalid?: boolean }>`
   margin: 0;
   padding: 0;
   outline: none;
-  text-align: left;
+  text-align: right;
+  letter-spacing: 1px;
   color: ${({ theme, invalid }) => (invalid ? theme.colors.failure : theme.colors.text)};
 `
 
@@ -112,6 +128,9 @@ interface TokenInputProps {
   disabled?: boolean
   isLocked?: boolean
   invalid?: boolean
+
+  tokenChanged?: boolean
+  amountChanged?: boolean
 }
 
 const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
@@ -126,6 +145,9 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
   disabled,
   isLocked,
   invalid,
+
+  tokenChanged,
+  amountChanged,
 }) => {
   const { data: tokenData, userData: tokenUserData } = useTokenFullData(token)
 
@@ -159,7 +181,15 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
         <TextButton onClick={handleSelectMax}>MAX</TextButton>
       </ThinRow>
       <InputRow>
-        <InputWrapper>
+        <TokenSelectButton
+          token={token}
+          setToken={setToken}
+          noTokenString="select"
+          disabledTokens={disabledReasons}
+          modalVariant="tokenIn"
+          changed={tokenChanged}
+        />
+        <InputWrapper changed={amountChanged}>
           <StyledInput
             disabled={disabled || isLocked}
             placeholder={placeholder}
@@ -168,13 +198,6 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
             invalid={invalid}
           />
         </InputWrapper>
-        <TokenSelectButton
-          token={token}
-          setToken={setToken}
-          noTokenString="select"
-          disabledTokens={disabledReasons}
-          modalVariant="tokenIn"
-        />
       </InputRow>
       <BalanceRow>
         <Text>Balance:</Text>

@@ -1,6 +1,6 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { Text } from 'uikit'
+import { TextWithChanged } from 'uikit'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 
 interface NumericInputProps {
@@ -14,6 +14,9 @@ interface NumericInputProps {
   min?: string
   max?: string
   step?: string
+  leftBlend?: boolean
+  rightBlend?: boolean
+  changed?: boolean
 }
 
 const NumericInput: React.FC<NumericInputProps> = ({
@@ -23,12 +26,14 @@ const NumericInput: React.FC<NumericInputProps> = ({
   endText,
   disabled = false,
   invalid = false,
+  leftBlend = false,
+  rightBlend = false,
+  changed,
   ...rest
 }) => {
-
   return (
     <StyledNumericInput>
-      <StyledInputWrapper disabled={disabled} invalid={invalid}>
+      <StyledInputWrapper disabled={disabled} invalid={invalid} leftBlend={leftBlend} rightBlend={rightBlend}>
         <InputWrapper>
           <StyledInput
             disabled={disabled}
@@ -39,9 +44,11 @@ const NumericInput: React.FC<NumericInputProps> = ({
             {...rest}
           />
         </InputWrapper>
-        {endText != null &&
-          <Text small italic red={invalid}>{endText}</Text>
-        }
+        {endText != null && (
+          <TextWithChanged small italic red={invalid} changed={changed} asterisk>
+            {endText}
+          </TextWithChanged>
+        )}
       </StyledInputWrapper>
     </StyledNumericInput>
   )
@@ -49,15 +56,15 @@ const NumericInput: React.FC<NumericInputProps> = ({
 
 const StyledNumericInput = styled.div`
   position: relative;
-  width: 110px;
+  width: 100px;
 `
 
-
-const StyledInputWrapper = styled(SelectorWrapperBase)`
+const StyledInputWrapper = styled(SelectorWrapperBase)<{ leftBlend: boolean; rightBlend: boolean }>`
   position: relative;
   align-items: center;
 
-  border-radius: 16px;
+  border-radius: ${({ leftBlend, rightBlend }) =>
+    `${leftBlend ? '0' : '16px'} ${rightBlend ? '0 0' : '16px 16px'} ${leftBlend ? '0' : '16px'}`};
   display: flex;
   height: 28px;
   padding: 0 ${(props) => props.theme.spacing[3]}px;
@@ -96,7 +103,7 @@ export const StyledInput = styled.input<{ invalid?: boolean }>`
   margin: 0;
   padding: 0;
   outline: none;
-  color: ${({ theme, invalid }) => invalid ? theme.colors.failure : theme.colors.text};
+  color: ${({ theme, invalid }) => (invalid ? theme.colors.failure : theme.colors.text)};
 `
 
 export default NumericInput
