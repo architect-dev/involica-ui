@@ -9,8 +9,8 @@ import {
   SummitButton,
   Text,
   TokenSymbolImage,
+  SummitPopUp,
 } from 'uikit'
-import { SummitPopUp } from 'uikit/widgets/Popup'
 import { PositionSwapsOverviewOverride } from './PositionOverviewElements'
 
 const ModalWrapper = styled.div`

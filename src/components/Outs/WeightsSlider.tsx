@@ -7,11 +7,11 @@ import { Row, Text, TokenSymbolImage } from 'uikit'
 import { getSymbol } from 'config/tokens'
 import { useConfigurableOuts } from 'state/hooks'
 
-const SliderWrapper = styled.div`
+const SliderWrapper = styled.div<{ intro?: boolean}>`
   height: 60px;
   display: flex;
-  width: calc(100% + 36px);
-  margin-left: -18px;
+  width: ${({ intro }) => intro ? 'calc(100% + 36px)' : '100%'};
+  margin-left: ${({ intro }) => intro ? '-18px' : '0'};
   position: relative;
   align-items: center;
   justify-content: center;
@@ -93,7 +93,7 @@ const StyledSlider = styled(Slider)`
   }
 `
 
-export const WeightsSlider: React.FC = () => {
+export const WeightsSlider: React.FC<{ intro?: boolean }> = ({ intro }) => {
   const { outs, updateWeights } = useConfigurableOuts()
 
   const weightValues = useMemo(() => {
@@ -121,7 +121,7 @@ export const WeightsSlider: React.FC = () => {
   )
 
   return (
-    <SliderWrapper>
+    <SliderWrapper intro={intro}>
       <WeightsRow>
         <Bound/>
         {outs.length === 0 && <EmptySlider/>}

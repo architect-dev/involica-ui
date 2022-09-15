@@ -109,7 +109,7 @@ const TokenSelectModal: React.FC<{
   disabledTokens?: AddressRecord<string>
   variant: ModalVariant
   onDismiss?: () => void
-  setToken: (string) => void
+  setToken?: (string) => void
 }> = ({
   selectedTokens,
   disabledTokens,
@@ -124,7 +124,9 @@ const TokenSelectModal: React.FC<{
 
   const handleSelect = useCallback(
     (addr) => {
-      setToken(addr)
+      if (setToken != null) {
+        setToken(addr)
+      }
       onDismiss()
     },
     [setToken, onDismiss],

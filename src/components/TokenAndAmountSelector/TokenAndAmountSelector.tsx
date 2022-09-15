@@ -8,6 +8,7 @@ import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 import { bn, bnDisplay } from 'utils'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { transparentize } from 'polished'
+import { TokenIndicator } from 'components/TokenSelect/TokenIndicator'
 
 const StyledInputWrapper = styled(SelectorWrapperBase)`
   position: relative;
@@ -47,7 +48,7 @@ const ThinRow = styled.div`
 `
 const BalanceRow = styled(ThinRow)`
   justify-content: space-between;
-  `
+`
 const InputRow = styled(ThinRow)`
   height: 52px;
   border: 1px solid ${({ theme }) => transparentize(0.75, theme.colors.text)};
@@ -66,18 +67,20 @@ const InputWrapper = styled.div<{ changed?: boolean }>`
   position: relative;
   height: 28px;
 
-  ${({ changed, theme }) => changed && css`
-    :after {
-      content: '*';
-      color: ${theme.colors.warning};
-      font-size: 14px;
-      font-weight: bold;
-      font-family: Courier Prime, monospace;
-      position: absolute;
-      top: -4px;
-      right: -8px;
-    }
-  `}
+  ${({ changed, theme }) =>
+    changed &&
+    css`
+      :after {
+        content: '*';
+        color: ${theme.colors.warning};
+        font-size: 14px;
+        font-weight: bold;
+        font-family: Courier Prime, monospace;
+        position: absolute;
+        top: -4px;
+        right: -8px;
+      }
+    `}
 `
 
 export const StyledInput = styled.input<{ invalid?: boolean }>`
@@ -118,11 +121,11 @@ const TextButton = styled.div`
 
 interface TokenInputProps {
   token: string | null
-  setToken: (token: string) => void
+  setToken?: (token: string) => void
   value: string
   setValue: (val: string, max: string) => void
 
-  disabledReasons: AddressRecord<string>
+  disabledReasons?: AddressRecord<string>
 
   placeholder?: string
   disabled?: boolean
@@ -131,6 +134,8 @@ interface TokenInputProps {
 
   tokenChanged?: boolean
   amountChanged?: boolean
+
+  tokenSelectDisabled?: boolean
 }
 
 const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
@@ -141,13 +146,15 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
 
   disabledReasons,
 
-  placeholder,
+  placeholder = '0.0',
   disabled,
   isLocked,
   invalid,
 
   tokenChanged,
   amountChanged,
+
+  tokenSelectDisabled,
 }) => {
   const { data: tokenData, userData: tokenUserData } = useTokenFullData(token)
 
@@ -172,7 +179,7 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
   const handleSelectMax = useCallback(() => {
     setValue(fullBalance, fullBalance)
   }, [setValue, fullBalance])
-  
+
   return (
     <StyledInputWrapper disabled={disabled} isLocked={isLocked} invalid={invalid}>
       <ThinRow>
@@ -181,14 +188,18 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
         <TextButton onClick={handleSelectMax}>MAX</TextButton>
       </ThinRow>
       <InputRow>
-        <TokenSelectButton
-          token={token}
-          setToken={setToken}
-          noTokenString="select"
-          disabledTokens={disabledReasons}
-          modalVariant="tokenIn"
-          changed={tokenChanged}
-        />
+        {tokenSelectDisabled ? (
+          <TokenIndicator token={token} />
+        ) : (
+          <TokenSelectButton
+            token={token}
+            setToken={setToken}
+            noTokenString="select"
+            disabledTokens={disabledReasons}
+            modalVariant="tokenIn"
+            changed={tokenChanged}
+          />
+        )}
         <InputWrapper changed={amountChanged}>
           <StyledInput
             disabled={disabled || isLocked}

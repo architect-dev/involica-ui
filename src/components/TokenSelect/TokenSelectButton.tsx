@@ -1,16 +1,15 @@
 import { TokenButton } from 'components/TokenButton'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { AddressRecord } from 'state/types'
 import { useInvolicaStore } from 'state/store'
-import { Column, Text } from 'uikit'
-import { SummitPopUp } from 'uikit/widgets/Popup'
-import { bn, bnDisplay } from 'utils'
+import { Column, Text, SummitPopUp } from 'uikit'
+import { bn, bnDisplay, useShowHideModal } from 'utils'
 import TokenSelectModal, { ModalVariant } from './TokenSelectModal'
 
 export const TokenSelectButton: React.FC<{
   token: string | null
   noTokenString: string
-  setToken: (token: string) => void
+  setToken?: (token: string) => void
   selectedTokens?: string[]
   disabledTokens?: AddressRecord<string>
   modalVariant: ModalVariant
@@ -35,26 +34,18 @@ export const TokenSelectButton: React.FC<{
     [selectedTokenBalance, tokenData?.price],
   )
 
-  const [tokenSelectModalOpen, setTokenSelectModalOpen] = useState(false)
-  const showSelectTokenModal = useCallback(
-    () => setTokenSelectModalOpen(true),
-    [setTokenSelectModalOpen],
-  )
-  const hideSelectTokenModal = useCallback(
-    () => setTokenSelectModalOpen(false),
-    [setTokenSelectModalOpen],
-  )
+  const [open, show, hide] = useShowHideModal()
 
   return (
     <Column gap='18px' className={className}>
       <SummitPopUp
-        open={tokenSelectModalOpen}
-        callOnDismiss={hideSelectTokenModal}
+        open={open}
+        callOnDismiss={hide}
         modal
         button={
           <TokenButton
             token={token}
-            onClick={showSelectTokenModal}
+            onClick={show}
             noTokenString={noTokenString}
             changed={changed}
           />

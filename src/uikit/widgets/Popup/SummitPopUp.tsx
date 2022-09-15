@@ -1,5 +1,6 @@
 import { transparentize } from 'polished'
 import React, { useCallback, useRef } from 'react'
+import { X } from 'react-feather'
 import Popup from 'reactjs-popup'
 import styled from 'styled-components'
 
@@ -9,7 +10,7 @@ interface Props {
   contentPadding?: string
   popUpContent: JSX.Element
   open?: boolean
-	modal?: boolean
+  modal?: boolean
   callOnDismiss?: () => void
   className?: string
 }
@@ -29,6 +30,16 @@ const PopUpCard = styled.div<{ contentPadding?: string }>`
   padding: ${({ contentPadding }) => contentPadding || '18px'};
   flex: 1;
   box-shadow: ${({ theme }) => `2px 2px 4px ${transparentize(0.5, theme.colors.textShadow)}`};
+  position: relative;
+`
+
+const CloseIcon = styled(X)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  stroke: ${({ theme }) => theme.colors.text};
+  cursor: pointer;
+  stroke-width: 2.5;
 `
 
 const SummitPopUp: React.FC<Props> = ({
@@ -38,29 +49,34 @@ const SummitPopUp: React.FC<Props> = ({
   popUpContent,
   open,
   callOnDismiss,
-	modal,
+  modal,
   className,
 }) => {
   const ref = useRef()
   const onDismiss = useCallback(() => {
-		callOnDismiss()
+    callOnDismiss()
     if (ref.current != null) {
       ((ref.current as unknown) as any).close()
     }
   }, [ref, callOnDismiss])
-	let WrappedButton = null;
-	if (typeof button === "object" && typeof button.type === "function") {
-		WrappedButton = button && React.forwardRef((props, buttonRef: React.ForwardedRef<HTMLDivElement>)=>(
-			<span {...props} ref={buttonRef}>{button}</span>));
-	}
+  let WrappedButton = null
+  if (typeof button === 'object' && typeof button.type === 'function') {
+    WrappedButton =
+      button &&
+      React.forwardRef((props, buttonRef: React.ForwardedRef<HTMLDivElement>) => (
+        <span {...props} ref={buttonRef}>
+          {button}
+        </span>
+      ))
+  }
   return (
     <StyledPopup
-      trigger={WrappedButton ? <WrappedButton/> : button}
+      trigger={WrappedButton ? <WrappedButton /> : button}
       position={position}
       closeOnDocumentClick
       closeOnEscape
       ref={ref}
-			modal={modal}
+      modal={modal}
       offsetX={0}
       offsetY={0}
       open={open}
@@ -72,6 +88,7 @@ const SummitPopUp: React.FC<Props> = ({
         {React.cloneElement(popUpContent, {
           onDismiss,
         })}
+        <CloseIcon onClick={onDismiss} size={16} />
       </PopUpCard>
     </StyledPopup>
   )

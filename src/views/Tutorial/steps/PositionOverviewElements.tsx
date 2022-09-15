@@ -7,6 +7,7 @@ import { TokenSymbolImage, Text, Column, Row } from 'uikit'
 import { bn, bnDisplay, eN } from 'utils'
 import { ethers } from 'ethers'
 import { usePositionAmountDCA, usePositionIntervalDCA, usePositionOuts, usePositionTokenInWithData } from 'state/hooks'
+import { useIntervalStrings } from 'state/uiHooks'
 
 const SwapRow = styled.div`
   display: flex;
@@ -109,26 +110,9 @@ export const PositionSwapsOverviewOverride: React.FC<{
 }> = ({ outs }) => {
   const { tokenIn, tokenInData } = usePositionTokenInWithData()
   const { amountDCA } = usePositionAmountDCA()
-  const { intervalDCA } = usePositionIntervalDCA()
+  const { intervalStringly } = useIntervalStrings()
 
   const sortedOuts = [...outs].sort((a, b) => (a.weight > b.weight ? -1 : 1))
-
-  const intervalString = useMemo(() => {
-    if (intervalDCA == null) return '-'
-    if (intervalDCA === 3600 * 24 * 28) return 'monthly'
-    if (intervalDCA === 3600 * 24 * 14) return 'every other week'
-    if (intervalDCA === 3600 * 24 * 7) return 'weekly'
-    if (intervalDCA === 3600 * 24 * 2) return 'every other day'
-    if (intervalDCA === 3600 * 24) return 'daily'
-    if (intervalDCA === 3600 * 2) return 'every other hour'
-    if (intervalDCA === 3600) return 'hourly'
-    if (intervalDCA % (3600 * 24 * 7) === 0)
-      return `every ${intervalDCA / (3600 * 24 * 7)} weeks`
-    if (intervalDCA % (3600 * 24) === 0)
-      return `every ${intervalDCA / (3600 * 24)} days`
-    if (intervalDCA % 3600 === 0) return `every ${intervalDCA / 3600} hours`
-    return '-'
-  }, [intervalDCA])
 
   return (
     <SwapRow>
@@ -150,7 +134,7 @@ export const PositionSwapsOverviewOverride: React.FC<{
         </TokenRow>
         <TextWrap>
           <Text small italic>
-            Executed {intervalString}
+            {intervalStringly}
           </Text>
         </TextWrap>
       </InColumn>

@@ -6,7 +6,8 @@ import { OutsSelectionColumn } from 'components/Outs/OutsSelectionColumn'
 import TokenAndAmountSelector from 'components/TokenAndAmountSelector'
 import { useConfigurableAmountDCA, useConfigurableTokenIn, usePositionOuts } from 'state/hooks'
 import { IntervalSelector } from 'components/IntervalSelector'
-import { transparentize } from 'polished'
+import { WeightsSlider } from 'components/Outs/WeightsSlider'
+import { CellCol, CellWithChanged } from './styles'
 
 const CellRow = styled.div`
   display: flex;
@@ -15,21 +16,7 @@ const CellRow = styled.div`
   align-items: flex-start;
   justify-content: flex-start;
   width: 100%;
-`
-
-const CellCol = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-`
-
-const CellWithChanged = styled(CellCol)<{ changed?: boolean }>`
-  background-color: ${({ theme, changed }) => (changed ? transparentize(0.8, theme.colors.warning) : 'transparent')};
-  padding: 12px;
-  width: 100%;
-  gap: 24px;
+  gap: 18px;
 `
 
 export const PositionCard: React.FC = () => {
@@ -47,10 +34,10 @@ export const PositionCard: React.FC = () => {
   }, [outs, tokenIn])
 
   return (
-    <Card title="Position" padding='24px'>
+    <Card title="Position" padding="24px">
       <CellRow>
         <CellCol>
-          <CellWithChanged>
+          <CellWithChanged changed>
             <TextWithChanged small italic changed>
               DCA:
             </TextWithChanged>
@@ -72,13 +59,21 @@ export const PositionCard: React.FC = () => {
           </CellWithChanged>
         </CellCol>
         <CellCol>
-          <CellWithChanged>
+          <CellWithChanged changed>
             <TextWithChanged small italic ml="6px" changed>
-              <pre>{'           '}</pre>Into:
+              <pre>{'        '}</pre>Into:
             </TextWithChanged>
             <OutsSelectionColumn />
           </CellWithChanged>
         </CellCol>
+      </CellRow>
+      <CellRow>
+        <CellWithChanged changed>
+          <TextWithChanged small italic changed>
+            DCA Weighting:
+          </TextWithChanged>
+          <WeightsSlider />
+        </CellWithChanged>
       </CellRow>
     </Card>
   )

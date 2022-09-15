@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { TokenButton } from 'components/TokenButton'
-import { SummitPopUp } from 'uikit/widgets/Popup'
+import { SummitPopUp } from 'uikit'
 import { OutTokenOptionsModal } from './OutTokenOptionsModal'
 
 export const OutTokenButton: React.FC<{ token: string; index: number, changed?: boolean }> = ({

@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
 import { PositionCard } from './Components/PositionCard'
+import { ApprovalCard } from './Components/ApprovalCard'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -45,6 +46,7 @@ const Home: React.FC = () => {
         </StyledHighlightedText>
         <CardsWrapper>
           <PositionCard/>
+          <ApprovalCard/>
         </CardsWrapper>
       </Hero>
 

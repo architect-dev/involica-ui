@@ -96,7 +96,7 @@ export const OutsSelectionColumn: React.FC = () => {
       {[0, 1, 2, 3].map((i) => (
         <RowStart gap="6px" key={i}>
           <Text small>
-            <pre>{'     >     '}</pre>
+            <pre>{'  >     '}</pre>
           </Text>
           <OutAddOrEmpty
             out={chunkedOuts[0] != null ? chunkedOuts[0][i] : null}
