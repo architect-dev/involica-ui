@@ -2,20 +2,19 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useApprove } from 'hooks/useExecute'
 import { MaxUint256 } from 'ethers/constants'
 import { usePositionTokenInWithData, usePositionAmountDCA } from 'state/hooks'
-import { SummitButton, Flex, Text, RowBetween, RowCenter } from 'uikit'
+import { SummitButton, Text, RowBetween, RowCenter } from 'uikit'
 import { bn, bnDisplay, eN } from 'utils'
 import NumericInput from './Input/NumericInput'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
+import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 
-export const IncreaseApprovalModal: React.FC<{
+export const SetAllowanceModal: React.FC<{
   onDismiss?: () => void
 }> = ({ onDismiss }) => {
-  const { tokenIn, tokenInData, tokenInUserData } = usePositionTokenInWithData()
-  const { amountDCA } = usePositionAmountDCA()
+  const { tokenIn, dirty: tokenInDirty, tokenInData, tokenInUserData } = usePositionTokenInWithData(true)
+  const { amountDCA, dirty: amountDCADirty } = usePositionAmountDCA(true)
 
-  const amountDCAInvalid = useMemo(() => (
-    amountDCA == null || amountDCA === '' || amountDCA === '0'
-  ), [amountDCA])
+  const amountDCAInvalid = useMemo(() => amountDCA == null || amountDCA === '' || amountDCA === '0', [amountDCA])
 
   const { onApprove, onInfApprove, pending } = useApprove(tokenInData?.symbol, tokenIn)
   const [rawDcasCount, setRawDcasCount] = useState<string>('')
@@ -122,11 +121,17 @@ export const IncreaseApprovalModal: React.FC<{
   const alreadyInfApproved = useMemo(() => allowance === 'Inf', [allowance])
 
   return (
-    <Flex flexDirection="column" alignItems="flex-start" justifyContent="center" minWidth="300px" gap="12px">
-      <Text bold margin="auto">
-        Increase Approval:
-      </Text>
-      <br />
+    <ModalContentContainer alignItems="flex-start" minWidth="300px" maxWidth="400px" gap="12px">
+      {(tokenInDirty || amountDCADirty) && (
+        <>
+          <Text bold color="warning">
+            You have changed your {tokenInDirty ? 'DCA Token ' : ''}
+            {tokenInDirty && amountDCADirty ? 'and ' : ''}
+            {amountDCADirty ? 'DCA Amount ' : ''} above, we recommend you UPDATE your Position before Approving.
+          </Text>
+          <br />
+        </>
+      )}
       <RowBetween>
         <Text small italic>
           Current DCA Amount:
@@ -186,7 +191,9 @@ export const IncreaseApprovalModal: React.FC<{
         disabled={approvalAmountInvalidReason != null || rawApprovalAmount === '' || rawApprovalAmount == null}
         isLoading={pending}
         onClick={handleApproveRawAmount}
-        activeText={`Approve ${rawApprovalAmountDisplay} ${tokenInData?.symbol}${amountDCAInvalid ? '' : `(${rawApprovalAmountDcasCovered} DCAs)`}`}
+        activeText={`Approve ${rawApprovalAmountDisplay} ${tokenInData?.symbol}${
+          amountDCAInvalid ? '' : ` (${rawApprovalAmountDcasCovered} DCAs)`
+        }`}
         loadingText="Approving"
         padding="0px 18px"
       />
@@ -206,6 +213,7 @@ export const IncreaseApprovalModal: React.FC<{
         onClick={onInfApprove}
         activeText={alreadyInfApproved ? 'Approved' : 'Inf Approve'}
         loadingText="Approving"
+        padding="0px 18px"
       />
 
       <br />
@@ -213,6 +221,6 @@ export const IncreaseApprovalModal: React.FC<{
       <RowCenter>
         <SummitButton onClick={onDismiss} activeText="Close" />
       </RowCenter>
-    </Flex>
+    </ModalContentContainer>
   )
 }

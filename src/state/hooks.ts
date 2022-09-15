@@ -41,16 +41,16 @@ export const useConfigSupplements = <S extends Array<keyof PositionConfigSupplem
     return supps
   })
 }
-export const useDirtyablePositionValue = <K extends keyof PositionConfig>(key: K): WithDirty<K> => {
+export const useDirtyablePositionValue = <K extends keyof PositionConfig>(key: K, positionOnly?: boolean): WithDirty<K> => {
   const positionVal = useInvolicaStore((state) => state.userData?.position?.[key])
   const configVal = useInvolicaStore((state) => state.config[key])
   return useMemo(
     () =>
       ({
-        [key]: configVal ?? positionVal,
+        [key]: positionOnly ? positionVal : configVal ?? positionVal,
         dirty: JSON.stringify(configVal) !== JSON.stringify(positionVal),
       } as WithDirty<K>),
-    [key, positionVal, configVal],
+    [key, positionOnly, positionVal, configVal],
   )
 }
 
@@ -76,10 +76,10 @@ export const useConfigurablePositionValue = <
   ...usePositionSetters(mutators),
 })
 
-export const usePositionTokenIn = () => ({ ...useDirtyablePositionValue('tokenIn') })
+export const usePositionTokenIn = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('tokenIn', positionOnly) })
 export const useConfigurableTokenIn = () => ({ ...useConfigurablePositionValue('tokenIn', ['setTokenIn']) })
 
-export const usePositionOuts = () => ({ ...useDirtyablePositionValue('outs') })
+export const usePositionOuts = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('outs', positionOnly) })
 export const useConfigurableOuts = () => ({
   ...useConfigurablePositionValue('outs', [
     'setOutsFromPreset',
@@ -90,19 +90,19 @@ export const useConfigurableOuts = () => ({
   ]),
 })
 
-export const usePositionAmountDCA = () => ({ ...useDirtyablePositionValue('amountDCA') })
+export const usePositionAmountDCA = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('amountDCA', positionOnly) })
 export const useConfigurableAmountDCA = () => ({
   ...useConfigurablePositionValue('amountDCA', ['setAmountDCA']),
   ...useConfigSupplements(['amountDCAInvalidReason']),
 })
 
-export const usePositionIntervalDCA = () => ({ ...useDirtyablePositionValue('intervalDCA') })
+export const usePositionIntervalDCA = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('intervalDCA', positionOnly) })
 export const useConfigurableIntervalDCA = () => ({
   ...useConfigurablePositionValue('intervalDCA', ['setWeeks', 'setDays', 'setHours']),
   ...useConfigSupplements(['weeks', 'weeksInvalidReason', 'days', 'daysInvalidReason', 'hours', 'hoursInvalidReason']),
 })
 
-export const usePositionMaxGasPrice = () => ({ ...useDirtyablePositionValue('maxGasPrice') })
+export const usePositionMaxGasPrice = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('maxGasPrice', positionOnly) })
 export const useConfigurableMaxGasPrice = () => ({ ...useConfigurablePositionValue('maxGasPrice', ['setMaxGasPrice']) })
 
 export const useConfigurableDcasCount = () => ({
@@ -149,8 +149,8 @@ export const useNativeTokenFullData = (): { nativeTokenData: Token | undefined; 
   nativeTokenUserData: useInvolicaStore((state) => state?.userData?.userNativeTokenData),
 })
 
-export const usePositionTokenInWithData = () => {
-  const { tokenIn, dirty } = usePositionTokenIn()
+export const usePositionTokenInWithData = (positionOnly?: boolean) => {
+  const { tokenIn, dirty } = usePositionTokenIn(positionOnly)
   const { data: tokenInData, userData: tokenInUserData } = useTokenFullData(tokenIn)
   return { tokenIn, dirty, tokenInData, tokenInUserData }
 }

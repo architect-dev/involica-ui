@@ -24,6 +24,12 @@ const EmptyOut = styled.div`
   height: 28px;
   border-radius: 28px;
 `
+const DesktopOnlyPre = styled.pre`
+  display: none;
+  ${({ theme }) => theme.mediaQueries.nav} {
+    display: initial;
+  }
+`
 
 export const OutAddOrEmpty: React.FC<{
   out: PositionOut | null
@@ -96,7 +102,7 @@ export const OutsSelectionColumn: React.FC = () => {
       {[0, 1, 2, 3].map((i) => (
         <RowStart gap="6px" key={i}>
           <Text small>
-            <pre>{'  >     '}</pre>
+            <DesktopOnlyPre>{'  >     '}</DesktopOnlyPre>
           </Text>
           <OutAddOrEmpty
             out={chunkedOuts[0] != null ? chunkedOuts[0][i] : null}

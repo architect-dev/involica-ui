@@ -8,6 +8,7 @@ import { Login, Config } from './types'
 
 const StyledButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.selectorBackground};
+  width: 100%;
 `
 
 interface Props {
@@ -21,7 +22,6 @@ const WalletCard: React.FC<Props> = ({ login, walletConfig, onDismiss, mb }) => 
   const { title, icon: Icon } = walletConfig
   return (
     <StyledButton
-      width="100%"
       variant="tertiary"
       onClick={() => {
         login(walletConfig.connectorId)

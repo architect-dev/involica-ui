@@ -50,6 +50,7 @@ export const TokenSelectButton: React.FC<{
             changed={changed}
           />
         }
+        popUpTitle='Select Token:'
         popUpContent={
           <TokenSelectModal
             setToken={setToken}

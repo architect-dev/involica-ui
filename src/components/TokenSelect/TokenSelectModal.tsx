@@ -16,6 +16,7 @@ import { pressableMixin } from 'uikit/util/styledMixins'
 import { bnDisplay } from 'utils'
 import { getIsStable } from 'config/tokens'
 import { Check } from 'react-feather'
+import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 
 export type ModalVariant = 'tokenIn' | 'tokenOut'
 
@@ -78,15 +79,6 @@ const TokenSelectRow: React.FC<{
     </TokenRowButton>
   )
 }
-
-const ModalWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 300px;
-  max-height: 600px;
-`
 
 const Scrollable = styled.div`
   display: flex;
@@ -151,9 +143,7 @@ const TokenSelectModal: React.FC<{
   }, [variant, tokens, userTokensData])
 
   return (
-    <ModalWrapper>
-      <Text bold>Select Token:</Text>
-      <br />
+    <ModalContentContainer minWidth='300px' maxHeight='600px' gap='0px'>
       <HeaderRow>
         <Text>Token</Text>
         <Text>{variant === 'tokenIn' ? 'Bal' : 'Price'}</Text>
@@ -173,7 +163,7 @@ const TokenSelectModal: React.FC<{
       </Scrollable>
       <br />
       <SummitButton onClick={onDismiss} activeText="Close" />
-    </ModalWrapper>
+    </ModalContentContainer>
   )
 }
 

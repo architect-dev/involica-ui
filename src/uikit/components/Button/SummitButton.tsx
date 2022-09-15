@@ -1,9 +1,4 @@
-import React, {
-  cloneElement,
-  ElementType,
-  isValidElement,
-  useCallback,
-} from 'react'
+import React, { cloneElement, ElementType, isValidElement, useCallback } from 'react'
 import styled from 'styled-components'
 import getExternalLinkProps from '../../util/getExternalLinkProps'
 import { Dots } from '../Dots'
@@ -19,9 +14,7 @@ const StyledLock = styled(Lock)`
   filter: drop-shadow(1px 1px 4px black);
 `
 
-const SummitButton = <E extends ElementType = 'button'>(
-  props: ButtonProps<E>,
-): JSX.Element => {
+const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): JSX.Element => {
   const {
     startIcon,
     endIcon,
@@ -68,18 +61,12 @@ const SummitButton = <E extends ElementType = 'button'>(
       {...rest}
     >
       <>
-        {isValidElement(startIcon) &&
-          cloneElement(startIcon, {
-            mr: '0.5rem',
-          })}
+        {isValidElement(startIcon) && cloneElement(startIcon)}
         {children != null && children}
         {activeText != null && !isLoading && activeText}
         {loadingText != null && isLoading && loadingText}
         {isLoading && <Dots />}
-        {isValidElement(endIcon) &&
-          cloneElement(endIcon, {
-            ml: '0.5rem',
-          })}
+        {isValidElement(endIcon) && cloneElement(endIcon)}
         {isLocked && <StyledLock width="28px" />}
       </>
     </SummitStyledButton>

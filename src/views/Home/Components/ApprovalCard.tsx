@@ -5,11 +5,13 @@ import { RowBetween, RowCenter, Text, SummitPopUp, SummitButton } from 'uikit'
 import { usePositionAmountDCA, usePositionTokenInWithData } from 'state/hooks'
 import { CellCol } from './styles'
 import { bn, bnDisplay, eN, useShowHideModal } from 'utils'
-import { IncreaseApprovalModal } from 'components/IncreaseApprovalModal'
+import { SetAllowanceModal } from 'components/SetAllowanceModal'
+import { useRevokeApproval } from 'hooks/useExecute'
 
 export const ApprovalCard: React.FC = () => {
-  const { tokenInData, tokenInUserData } = usePositionTokenInWithData()
-  const { amountDCA } = usePositionAmountDCA()
+  const { onRevokeApproval, pending } = useRevokeApproval()
+  const { tokenInData, tokenInUserData } = usePositionTokenInWithData(true)
+  const { amountDCA } = usePositionAmountDCA(true)
 
   const [allowance, allowanceDCAs] = useMemo(() => {
     const infAllowance = bn(tokenInUserData?.allowance).gt(bn(MaxUint256.div(2).toString()))
@@ -39,16 +41,27 @@ export const ApprovalCard: React.FC = () => {
           <Text small italic>
             DCAs Covered by Allowance:
           </Text>
-          <Text bold>{allowanceDCAs} DCAs</Text>
+          <Text bold red={allowanceDCAs === 0}>{allowanceDCAs} DCAs</Text>
         </RowBetween>
         <RowCenter>
           <SummitPopUp
             open={open}
             callOnDismiss={hide}
             modal
-            button={<SummitButton onClick={show}>Increase Approval</SummitButton>}
-            popUpContent={<IncreaseApprovalModal />}
+            button={<SummitButton onClick={show}>Set Allowance</SummitButton>}
+            popUpTitle='Set Allowance'
+            popUpContent={<SetAllowanceModal />}
           />
+        </RowCenter>
+
+        <br />
+        <Text small italic>
+          Revoke full approval:
+          <br />
+          (Will halt all future DCA executions)
+        </Text>
+        <RowCenter>
+          <SummitButton onClick={onRevokeApproval} activeText="Revoke Approval" loadingText="Revoking Approval" isLoading={pending} />
         </RowCenter>
       </CellCol>
     </Card>

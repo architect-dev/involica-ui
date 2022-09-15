@@ -8,6 +8,7 @@ import { callWithEstimateGas } from 'utils/estimateGas'
 import BigNumber from 'bignumber.js'
 import { ethers } from 'ethers'
 import { eN } from 'utils'
+import { usePositionTokenInWithData } from 'state/hooks'
 
 const useExecuteTx = () => {
   const fetchUserData = useInvolicaStore((state) => state.fetchUserData)
@@ -79,6 +80,26 @@ export const useApprove = (symbol: string, erc20Address: string) => {
   return { onApprove, onInfApprove, pending }
 }
 
+export const useRevokeApproval = () => {
+  const { tokenInData } = usePositionTokenInWithData()
+  const erc20Contract = useERC20(tokenInData?.address)
+  const involica = useInvolica()
+  const { handleExecute, pending } = useExecuteTx()
+
+  const onRevokeApproval = useCallback(() => {
+    handleExecute(
+      erc20Contract,
+      'approve',
+      [involica.address, '0'],
+      undefined,
+      `Revoked ${tokenInData?.symbol} Approval, DCAs halted`,
+      `${tokenInData?.symbol} Approval Revocation Failed`,
+    )
+  }, [handleExecute, erc20Contract, involica.address, tokenInData?.symbol])
+
+  return { onRevokeApproval, pending }
+}
+
 export const useDepositTreasury = () => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
@@ -86,14 +107,7 @@ export const useDepositTreasury = () => {
   const onDepositTreasury = useCallback(
     (amount: string, decimals: number) => {
       const amountRaw = eN(amount, decimals)
-      handleExecute(
-        involica,
-        'depositTreasury',
-        [],
-        { value: amountRaw },
-        `Funds Added`,
-        'Error Adding Funds',
-      )
+      handleExecute(involica, 'depositTreasury', [], { value: amountRaw }, `Funds Added`, 'Error Adding Funds')
     },
     [handleExecute, involica],
   )
@@ -108,14 +122,7 @@ export const useWithdrawTreasury = () => {
   const onWithdrawTreasury = useCallback(
     (amount: BigNumber) => {
       const amountRaw = eN(amount, 18)
-      handleExecute(
-        involica,
-        'withdrawTreasury',
-        [amountRaw],
-        undefined,
-        `Withdrew Funds`,
-        'Error Withdrawing Funds',
-      )
+      handleExecute(involica, 'withdrawTreasury', [amountRaw], undefined, `Withdrew Funds`, 'Error Withdrawing Funds')
     },
     [handleExecute, involica],
   )
@@ -188,14 +195,7 @@ export const useExitPosition = () => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onExitPosition = useCallback(() => {
-    handleExecute(
-      involica,
-      'exitPosition',
-      [],
-      undefined,
-      `Position Exited`,
-      'Error Exiting Position',
-    )
+    handleExecute(involica, 'exitPosition', [], undefined, `Position Exited`, 'Error Exiting Position')
   }, [handleExecute, involica])
 
   return { onExitPosition, pending }

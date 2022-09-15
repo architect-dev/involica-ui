@@ -28,6 +28,7 @@ export const ConfigPreview: React.FC = () => {
         button={
           <SummitButton onClick={show} activeText="Preview Position" width="130px" />
         }
+        popUpTitle='Preview Position:'
         popUpContent={<ConfigPreviewModal />}
       />
     </FixedDiv>

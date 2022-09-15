@@ -17,6 +17,7 @@ export const OutTokenButton: React.FC<{ token: string; index: number, changed?: 
       callOnDismiss={hide}
       modal
       button={<TokenButton token={token} noTokenString="Missing" changed={changed} />}
+      popUpTitle='Manage Token'
       popUpContent={<OutTokenOptionsModal token={token} index={index} />}
     />
   )

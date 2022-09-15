@@ -4,8 +4,8 @@ import { pressableMixin } from 'uikit/util/styledMixins'
 import { Text } from 'uikit/components/Text'
 import { SummitPopUp } from 'uikit/widgets/Popup'
 import { useDebugActions } from 'state/debugHooks'
-import { Flex } from 'uikit/components/Box'
 import { SummitButton } from 'uikit/components/Button'
+import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 
 const ItemFlex = styled.div`
   display: flex;
@@ -31,9 +31,7 @@ export const DebugModal: React.FC<{
 }> = ({ onDismiss }) => {
   const debugActions = useDebugActions()
   return (
-    <Flex flexDirection="column" alignItems="center" justifyContent="center" minWidth="300px" gap='12px'>
-      <Text bold>Debug Options:</Text>
-      <br />
+    <ModalContentContainer gap='12px'>
       {Object.entries(debugActions).map(([key, action]) => (
         <ItemFlex
           key={key}
@@ -47,7 +45,7 @@ export const DebugModal: React.FC<{
       ))}
       <br />
       <SummitButton onClick={onDismiss} activeText="Close" />
-    </Flex>
+    </ModalContentContainer>
   )
 }
 
@@ -65,6 +63,7 @@ const DebugMenu: React.FC<{ account: string | null }> = ({ account }) => {
           <Text className="item-label">DEBUG</Text>
         </ItemFlex>
       }
+      popUpTitle='Debug Options:'
       popUpContent={<DebugModal />}
       modal
       open={open}

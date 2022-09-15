@@ -17,6 +17,7 @@ const SummitStyledButton = styled(StyledButton)<{
   min-height: ${({ height }) => height || 28}px;
   border-radius: 22px;
   border: 0px solid ${({ theme }) => theme.colors.text};
+  gap: 4px;
   
   padding: ${({ padding }) => padding || '0px 38px'};
   /* box-shadow: ${({ theme, disabled, $isLocked }) => disabled || $isLocked ? 'none' : `1px 1px 1px ${theme.colors.textShadow}, 1px 1px 1px inset ${theme.colors.textShadow}`}; */

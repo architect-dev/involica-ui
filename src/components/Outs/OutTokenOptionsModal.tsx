@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import { useConfigurableOuts } from 'state/hooks'
-import { Flex, SummitButton, Text } from 'uikit'
+import { SummitButton, Text } from 'uikit'
+import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 
 // TODO: Add max slippage setting
 export const OutTokenOptionsModal: React.FC<{
@@ -14,10 +15,7 @@ export const OutTokenOptionsModal: React.FC<{
     onDismiss()
   }, [removeOut, index, onDismiss])
   return (
-    <Flex
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
+    <ModalContentContainer
       minWidth="300px"
     >
       <Text bold>Manage Token:</Text>
@@ -25,6 +23,6 @@ export const OutTokenOptionsModal: React.FC<{
       <SummitButton onClick={handleRemove} activeText="Remove" />
       <br />
       <SummitButton onClick={onDismiss} activeText="Close" />
-    </Flex>
+    </ModalContentContainer>
   )
 }

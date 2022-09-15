@@ -12,6 +12,7 @@ import Divider from 'uikit/components/Divider'
 import DarkModeToggle from '../Menu/components/DarkModeToggle'
 import { CHAIN_ID } from 'utils'
 import { ChainIcon } from 'uikit/components/Svg'
+import { ModalContentContainer } from '../Popup/SummitPopUp'
 
 const AccountDot = styled.div`
   width: 42px;
@@ -59,7 +60,7 @@ const AccountPopUp: React.FC<Props> = ({ account, isDark, toggleTheme, logout, o
   )
 
   return (
-    <Flex flexDirection='column' alignItems='center' justifyContent='center' gap='18px' minWidth='300px'>
+    <ModalContentContainer gap='18px' minWidth='300px' padding='18px 0px'>
       <Flex width='100%' alignItems='center' justifyContent='space-between'>
         <Text bold monospace>ACCOUNT</Text>
         <SummitButton
@@ -114,7 +115,7 @@ const AccountPopUp: React.FC<Props> = ({ account, isDark, toggleTheme, logout, o
       </Flex>
 
 
-    </Flex>
+    </ModalContentContainer>
   )
 }
 

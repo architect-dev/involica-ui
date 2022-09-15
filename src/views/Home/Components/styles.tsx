@@ -16,3 +16,10 @@ export const CellWithChanged = styled(CellCol)<{ changed?: boolean }>`
   width: 100%;
   gap: 24px;
 `
+
+export const DesktopOnlyPre = styled.pre`
+  display: none;
+  ${({ theme }) => theme.mediaQueries.nav} {
+    display: initial;
+  }
+`

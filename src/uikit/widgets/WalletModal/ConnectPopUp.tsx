@@ -3,19 +3,10 @@ import WalletCard from './WalletCard'
 import config from './config'
 import { Login } from './types'
 import { Text } from '../../components/Text'
-import styled from 'styled-components'
 import { Flex } from 'uikit/components/Box'
 import Divider from 'uikit/components/Divider'
 import DarkModeToggle from '../Menu/components/DarkModeToggle'
-
-const PopUpWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  max-width: 300px;
-  gap: 18px;
-`
+import { ModalContentContainer } from '../Popup/SummitPopUp'
 
 interface Props {
   login: Login
@@ -25,9 +16,9 @@ interface Props {
 }
 
 const ConnectPopUp: React.FC<Props> = ({ login, isDark, toggleTheme, onDismiss = () => null }) => (
-  <PopUpWrapper>
+  <ModalContentContainer gap='18px' minWidth='300px' padding='18px 0px'>
     <Text bold monospace>Connect Wallet:</Text>
-    <Flex flexDirection='column'>
+    <Flex flexDirection='column' width='100%'>
       {config.map((entry, index) => (
         <WalletCard
           key={entry.title}
@@ -45,7 +36,7 @@ const ConnectPopUp: React.FC<Props> = ({ login, isDark, toggleTheme, onDismiss =
       <Text bold monospace>Site Theme</Text>
       <DarkModeToggle isDark={isDark} toggleTheme={toggleTheme}/>
     </Flex>
-  </PopUpWrapper>
+  </ModalContentContainer>
 )
 
 export default ConnectPopUp

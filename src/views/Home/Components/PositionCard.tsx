@@ -7,7 +7,7 @@ import TokenAndAmountSelector from 'components/TokenAndAmountSelector'
 import { useConfigurableAmountDCA, useConfigurableTokenIn, usePositionOuts } from 'state/hooks'
 import { IntervalSelector } from 'components/IntervalSelector'
 import { WeightsSlider } from 'components/Outs/WeightsSlider'
-import { CellCol, CellWithChanged } from './styles'
+import { CellCol, CellWithChanged, DesktopOnlyPre } from './styles'
 
 const CellRow = styled.div`
   display: flex;
@@ -17,6 +17,7 @@ const CellRow = styled.div`
   justify-content: flex-start;
   width: 100%;
   gap: 18px;
+  flex-wrap: wrap;
 `
 
 export const PositionCard: React.FC = () => {
@@ -39,7 +40,7 @@ export const PositionCard: React.FC = () => {
         <CellCol>
           <CellWithChanged changed>
             <TextWithChanged small italic changed>
-              DCA:
+              Token:
             </TextWithChanged>
             <TokenAndAmountSelector
               token={tokenIn}
@@ -53,15 +54,15 @@ export const PositionCard: React.FC = () => {
           </CellWithChanged>
           <CellWithChanged changed>
             <TextWithChanged small italic>
-              Every:
+              Interval:
             </TextWithChanged>
             <IntervalSelector />
           </CellWithChanged>
         </CellCol>
         <CellCol>
           <CellWithChanged changed>
-            <TextWithChanged small italic ml="6px" changed>
-              <pre>{'        '}</pre>Into:
+            <TextWithChanged small italic changed>
+              <DesktopOnlyPre>{'         '}</DesktopOnlyPre>DCA Into:
             </TextWithChanged>
             <OutsSelectionColumn />
           </CellWithChanged>
