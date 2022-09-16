@@ -6,6 +6,7 @@ import NumericInput from './Input/NumericInput'
 
 export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false }) => {
   const {
+    dirty,
     intervalDCA,
     weeks,
     weeksInvalidReason,
@@ -17,7 +18,7 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
     setDays,
     setHours,
   } = useConfigurableIntervalDCA()
-  const { intervalString, intervalStringly } = useIntervalStrings()
+  const { intervalString } = useIntervalStrings()
 
   const handleSetWeeks = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -41,7 +42,11 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
   return (
     <ColumnStart gap={intro ? 'inherit' : '4px'}>
       <RowStart>
-        { intro && <Text small mr='6px'>Every: </Text> }
+        {intro && (
+          <Text small mr="6px">
+            Every:{' '}
+          </Text>
+        )}
         <NumericInput
           value={weeks}
           onChange={handleSetWeeks}
@@ -49,7 +54,7 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
           placeholder="0"
           invalid={weeksInvalidReason != null}
           rightBlend
-          changed
+          changed={dirty && weeks !== ''}
         />
         <NumericInput
           value={days}
@@ -59,6 +64,7 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
           invalid={daysInvalidReason != null}
           leftBlend
           rightBlend
+          changed={dirty && days !== ''}
         />
         <NumericInput
           value={hours}
@@ -67,6 +73,7 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
           placeholder="0"
           invalid={hoursInvalidReason != null}
           leftBlend
+          changed={dirty && hours !== ''}
         />
       </RowStart>
       <Column mt={intro ? '-12px' : '0'}>
@@ -91,10 +98,12 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
           </Text>
         )}
       </Column>
-      <Text italic bold={intro}>
-        {intro && <br />}
-        {intervalDCA === 0 ? '-' : intro ? intervalString : intervalStringly}
-      </Text>
+      {intro && (
+        <Text italic small bold={intro}>
+          <br/>
+          {intervalDCA === 0 ? '-' : intervalString}
+        </Text>
+      )}
     </ColumnStart>
   )
 }

@@ -4,6 +4,9 @@ import { HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
 import { PositionCard } from './Components/PositionCard'
 import { ApprovalCard } from './Components/ApprovalCard'
+import { PositionStatusCard } from './Components/PositionStatusCard'
+import { FundsCard } from './Components/FundsCard'
+import { UpcomingExecutionsCard } from './Components/UpcomingExecutionsCard'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -45,8 +48,11 @@ const Home: React.FC = () => {
           INVOLICA
         </StyledHighlightedText>
         <CardsWrapper>
+          <PositionStatusCard/>
+          <FundsCard/>
           <PositionCard/>
           <ApprovalCard/>
+          <UpcomingExecutionsCard/>
         </CardsWrapper>
       </Hero>
 

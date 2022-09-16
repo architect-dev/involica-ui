@@ -5,7 +5,6 @@ import useToast from './useToast'
 import { useInvolicaStore } from 'state/store'
 import { Contract, PayableOverrides } from '@ethersproject/contracts'
 import { callWithEstimateGas } from 'utils/estimateGas'
-import BigNumber from 'bignumber.js'
 import { ethers } from 'ethers'
 import { eN } from 'utils'
 import { usePositionTokenInWithData } from 'state/hooks'
@@ -120,8 +119,8 @@ export const useWithdrawTreasury = () => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onWithdrawTreasury = useCallback(
-    (amount: BigNumber) => {
-      const amountRaw = eN(amount, 18)
+    (amount: string, decimals: number) => {
+      const amountRaw = eN(amount, decimals)
       handleExecute(involica, 'withdrawTreasury', [amountRaw], undefined, `Withdrew Funds`, 'Error Withdrawing Funds')
     },
     [handleExecute, involica],

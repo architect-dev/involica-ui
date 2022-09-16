@@ -1,1 +1,1 @@
-export { default as SummitPopUp } from './SummitPopUp'
+export * from './SummitPopUp'

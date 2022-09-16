@@ -28,7 +28,7 @@ export const getDecimals = (address: string): number => {
 export const getChainGwei = (raw: BigNumberish) => {
   switch (parseInt(CHAIN_ID)) {
     case 250:
-      return eN(raw, 11)
+      return eN(raw, 9)
     default:
       return eN(raw, 9)
   }

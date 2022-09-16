@@ -11,7 +11,6 @@ const Flex = styled(Box)<FlexProps>`
 
 export const Row = styled(Flex)`
   flex-direction: row;
-  flex: 1;
   align-items: center;
   width: 100%;
 `
@@ -20,6 +19,9 @@ export const RowCenter = styled(Row)`
 `
 export const RowStart = styled(Row)`
   justify-content: flex-start;
+`
+export const RowEnd = styled(Row)`
+  justify-content: flex-end;
 `
 export const RowBetween = styled(Row)`
   justify-content: space-between;

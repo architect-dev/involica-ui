@@ -1,8 +1,14 @@
 import { useWeb3React } from '@web3-react/core'
+import BigNumber from 'bignumber.js'
+import { nativeAdd } from 'config/constants'
+import { useInterval } from 'hooks/useInterval'
 import useRefresh from 'hooks/useRefresh'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { bnDisplay, eN } from 'utils'
 import { useInvolicaStore } from './store'
 import { PositionConfig, PositionConfigMutators, PositionConfigSupplements, Token, UserTokenData } from './types'
+
+// FETCHERS
 
 export const useFetchPublicData = () => {
   const { slowRefresh } = useRefresh()
@@ -28,6 +34,8 @@ export const useFetchUserData = () => {
   }, [account, fetchUserData, setActiveAccount, slowRefresh])
 }
 
+// POSITION & CONFIG
+
 export type WithDirty<T extends keyof PositionConfig> = { dirty: boolean } & Pick<PositionConfig, T>
 
 export const useConfigSupplements = <S extends Array<keyof PositionConfigSupplements>>(
@@ -41,7 +49,10 @@ export const useConfigSupplements = <S extends Array<keyof PositionConfigSupplem
     return supps
   })
 }
-export const useDirtyablePositionValue = <K extends keyof PositionConfig>(key: K, positionOnly?: boolean): WithDirty<K> => {
+export const useDirtyablePositionValue = <K extends keyof PositionConfig>(
+  key: K,
+  positionOnly?: boolean,
+): WithDirty<K> => {
   const positionVal = useInvolicaStore((state) => state.userData?.position?.[key])
   const configVal = useInvolicaStore((state) => state.config[key])
   return useMemo(
@@ -76,7 +87,9 @@ export const useConfigurablePositionValue = <
   ...usePositionSetters(mutators),
 })
 
-export const usePositionTokenIn = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('tokenIn', positionOnly) })
+export const usePositionTokenIn = (positionOnly?: boolean) => ({
+  ...useDirtyablePositionValue('tokenIn', positionOnly),
+})
 export const useConfigurableTokenIn = () => ({ ...useConfigurablePositionValue('tokenIn', ['setTokenIn']) })
 
 export const usePositionOuts = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('outs', positionOnly) })
@@ -89,20 +102,63 @@ export const useConfigurableOuts = () => ({
     'updateOutMaxSlippage',
   ]),
 })
+export const usePositionOutWeightsDirty = () => {
+  const positionOuts = useInvolicaStore((state) => state.userData?.position?.outs ?? [])
+  const configOuts = useInvolicaStore((state) => state.config?.outs ?? [])
 
-export const usePositionAmountDCA = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('amountDCA', positionOnly) })
+  return useMemo(() => {
+    if (positionOuts.length !== configOuts.length) return true
+    return positionOuts.some((out, i) => out.token !== configOuts[i].token || out.weight !== configOuts[i].weight)
+  }, [positionOuts, configOuts])
+}
+export const usePositionOutsDirtyData = (intro = false) => {
+  const positionOuts = useInvolicaStore((state) => state.userData?.position?.outs ?? [])
+  const configOuts = useInvolicaStore((state) => state.config?.outs ?? [])
+
+  return useMemo(() => {
+    if (intro) return null
+
+    const longerOuts = positionOuts.length > configOuts.length ? positionOuts : configOuts
+    const shorterOuts = positionOuts.length > configOuts.length ? configOuts : positionOuts
+
+    const dirtyData: { token: boolean, weight: boolean, slippage: boolean}[] = []
+
+    longerOuts.forEach((out, i) => {
+      if (i >= shorterOuts.length) {
+        dirtyData.push({ token: true, weight: true, slippage: true })
+        return
+      }
+      const tokenDirty = out.token !== shorterOuts[i].token
+      dirtyData.push({
+        token: tokenDirty,
+        weight: tokenDirty || out.weight !== shorterOuts[i].weight,
+        slippage: tokenDirty || out.maxSlippage !== shorterOuts[i].maxSlippage,
+      })
+    })
+
+    return dirtyData
+  }, [intro, positionOuts, configOuts])
+}
+
+export const usePositionAmountDCA = (positionOnly?: boolean) => ({
+  ...useDirtyablePositionValue('amountDCA', positionOnly),
+})
 export const useConfigurableAmountDCA = () => ({
   ...useConfigurablePositionValue('amountDCA', ['setAmountDCA']),
   ...useConfigSupplements(['amountDCAInvalidReason']),
 })
 
-export const usePositionIntervalDCA = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('intervalDCA', positionOnly) })
+export const usePositionIntervalDCA = (positionOnly?: boolean) => ({
+  ...useDirtyablePositionValue('intervalDCA', positionOnly),
+})
 export const useConfigurableIntervalDCA = () => ({
   ...useConfigurablePositionValue('intervalDCA', ['setWeeks', 'setDays', 'setHours']),
   ...useConfigSupplements(['weeks', 'weeksInvalidReason', 'days', 'daysInvalidReason', 'hours', 'hoursInvalidReason']),
 })
 
-export const usePositionMaxGasPrice = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('maxGasPrice', positionOnly) })
+export const usePositionMaxGasPrice = (positionOnly?: boolean) => ({
+  ...useDirtyablePositionValue('maxGasPrice', positionOnly),
+})
 export const useConfigurableMaxGasPrice = () => ({ ...useConfigurablePositionValue('maxGasPrice', ['setMaxGasPrice']) })
 
 export const useConfigurableDcasCount = () => ({
@@ -124,7 +180,8 @@ export const useConfigurableGetStarted = () => ({
   ...usePositionSetters(['getStarted']),
 })
 
-// TOKEN DATA
+// TOKENS
+
 export const useTokenPublicData = (token: string | undefined): { data: Token | undefined } => ({
   data: useInvolicaStore((state) => state?.tokens?.[token]),
 })
@@ -144,9 +201,24 @@ export const useNativeTokenPublicData = (): { nativeTokenData: Token | undefined
 export const useNativeTokenUserData = (): { nativeTokenUserData: UserTokenData | undefined } => ({
   nativeTokenUserData: useInvolicaStore((state) => state?.userData?.userNativeTokenData),
 })
-export const useNativeTokenFullData = (): { nativeTokenData: Token | undefined; nativeTokenUserData: UserTokenData | undefined } => ({
+export const useNativeTokenFullData = (): {
+  nativeTokenData: Token | undefined
+  nativeTokenUserData: UserTokenData | undefined
+} => ({
   nativeTokenData: useInvolicaStore((state) => state?.nativeToken),
   nativeTokenUserData: useInvolicaStore((state) => state?.userData?.userNativeTokenData),
+})
+
+export const useTokenOrNativePublicData = (token: string | undefined): { data: Token | undefined } => ({
+  data: useInvolicaStore((state) => (token === nativeAdd ? state?.nativeToken : state?.tokens?.[token])),
+})
+export const useTokenOrNativeFullData = (
+  token: string | undefined,
+): { data: Token | undefined; userData: UserTokenData | undefined } => ({
+  data: useInvolicaStore((state) => (token === nativeAdd ? state?.nativeToken : state?.tokens?.[token])),
+  userData: useInvolicaStore((state) =>
+    token === nativeAdd ? state?.userData?.userNativeTokenData : state?.userData?.userTokensData?.[token],
+  ),
 })
 
 export const usePositionTokenInWithData = (positionOnly?: boolean) => {
@@ -155,3 +227,98 @@ export const usePositionTokenInWithData = (positionOnly?: boolean) => {
   return { tokenIn, dirty, tokenInData, tokenInUserData }
 }
 
+// USER DATA
+export const useUserHasPosition = () => useInvolicaStore((state) => state.userData?.userHasPosition)
+export const useUserTreasury = () => useInvolicaStore((state) => state.userData?.userTreasury)
+export const useDcasRemaining = () => useInvolicaStore((state) => state.userData?.dcasRemaining)
+export const useNextDCATimestamp = () => {
+  const lastDCA = useInvolicaStore((state) => state.userData?.position?.lastDCA)
+  const intervalDCA = useInvolicaStore((state) => state.userData?.position?.intervalDCA)
+
+  return useMemo(() => {
+    if (lastDCA == null || lastDCA === 0 || intervalDCA == null || intervalDCA === 0) return null
+    return lastDCA + intervalDCA + 375500
+  }, [intervalDCA, lastDCA])
+}
+
+export const useTimeUntilNextDCA = () => {
+  const nextDCA = useNextDCATimestamp()
+  const [timeUntilNextDCA, setTimeUntilNextDCA] = useState<number | null>(null)
+
+  useInterval(
+    useCallback(() => {
+      if (nextDCA == null) return
+      if (nextDCA <= Math.floor(Date.now() / 1000)) setTimeUntilNextDCA(0)
+      else setTimeUntilNextDCA(nextDCA - Math.floor(Date.now() / 1000))
+    }, [nextDCA]),
+    1000,
+  )
+
+  return timeUntilNextDCA
+}
+
+export const baseGasPrice = 450000
+export const perSwapGasPrice = 195000
+export const usePositionOutsLength = (positionOnly?: boolean) => {
+  const { outs } = usePositionOuts(positionOnly)
+  return useMemo(() => outs.length, [outs.length])
+}
+export const useDcaTxPriceRange = (positionOnly?: boolean) => {
+  const minGasPrice = '100'
+  const { maxGasPrice } = usePositionMaxGasPrice(positionOnly)
+  const outsLength = usePositionOutsLength(positionOnly)
+
+  const minTxPrice = useMemo(() => {
+    return bnDisplay((baseGasPrice + outsLength * perSwapGasPrice) * parseFloat(eN(minGasPrice, 9)), 0)
+  }, [minGasPrice, outsLength])
+
+  const maxTxPrice = useMemo(() => {
+    if (maxGasPrice == null) return null
+    return bnDisplay((baseGasPrice + outsLength * perSwapGasPrice) * parseFloat(eN(maxGasPrice, 9)), 0)
+  }, [maxGasPrice, outsLength])
+
+  return {
+    minTxPrice,
+    maxTxPrice,
+    maxGasPrice,
+  }
+}
+
+export enum PositionStatus {
+  NoPosition = 'NoPosition',
+  Active = 'Active',
+
+  WarnGasFunds = 'WarnGasFunds',
+
+  ErrorNoDcaAmount = 'ErrorNoDcaAmount',
+  ErrorGasFunds = 'ErrorGasFunds',
+  ErrorInsufficientAllowance = 'ErrorInsufficientAllowance',
+  ErrorInsufficientBalance = 'ErrorInsufficientBalance',
+}
+export type PositionStatusRecord<T> = Record<PositionStatus, T>
+export const usePositionStatus = () => {
+  const { tokenInUserData } = usePositionTokenInWithData(true)
+  const userHasPosition = useUserHasPosition()
+  const userTreasury = useUserTreasury()
+  const { amountDCA } = usePositionAmountDCA(true)
+  const { minTxPrice, maxTxPrice } = useDcaTxPriceRange(true)
+
+  return useMemo(() => {
+    if (!userHasPosition) return PositionStatus.NoPosition
+    if (new BigNumber(userTreasury).lt(eN(minTxPrice, 9))) return PositionStatus.ErrorGasFunds
+    if (amountDCA == null || amountDCA === '' || amountDCA === '0') return PositionStatus.ErrorNoDcaAmount
+    if (new BigNumber(tokenInUserData?.allowance).lt(amountDCA)) return PositionStatus.ErrorInsufficientAllowance
+    if (new BigNumber(tokenInUserData?.balance).lt(amountDCA)) return PositionStatus.ErrorInsufficientBalance
+    if (new BigNumber(userTreasury).lt(eN(maxTxPrice, 9))) return PositionStatus.WarnGasFunds
+
+    return PositionStatus.Active
+  }, [
+    userHasPosition,
+    userTreasury,
+    minTxPrice,
+    amountDCA,
+    tokenInUserData?.allowance,
+    tokenInUserData?.balance,
+    maxTxPrice,
+  ])
+}

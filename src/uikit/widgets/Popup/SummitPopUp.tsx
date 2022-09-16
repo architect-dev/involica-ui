@@ -118,7 +118,7 @@ const CloseIcon = styled(X)`
   stroke-width: 2.5;
 `
 
-const SummitPopUp: React.FC<Props> = ({
+export const SummitPopUp: React.FC<Props> = React.memo(({
   button,
   position,
   contentPadding,
@@ -179,6 +179,4 @@ const SummitPopUp: React.FC<Props> = ({
       </PopUpCard>
     </StyledPopup>
   )
-}
-
-export default React.memo(SummitPopUp)
+})

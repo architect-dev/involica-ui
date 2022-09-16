@@ -1,6 +1,6 @@
 import { transparentize } from 'polished'
 import React from 'react'
-import { useInvolicaStore } from 'state/store'
+import { useTokenOrNativePublicData } from 'state/hooks'
 import styled from 'styled-components'
 import { TokenSymbolImage } from 'uikit'
 
@@ -29,7 +29,7 @@ export const TokenIndicator: React.FC<{
   token: string | null
   className?: string
 }> = ({ token, className }) => {
-  const tokenData = useInvolicaStore((state) => state.tokens?.[token])
+  const { data: tokenData } = useTokenOrNativePublicData(token)
 
   return (
     <IndicatorWrapper className={className}>

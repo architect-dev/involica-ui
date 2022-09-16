@@ -5,11 +5,10 @@ import { getNativeTokenSymbol } from 'config/constants'
 import { bnDisplay } from 'utils'
 import MaxGasPriceSelector from './MaxGasPriceSelector'
 import styled from 'styled-components'
-import { useConfigurableFundingAmount, useNativeTokenFullData, usePositionMaxGasPrice, usePositionOuts } from 'state/hooks'
+import { useConfigurableFundingAmount, useDcaTxPriceRange, useNativeTokenFullData } from 'state/hooks'
 import { MaxGasPriceOptions } from 'state/types'
 
-const baseGasPrice = 450000
-const perSwapGasPrice = 195000
+
 
 const IntroText = styled(Text)`
   max-width: 500px;
@@ -18,27 +17,8 @@ const IntroText = styled(Text)`
 export const AddFunds: React.FC = () => {
   const { nativeTokenData, nativeTokenUserData } = useNativeTokenFullData()
   const { fundingAmount, fundingInvalidReason, setFundingAmount } = useConfigurableFundingAmount()
-  const { outs } = usePositionOuts()
-  
-  const { maxGasPrice } = usePositionMaxGasPrice()
+  const { minTxPrice, maxTxPrice, maxGasPrice } = useDcaTxPriceRange()
   const minGasPrice: MaxGasPriceOptions = '100'
-
-  const minTxPrice = useMemo(() => {
-    return bnDisplay(
-      (baseGasPrice + outs.length * perSwapGasPrice) * parseFloat(minGasPrice),
-      9,
-      4,
-    )
-  }, [minGasPrice, outs.length])
-
-  const maxTxPrice = useMemo(() => {
-    if (maxGasPrice == null) return null
-    return bnDisplay(
-      (baseGasPrice + outs.length * perSwapGasPrice) * parseFloat(maxGasPrice),
-      9,
-      4,
-    )
-  }, [maxGasPrice, outs.length])
 
   const fullBalance = useMemo(
     () => bnDisplay(nativeTokenUserData?.balance, nativeTokenData?.decimals),
@@ -103,7 +83,7 @@ export const AddFunds: React.FC = () => {
           <br />
           OPTIONAL: Select max DCA gas price:
           <br />
-          (Will wait to execute DCA until gas price {'<='} max)
+          (DCA execution will wait until gas price {'<='} max)
         </Text>
         <MaxGasPriceSelector />
         <br />

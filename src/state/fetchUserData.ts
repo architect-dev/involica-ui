@@ -23,7 +23,7 @@ const userDataFields: Record<string, ParseFieldConfig> = {
       amountDCA: { type: ParseFieldType.bignumber },
       intervalDCA: { type: ParseFieldType.number },
       lastDCA: { type: ParseFieldType.number },
-      maxGasPrice: { type: ParseFieldType.numberBp },
+      maxGasPrice: { type: ParseFieldType.gwei },
       taskId: { type: ParseFieldType.string },
       finalizationReason: { type: ParseFieldType.string },
     },

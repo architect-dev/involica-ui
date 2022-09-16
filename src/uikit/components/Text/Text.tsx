@@ -1,6 +1,7 @@
 import React from 'react'
 import styled, { css, DefaultTheme } from 'styled-components'
 import { space, typography } from 'styled-system'
+import { pressableMixin } from 'uikit/util/styledMixins'
 import { TextProps } from './types'
 
 export interface ThemedProps extends TextProps {
@@ -61,6 +62,25 @@ export const TextWithChanged = styled(Text)<{ changed?: boolean; asterisk?: bool
             font-weight: bold;
           }
         `)}
+`
+
+export const TextWithChangedButton = styled(TextWithChanged)`
+  cursor: pointer;
+  line-height: 24px;
+  cursor: pointer;
+  padding: 0px 8px;
+  margin: 0px -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  ${pressableMixin};
+
+  &:hover {
+    font-weight: bold;
+    text-decoration: underline;
+  }
 `
 
 Text.defaultProps = {

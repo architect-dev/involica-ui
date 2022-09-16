@@ -212,6 +212,7 @@ export const useInvolicaStore = create<State>()(
           console.error('No position to hydrate')
           return
         }
+        const empty0String = (s: string | null) => (s === '0' ? '' : s)
         set({
           config: {
             tokenIn: position.tokenIn,
@@ -227,11 +228,11 @@ export const useInvolicaStore = create<State>()(
             fundingInvalidReason: null,
             dcasCount: '1',
             dcasCountInvalidReason: null,
-            weeks: Math.floor(position.intervalDCA / (3600 * 24 * 7)).toString(),
+            weeks: empty0String(Math.floor(position.intervalDCA / (3600 * 24 * 7)).toString()),
             weeksInvalidReason: null,
-            days: Math.floor((position.intervalDCA % (3600 * 24 * 7)) / (3600 * 24)).toString(),
+            days: empty0String(Math.floor((position.intervalDCA % (3600 * 24 * 7)) / (3600 * 24)).toString()),
             daysInvalidReason: null,
-            hours: Math.floor((position.intervalDCA % (3600 * 24)) / 3600).toString(),
+            hours: empty0String(Math.floor((position.intervalDCA % (3600 * 24)) / 3600).toString()),
             hoursInvalidReason: null,
           },
         })

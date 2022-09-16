@@ -3,12 +3,13 @@ import styled, { css } from 'styled-components'
 import { Text } from 'uikit'
 import { TokenSelectButton } from 'components/TokenSelect/TokenSelectButton'
 import { AddressRecord } from 'state/types'
-import { useTokenFullData } from 'state/hooks'
+import { useTokenOrNativeFullData } from 'state/hooks'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 import { bn, bnDisplay } from 'utils'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { transparentize } from 'polished'
 import { TokenIndicator } from 'components/TokenSelect/TokenIndicator'
+import { getNativeTokenSymbol } from 'config/constants'
 
 const StyledInputWrapper = styled(SelectorWrapperBase)`
   position: relative;
@@ -136,6 +137,11 @@ interface TokenInputProps {
   amountChanged?: boolean
 
   tokenSelectDisabled?: boolean
+
+  max?: string
+
+  balanceText?: string
+  isNativeDeposit?: boolean
 }
 
 const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
@@ -155,10 +161,15 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
   amountChanged,
 
   tokenSelectDisabled,
-}) => {
-  const { data: tokenData, userData: tokenUserData } = useTokenFullData(token)
+  max,
 
-  const fullBalance = useMemo(() => bnDisplay(tokenUserData?.balance, tokenData?.decimals), [
+  balanceText = 'Balance',
+  isNativeDeposit = false,
+}) => {
+  const { data: tokenData, userData: tokenUserData } = useTokenOrNativeFullData(token)
+
+  const fullBalance = useMemo(() => max ?? bnDisplay(tokenUserData?.balance, tokenData?.decimals), [
+    max,
     tokenData?.decimals,
     tokenUserData?.balance,
   ])
@@ -170,6 +181,12 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
     [setValue, fullBalance],
   )
 
+  const handleSelect10Native = useCallback(() => {
+    setValue('10', fullBalance)
+  }, [setValue, fullBalance])
+  const handleSelect20Native = useCallback(() => {
+    setValue('20', fullBalance)
+  }, [setValue, fullBalance])
   const handleSelect10 = useCallback(() => {
     setValue(bn(fullBalance).div(10).toString(), fullBalance)
   }, [setValue, fullBalance])
@@ -183,9 +200,18 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
   return (
     <StyledInputWrapper disabled={disabled} isLocked={isLocked} invalid={invalid}>
       <ThinRow>
-        <TextButton onClick={handleSelect10}>10%</TextButton>
-        <TextButton onClick={handleSelect50}>50%</TextButton>
-        <TextButton onClick={handleSelectMax}>MAX</TextButton>
+        {isNativeDeposit ? (
+          <>
+            <TextButton onClick={handleSelect10Native}>10 {getNativeTokenSymbol()}</TextButton>
+            <TextButton onClick={handleSelect20Native}>20 {getNativeTokenSymbol()}</TextButton>
+          </>
+        ) : (
+          <>
+            <TextButton onClick={handleSelect10}>10%</TextButton>
+            <TextButton onClick={handleSelect50}>50%</TextButton>
+            <TextButton onClick={handleSelectMax}>MAX</TextButton>
+          </>
+        )}
       </ThinRow>
       <InputRow>
         {tokenSelectDisabled ? (
@@ -211,8 +237,8 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
         </InputWrapper>
       </InputRow>
       <BalanceRow>
-        <Text>Balance:</Text>
-        <Text>{fullBalance != null ? parseFloat(fullBalance).toFixed(3) : '-'}</Text>
+        <Text>{balanceText}:</Text>
+        <Text>{fullBalance != null ? parseFloat(fullBalance).toFixed(4) : '-'}</Text>
       </BalanceRow>
     </StyledInputWrapper>
   )

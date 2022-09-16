@@ -1,13 +1,20 @@
 import React, { useMemo } from 'react'
 import { Card } from 'components/Card'
 import styled from 'styled-components'
-import { TextWithChanged } from 'uikit'
-import { OutsSelectionColumn } from 'components/Outs/OutsSelectionColumn'
+import { Column, RowBetween, TextWithChanged } from 'uikit'
 import TokenAndAmountSelector from 'components/TokenAndAmountSelector'
-import { useConfigurableAmountDCA, useConfigurableTokenIn, usePositionOuts } from 'state/hooks'
+import {
+  useConfigurableAmountDCA,
+  useConfigurableTokenIn,
+  usePositionIntervalDCA,
+  usePositionMaxGasPrice,
+  usePositionOuts,
+} from 'state/hooks'
 import { IntervalSelector } from 'components/IntervalSelector'
-import { WeightsSlider } from 'components/Outs/WeightsSlider'
-import { CellCol, CellWithChanged, DesktopOnlyPre } from './styles'
+import { CellCol, CellWithChanged } from './styles'
+import { EditMaxGasPriceButton } from 'components/EditMaxGasPriceModal'
+import { useIntervalStrings } from 'state/uiHooks'
+import { OutsSelectionAndWeights } from 'components/Outs/OutsSelectionAndWeights'
 
 const CellRow = styled.div`
   display: flex;
@@ -20,10 +27,10 @@ const CellRow = styled.div`
   flex-wrap: wrap;
 `
 
-export const PositionCard: React.FC = () => {
-  const { tokenIn, setTokenIn } = useConfigurableTokenIn()
+const TokenInCell: React.FC = () => {
+  const { dirty: tokenInDirty, tokenIn, setTokenIn } = useConfigurableTokenIn()
   const { outs } = usePositionOuts()
-  const { amountDCA, setAmountDCA } = useConfigurableAmountDCA()
+  const { dirty: amountDCADirty, amountDCA, setAmountDCA } = useConfigurableAmountDCA()
 
   const disabledReasons = useMemo(() => {
     const reasons = {}
@@ -35,46 +42,79 @@ export const PositionCard: React.FC = () => {
   }, [outs, tokenIn])
 
   return (
-    <Card title="Position" padding="24px">
+    <CellWithChanged changed={tokenInDirty || amountDCADirty}>
+      <TextWithChanged small italic changed={tokenInDirty || amountDCADirty}>
+        Token:
+      </TextWithChanged>
+      <TokenAndAmountSelector
+        token={tokenIn}
+        setToken={setTokenIn}
+        value={amountDCA}
+        setValue={setAmountDCA}
+        disabledReasons={disabledReasons}
+        tokenChanged={tokenInDirty}
+        amountChanged={amountDCADirty}
+      />
+    </CellWithChanged>
+  )
+}
+
+const OptionsCell: React.FC = () => {
+  const { dirty: intervalDirty } = usePositionIntervalDCA()
+  const { dirty: maxGasPriceDirty } = usePositionMaxGasPrice()
+  const { intervalStringly } = useIntervalStrings()
+  return (
+    <CellWithChanged changed={intervalDirty || maxGasPriceDirty}>
+      <TextWithChanged small italic changed={intervalDirty || maxGasPriceDirty}>
+        DCA Options:
+      </TextWithChanged>
+      <Column width="100%" gap='4px'>
+        <RowBetween>
+        <TextWithChanged small italic changed={intervalDirty} asterisk>
+          Interval:
+        </TextWithChanged>
+        <TextWithChanged bold changed={intervalDirty} asterisk>
+          {intervalStringly}
+        </TextWithChanged>
+        </RowBetween>
+        <IntervalSelector />
+      </Column>
+      <RowBetween>
+        <TextWithChanged small italic changed={maxGasPriceDirty} asterisk>
+          Max Gas Price:
+        </TextWithChanged>
+        <EditMaxGasPriceButton />
+      </RowBetween>
+    </CellWithChanged>
+  )
+}
+
+const OutsCell: React.FC = () => {
+  const { dirty } = usePositionOuts()
+  return (
+    <CellWithChanged changed={dirty}>
+      <TextWithChanged small italic changed={dirty}>
+        DCA Into:
+      </TextWithChanged>
+      <OutsSelectionAndWeights />
+    </CellWithChanged>
+  )
+}
+
+export const PositionCard: React.FC = () => {
+  return (
+    <Card title="Position" mobilePadding="12px" padding="24px">
       <CellRow>
         <CellCol>
-          <CellWithChanged changed>
-            <TextWithChanged small italic changed>
-              Token:
-            </TextWithChanged>
-            <TokenAndAmountSelector
-              token={tokenIn}
-              setToken={setTokenIn}
-              value={amountDCA}
-              setValue={setAmountDCA}
-              disabledReasons={disabledReasons}
-              tokenChanged
-              amountChanged
-            />
-          </CellWithChanged>
-          <CellWithChanged changed>
-            <TextWithChanged small italic>
-              Interval:
-            </TextWithChanged>
-            <IntervalSelector />
-          </CellWithChanged>
+          <TokenInCell />
         </CellCol>
         <CellCol>
-          <CellWithChanged changed>
-            <TextWithChanged small italic changed>
-              <DesktopOnlyPre>{'         '}</DesktopOnlyPre>DCA Into:
-            </TextWithChanged>
-            <OutsSelectionColumn />
-          </CellWithChanged>
+          {/* <IntervalCell /> */}
+          <OptionsCell />
         </CellCol>
       </CellRow>
       <CellRow>
-        <CellWithChanged changed>
-          <TextWithChanged small italic changed>
-            DCA Weighting:
-          </TextWithChanged>
-          <WeightsSlider />
-        </CellWithChanged>
+        <OutsCell />
       </CellRow>
     </Card>
   )
