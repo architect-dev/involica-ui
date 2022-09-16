@@ -1,6 +1,6 @@
 import { TokenSelectButton } from 'components/TokenSelect/TokenSelectButton'
 import React, { useCallback, useMemo } from 'react'
-import { usePositionTokenIn, useConfigurableOuts } from 'state/hooks'
+import { usePositionTokenIn, useConfigurableOuts, usePositionOutsDirtyData } from 'state/hooks'
 import { AddressRecord } from 'state/types'
 import { Text } from 'uikit'
 import styled from 'styled-components'
@@ -15,10 +15,17 @@ const OutsRow = styled.div`
   flex-wrap: wrap;
   gap: 12px;
 `
+const EmptyOut = styled.div`
+  width: 100px;
+  border: 1px dashed ${({ theme }) => theme.colors.text};
+  height: 28px;
+  border-radius: 28px;
+`
 
 export const OutsSelectionAndWeights: React.FC<{ intro?: boolean }> = ({ intro = false }) => {
   const { tokenIn } = usePositionTokenIn()
   const { outs, addOut } = useConfigurableOuts()
+  const dirtyData = usePositionOutsDirtyData(intro)
 
   const disabledReasons = useMemo(() => {
     const reasons: AddressRecord<string> = {}
@@ -40,12 +47,7 @@ export const OutsSelectionAndWeights: React.FC<{ intro?: boolean }> = ({ intro =
     <>
       <OutsRow>
         {outs.map(({ token }, i) => (
-          <OutTokenButton
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
-            token={token}
-            index={i}
-          />
+          <OutTokenButton key={token} token={token} index={i} changed={dirtyData != null && dirtyData[i].slippage} />
         ))}
         {outs.length < 8 && (
           <TokenSelectButton
@@ -57,6 +59,11 @@ export const OutsSelectionAndWeights: React.FC<{ intro?: boolean }> = ({ intro =
             modalVariant="tokenOut"
           />
         )}
+        {outs.length < 7 &&
+          [...new Array(7 - outs.length)].map((_, i) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <EmptyOut key={i} />
+          ))}
       </OutsRow>
       {intro && (
         <Text small italic>
@@ -64,7 +71,7 @@ export const OutsSelectionAndWeights: React.FC<{ intro?: boolean }> = ({ intro =
           Use the slider to set your portfolio ratios.
         </Text>
       )}
-      <WeightsSlider />
+      <WeightsSlider intro={intro} />
     </>
   )
 }

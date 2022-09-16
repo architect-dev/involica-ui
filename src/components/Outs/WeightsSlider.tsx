@@ -3,9 +3,9 @@ import { transparentize } from 'polished'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 import styled from 'styled-components'
-import { Row, Text, TokenSymbolImage } from 'uikit'
+import { Row, TextWithChanged, TokenSymbolImage } from 'uikit'
 import { getSymbol } from 'config/tokens'
-import { useConfigurableOuts } from 'state/hooks'
+import { useConfigurableOuts, usePositionOutsDirtyData } from 'state/hooks'
 
 const SliderWrapper = styled.div<{ intro?: boolean}>`
   height: 60px;
@@ -95,6 +95,7 @@ const StyledSlider = styled(Slider)`
 
 export const WeightsSlider: React.FC<{ intro?: boolean }> = ({ intro }) => {
   const { outs, updateWeights } = useConfigurableOuts()
+  const dirtyData = usePositionOutsDirtyData(intro)
 
   const weightValues = useMemo(() => {
     const weights = []
@@ -129,7 +130,7 @@ export const WeightsSlider: React.FC<{ intro?: boolean }> = ({ intro }) => {
           // eslint-disable-next-line react/no-array-index-key
           <WeightIndicator key={i} weight={out.weight}>
             <TokenSymbolImage symbol={getSymbol(out.token)} width={24} height={24}/>
-            <Text>{out.weight}%</Text>
+            <TextWithChanged changed={dirtyData && dirtyData[i].weight} asterisk>{out.weight}%</TextWithChanged>
           </WeightIndicator>
         ))}
         <Bound/>
