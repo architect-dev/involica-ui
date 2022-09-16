@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
 import { Card } from 'components/Card'
 import { MaxUint256 } from 'ethers/constants'
-import { RowBetween, RowCenter, Text, SummitPopUp, SummitButton } from 'uikit'
+import { RowBetween, RowCenter, Text, SummitButton } from 'uikit'
 import { usePositionAmountDCA, usePositionTokenInWithData } from 'state/hooks'
 import { CellCol } from './styles'
-import { bn, bnDisplay, eN, useShowHideModal } from 'utils'
-import { SetAllowanceModal } from 'components/SetAllowanceModal'
+import { bn, bnDisplay, eN } from 'utils'
+import { SetAllowanceButton } from 'components/SetAllowanceModal'
 import { useRevokeApproval } from 'hooks/useExecute'
 
 export const ApprovalCard: React.FC = () => {
@@ -24,8 +24,6 @@ export const ApprovalCard: React.FC = () => {
     return [a, aDCAs]
   }, [amountDCA, tokenInData?.decimals, tokenInUserData?.allowance])
 
-  const [open, show, hide] = useShowHideModal()
-
   return (
     <Card title="Approval" padding="24px" halfWidth>
       <CellCol>
@@ -33,7 +31,7 @@ export const ApprovalCard: React.FC = () => {
           <Text small italic>
             Current Allowance:
           </Text>
-          <Text bold>
+          <Text bold red={allowanceDCAs === 0}>
             {allowance} {tokenInData?.symbol}
           </Text>
         </RowBetween>
@@ -44,14 +42,7 @@ export const ApprovalCard: React.FC = () => {
           <Text bold red={allowanceDCAs === 0}>{allowanceDCAs} DCAs</Text>
         </RowBetween>
         <RowCenter>
-          <SummitPopUp
-            open={open}
-            callOnDismiss={hide}
-            modal
-            button={<SummitButton onClick={show}>Set Allowance</SummitButton>}
-            popUpTitle='Set Allowance'
-            popUpContent={<SetAllowanceModal />}
-          />
+          <SetAllowanceButton/>
         </RowCenter>
 
         <br />
