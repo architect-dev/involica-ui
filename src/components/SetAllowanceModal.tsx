@@ -2,8 +2,8 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useApprove } from 'hooks/useExecute'
 import { MaxUint256 } from 'ethers/constants'
 import { usePositionTokenInWithData, usePositionAmountDCA } from 'state/hooks'
-import { SummitButton, Text, RowBetween, RowCenter } from 'uikit'
-import { bn, bnDisplay, eN } from 'utils'
+import { SummitButton, Text, RowBetween, RowCenter, SummitPopUp } from 'uikit'
+import { bn, bnDisplay, eN, useShowHideModal } from 'utils'
 import NumericInput from './Input/NumericInput'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
@@ -222,5 +222,19 @@ export const SetAllowanceModal: React.FC<{
         <SummitButton onClick={onDismiss} activeText="Close" />
       </RowCenter>
     </ModalContentContainer>
+  )
+}
+
+export const SetAllowanceButton: React.FC<{ buttonText?: string }> = ({ buttonText = 'Set Allowance' }) => {
+  const [open, show, hide] = useShowHideModal()
+  return (
+    <SummitPopUp
+      open={open}
+      callOnDismiss={hide}
+      modal
+      button={<SummitButton onClick={show}>{buttonText}</SummitButton>}
+      popUpTitle="Set Allowance"
+      popUpContent={<SetAllowanceModal />}
+    />
   )
 }
