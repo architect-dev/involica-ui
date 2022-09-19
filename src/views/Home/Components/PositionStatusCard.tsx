@@ -7,10 +7,14 @@ import { SetAllowanceButton } from 'components/SetAllowanceModal'
 import { Link } from 'react-router-dom'
 import { TopUpFundsButton } from 'components/TopUpFundsModal'
 import { TimeUntilNextDca } from 'components/TimeUntilNextDca'
+import { ManagePositionButton } from 'components/ManagePositionModal'
+import { ManuallyExecuteDCAButton } from 'components/ManuallyExecuteDCAButton'
 
 const StatusString: PositionStatusRecord<React.ReactNode> = {
   [PositionStatus.Active]: 'Active',
+  [PositionStatus.ActiveManualOnly]: 'Manual DCAs Only',
 
+  [PositionStatus.WarnPaused]: 'Paused',
   [PositionStatus.WarnGasFunds]: 'Warning: Gas Funds Low',
 
   [PositionStatus.NoPosition]: 'No Position',
@@ -42,7 +46,9 @@ enum PositionStatusType {
 const StatusType: PositionStatusRecord<PositionStatusType> = {
   [PositionStatus.NoPosition]: PositionStatusType.Default,
   [PositionStatus.Active]: PositionStatusType.Active,
+  [PositionStatus.ActiveManualOnly]: PositionStatusType.Active,
 
+  [PositionStatus.WarnPaused]: PositionStatusType.Warning,
   [PositionStatus.WarnGasFunds]: PositionStatusType.Warning,
 
   [PositionStatus.ErrorNoDcaAmount]: PositionStatusType.Error,
@@ -59,8 +65,17 @@ const StatusColor: Record<PositionStatusType, string> = {
 }
 
 const StatusAction: PositionStatusRecord<React.ReactNode> = {
-  [PositionStatus.Active]: null,
+  [PositionStatus.Active]: (
+    <RowBetween>
+      <Text small italic>
+        Next DCA In:
+      </Text>
+      <TimeUntilNextDca />
+    </RowBetween>
+  ),
+  [PositionStatus.ActiveManualOnly]: <ManuallyExecuteDCAButton />,
 
+  [PositionStatus.WarnPaused]: <ManagePositionButton unpauseOnly />,
   [PositionStatus.WarnGasFunds]: <TopUpFundsButton />,
 
   [PositionStatus.NoPosition]: (
@@ -97,7 +112,7 @@ export const PositionStatusCard: React.FC = () => {
 
   return (
     <Card title="Status" padding="24px" halfWidth>
-      <CellCol justifyContent='flex-start'>
+      <CellCol justifyContent="space-between">
         <RowBetween>
           <Text small italic>
             Position Status:
@@ -106,19 +121,9 @@ export const PositionStatusCard: React.FC = () => {
             {StatusString[status]}
           </Text>
         </RowBetween>
-        {StatusType[status] !== PositionStatusType.Active && (
-          <Column gap="8px" alignItems="center" width="100%" mt="12px">
-            {StatusAction[status]}
-          </Column>
-        )}
-        {StatusType[status] === PositionStatusType.Active && (
-          <RowBetween>
-            <Text small italic>
-              Next DCA In:
-            </Text>
-            <TimeUntilNextDca/>
-          </RowBetween>
-        )}
+        <Column gap="8px" alignItems="center" width="100%" mt="12px">
+          {StatusAction[status]}
+        </Column>
       </CellCol>
     </Card>
   )

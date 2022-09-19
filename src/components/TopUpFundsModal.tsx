@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { useNativeTokenFullData, useUserTreasury } from 'state/hooks'
+import { useDcaTxPriceRange, useNativeTokenFullData, useUserTreasury } from 'state/hooks'
 import { SummitButton, Text, RowBetween, RowCenter, SummitPopUp } from 'uikit'
 import { bnDisplay, useShowHideModal } from 'utils'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
@@ -15,6 +15,19 @@ export const TopUpFundsModal: React.FC<{
     userTreasury,
   ])
   const { nativeTokenData } = useNativeTokenFullData()
+  const minGasPrice = '100'
+  const { maxGasPrice, minTxPrice, maxTxPrice } = useDcaTxPriceRange(true)
+
+  const maxTxPriceDisplay = useMemo(() => {
+    if (maxTxPrice == null || maxTxPrice === '' || maxTxPrice === '0') return '-'
+    return bnDisplay(maxTxPrice, 18, 4)
+  }, [maxTxPrice])
+  const minTxPriceDisplay = useMemo(() => {
+    if (minTxPrice == null || minTxPrice === '' || minTxPrice === '0') return '-'
+    return bnDisplay(minTxPrice, 18, 4)
+  }, [minTxPrice])
+
+
   const { onDepositTreasury, pending } = useDepositTreasury()
 
   const [fundingAmount, setFundingAmount] = useState<string>('')
@@ -44,6 +57,23 @@ export const TopUpFundsModal: React.FC<{
         </Text>
         <Text bold>
           {userTreasuryDisplay} {getNativeTokenSymbol()}
+        </Text>
+      </RowBetween>
+      <br/>
+      <RowBetween>
+        <Text small italic>
+          DCA gas @ {minGasPrice} gwei (min):
+        </Text>
+        <Text>
+          {minTxPriceDisplay} {getNativeTokenSymbol()}
+        </Text>
+      </RowBetween>
+      <RowBetween>
+        <Text small italic>
+          DCA gas @ {maxGasPrice} gwei (max):
+        </Text>
+        <Text>
+          {maxTxPriceDisplay} {getNativeTokenSymbol()}
         </Text>
       </RowBetween>
 

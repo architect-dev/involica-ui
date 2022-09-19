@@ -6,7 +6,14 @@ import useRefresh from 'hooks/useRefresh'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { bnDisplay, eN } from 'utils'
 import { useInvolicaStore } from './store'
-import { Position, PositionConfig, PositionConfigMutators, PositionConfigSupplements, Token, UserTokenData } from './types'
+import {
+  Position,
+  PositionConfig,
+  PositionConfigMutators,
+  PositionConfigSupplements,
+  Token,
+  UserTokenData,
+} from './types'
 
 // FETCHERS
 
@@ -36,7 +43,10 @@ export const useFetchUserData = () => {
 
 // POSITION & CONFIG
 
-export type WithDirty<T extends keyof PositionConfig> = { dirty: boolean; current: Position[T] } & Pick<PositionConfig, T>
+export type WithDirty<T extends keyof PositionConfig> = { dirty: boolean; current: Position[T] } & Pick<
+  PositionConfig,
+  T
+>
 
 export const useConfigSupplements = <S extends Array<keyof PositionConfigSupplements>>(
   supplements: S,
@@ -95,13 +105,7 @@ export const useConfigurableTokenIn = () => ({ ...useConfigurablePositionValue('
 
 export const usePositionOuts = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('outs', positionOnly) })
 export const useConfigurableOuts = () => ({
-  ...useConfigurablePositionValue('outs', [
-    'setOuts',
-    'addOut',
-    'removeOut',
-    'updateWeights',
-    'updateOutMaxSlippage',
-  ]),
+  ...useConfigurablePositionValue('outs', ['setOuts', 'addOut', 'removeOut', 'updateWeights', 'updateOutMaxSlippage']),
 })
 export const usePositionOutWeightsDirty = () => {
   const positionOuts = useInvolicaStore((state) => state.userData?.position?.outs ?? [])
@@ -122,7 +126,7 @@ export const usePositionOutsDirtyData = (intro = false) => {
     const longerOuts = positionOuts.length > configOuts.length ? positionOuts : configOuts
     const shorterOuts = positionOuts.length > configOuts.length ? configOuts : positionOuts
 
-    const dirtyData: { token: boolean, weight: boolean, slippage: boolean}[] = []
+    const dirtyData: { token: boolean; weight: boolean; slippage: boolean }[] = []
 
     longerOuts.forEach((out, i) => {
       if (i >= shorterOuts.length) {
@@ -288,7 +292,9 @@ export const useDcaTxPriceRange = (positionOnly?: boolean) => {
 export enum PositionStatus {
   NoPosition = 'NoPosition',
   Active = 'Active',
+  ActiveManualOnly = 'ActiveManualOnly',
 
+  WarnPaused = 'Paused',
   WarnGasFunds = 'WarnGasFunds',
 
   ErrorNoDcaAmount = 'ErrorNoDcaAmount',
@@ -303,18 +309,26 @@ export const usePositionStatus = () => {
   const userTreasury = useUserTreasury()
   const { amountDCA } = usePositionAmountDCA(true)
   const { minTxPrice, maxTxPrice } = useDcaTxPriceRange(true)
+  const positionPaused = true
+  const positionManualOnly = false
 
   return useMemo(() => {
     if (!userHasPosition) return PositionStatus.NoPosition
-    if (new BigNumber(userTreasury).lt(eN(minTxPrice, 9))) return PositionStatus.ErrorGasFunds
+
+    if (positionManualOnly) return PositionStatus.ActiveManualOnly
+    if (positionPaused) return PositionStatus.WarnPaused
+
+    if (new BigNumber(userTreasury).lt(minTxPrice)) return PositionStatus.ErrorGasFunds
     if (amountDCA == null || amountDCA === '' || amountDCA === '0') return PositionStatus.ErrorNoDcaAmount
     if (new BigNumber(tokenInUserData?.allowance).lt(amountDCA)) return PositionStatus.ErrorInsufficientAllowance
     if (new BigNumber(tokenInUserData?.balance).lt(amountDCA)) return PositionStatus.ErrorInsufficientBalance
-    if (new BigNumber(userTreasury).lt(eN(maxTxPrice, 9))) return PositionStatus.WarnGasFunds
+    if (new BigNumber(userTreasury).lt(maxTxPrice)) return PositionStatus.WarnGasFunds
 
     return PositionStatus.Active
   }, [
     userHasPosition,
+    positionManualOnly,
+    positionPaused,
     userTreasury,
     minTxPrice,
     amountDCA,
@@ -328,58 +342,65 @@ export const useAllowanceIsSufficient = () => {
   const { tokenInUserData } = usePositionTokenInWithData(true)
   const { amountDCA } = usePositionAmountDCA(true)
 
-  return useMemo(() => 
-    new BigNumber(tokenInUserData?.allowance).gte(amountDCA)
-  , [amountDCA, tokenInUserData?.allowance])
+  return useMemo(() => new BigNumber(tokenInUserData?.allowance).gte(amountDCA), [
+    amountDCA,
+    tokenInUserData?.allowance,
+  ])
 }
 
 // REVERT CONFIG
 export const useRevertTokenAndAmount = () => {
-  const {dirty: tokenInDirty, current: tokenInCurrent, setTokenIn} = useConfigurableTokenIn()
-  const {dirty: amountDCADirty, current: amountDCACurrent, setAmountDCA} = useConfigurableAmountDCA()
+  const { dirty: tokenInDirty, current: tokenInCurrent, setTokenIn } = useConfigurableTokenIn()
+  const { dirty: amountDCADirty, current: amountDCACurrent, setAmountDCA } = useConfigurableAmountDCA()
 
-  return useCallback(
-    () => {
-      if (tokenInDirty) {
-        setTokenIn(tokenInCurrent)
-      }
-      if (amountDCADirty) {
-        setAmountDCA(amountDCACurrent, amountDCACurrent)
-      }
-    },
-    [amountDCACurrent, amountDCADirty, setAmountDCA, setTokenIn, tokenInCurrent, tokenInDirty]
-  )
+  return useCallback(() => {
+    if (tokenInDirty) {
+      setTokenIn(tokenInCurrent)
+    }
+    if (amountDCADirty) {
+      setAmountDCA(amountDCACurrent, amountDCACurrent)
+    }
+  }, [amountDCACurrent, amountDCADirty, setAmountDCA, setTokenIn, tokenInCurrent, tokenInDirty])
 }
 
 const empty0String = (s: string | null) => (s === '0' ? '' : s)
 export const useRevertIntervalAndMaxGasPrice = () => {
-  const {dirty: intervalDCADirty, current: intervalDCACurrent, setWeeks, setDays, setHours} = useConfigurableIntervalDCA()
-  const {dirty: maxGasPriceDirty, current: maxGasPriceCurrent, setMaxGasPrice} = useConfigurableMaxGasPrice()
+  const {
+    dirty: intervalDCADirty,
+    current: intervalDCACurrent,
+    setWeeks,
+    setDays,
+    setHours,
+  } = useConfigurableIntervalDCA()
+  const { dirty: maxGasPriceDirty, current: maxGasPriceCurrent, setMaxGasPrice } = useConfigurableMaxGasPrice()
 
-  return useCallback(
-    () => {
-      if (intervalDCADirty) {
-        setWeeks(empty0String(Math.floor(intervalDCACurrent / (3600 * 24 * 7)).toString()))
-        setDays(empty0String(Math.floor((intervalDCACurrent % (3600 * 24 * 7)) / (3600 * 24)).toString()))
-        setHours(empty0String(Math.floor((intervalDCACurrent % (3600 * 24)) / 3600).toString()))
-      }
-      if (maxGasPriceDirty) {
-        setMaxGasPrice(maxGasPriceCurrent)
-      }
-    },
-    [intervalDCADirty, maxGasPriceDirty, setWeeks, intervalDCACurrent, setDays, setHours, setMaxGasPrice, maxGasPriceCurrent]
-  )
+  return useCallback(() => {
+    if (intervalDCADirty) {
+      setWeeks(empty0String(Math.floor(intervalDCACurrent / (3600 * 24 * 7)).toString()))
+      setDays(empty0String(Math.floor((intervalDCACurrent % (3600 * 24 * 7)) / (3600 * 24)).toString()))
+      setHours(empty0String(Math.floor((intervalDCACurrent % (3600 * 24)) / 3600).toString()))
+    }
+    if (maxGasPriceDirty) {
+      setMaxGasPrice(maxGasPriceCurrent)
+    }
+  }, [
+    intervalDCADirty,
+    maxGasPriceDirty,
+    setWeeks,
+    intervalDCACurrent,
+    setDays,
+    setHours,
+    setMaxGasPrice,
+    maxGasPriceCurrent,
+  ])
 }
 
 export const useRevertOuts = () => {
-  const {dirty: outsDirty, current: outsCurrent, setOuts} = useConfigurableOuts()
+  const { dirty: outsDirty, current: outsCurrent, setOuts } = useConfigurableOuts()
 
-  return useCallback(
-    () => {
-      if (outsDirty) {
-        setOuts(outsCurrent)
-      }
-    },
-    [outsCurrent, outsDirty, setOuts]
-  )
+  return useCallback(() => {
+    if (outsDirty) {
+      setOuts(outsCurrent)
+    }
+  }, [outsCurrent, outsDirty, setOuts])
 }
