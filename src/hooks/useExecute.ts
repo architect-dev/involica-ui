@@ -171,6 +171,27 @@ export const useSetPosition = () => {
   return { onSetPosition, pending }
 }
 
+export const usePausePosition = () => {
+  const involica = useInvolica()
+  const { handleExecute, pending } = useExecuteTx()
+
+  const onPausePosition = useCallback(
+    (pause: boolean) => {
+      handleExecute(
+        involica,
+        'pausePosition',
+        [pause],
+        undefined,
+        pause ? 'Position Paused' : 'Position Unpaused',
+        pause ? 'Error Pausing Position' : 'Error Unpausing Position',
+      )
+    },
+    [handleExecute, involica],
+  )
+
+  return { onPausePosition, pending }
+}
+
 export const useReInitPosition = () => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()

@@ -29,6 +29,7 @@ export const CellWithChanged = styled(CellCol)<{ changed?: boolean, gap?: string
   gap: ${({ gap }) => gap ?? '24px'};
   align-items: flex-start;
   justify-content: flex-start;
+  position: relative;
 `
 
 export const DesktopOnlyPre = styled.pre`

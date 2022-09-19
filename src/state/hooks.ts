@@ -6,7 +6,7 @@ import useRefresh from 'hooks/useRefresh'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { bnDisplay, eN } from 'utils'
 import { useInvolicaStore } from './store'
-import { PositionConfig, PositionConfigMutators, PositionConfigSupplements, Token, UserTokenData } from './types'
+import { Position, PositionConfig, PositionConfigMutators, PositionConfigSupplements, Token, UserTokenData } from './types'
 
 // FETCHERS
 
@@ -36,7 +36,7 @@ export const useFetchUserData = () => {
 
 // POSITION & CONFIG
 
-export type WithDirty<T extends keyof PositionConfig> = { dirty: boolean } & Pick<PositionConfig, T>
+export type WithDirty<T extends keyof PositionConfig> = { dirty: boolean; current: Position[T] } & Pick<PositionConfig, T>
 
 export const useConfigSupplements = <S extends Array<keyof PositionConfigSupplements>>(
   supplements: S,
@@ -60,6 +60,7 @@ export const useDirtyablePositionValue = <K extends keyof PositionConfig>(
       ({
         [key]: positionOnly ? positionVal : configVal ?? positionVal,
         dirty: JSON.stringify(configVal) !== JSON.stringify(positionVal),
+        current: positionVal,
       } as WithDirty<K>),
     [key, positionOnly, positionVal, configVal],
   )
@@ -95,7 +96,7 @@ export const useConfigurableTokenIn = () => ({ ...useConfigurablePositionValue('
 export const usePositionOuts = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('outs', positionOnly) })
 export const useConfigurableOuts = () => ({
   ...useConfigurablePositionValue('outs', [
-    'setOutsFromPreset',
+    'setOuts',
     'addOut',
     'removeOut',
     'updateWeights',
@@ -152,7 +153,7 @@ export const usePositionIntervalDCA = (positionOnly?: boolean) => ({
   ...useDirtyablePositionValue('intervalDCA', positionOnly),
 })
 export const useConfigurableIntervalDCA = () => ({
-  ...useConfigurablePositionValue('intervalDCA', ['setWeeks', 'setDays', 'setHours']),
+  ...useConfigurablePositionValue('intervalDCA', ['setWeeks', 'setDays', 'setHours', 'setIntervalDCA']),
   ...useConfigSupplements(['weeks', 'weeksInvalidReason', 'days', 'daysInvalidReason', 'hours', 'hoursInvalidReason']),
 })
 
@@ -321,4 +322,55 @@ export const usePositionStatus = () => {
     tokenInUserData?.balance,
     maxTxPrice,
   ])
+}
+
+// REVERT CONFIG
+export const useRevertTokenAndAmount = () => {
+  const {dirty: tokenInDirty, current: tokenInCurrent, setTokenIn} = useConfigurableTokenIn()
+  const {dirty: amountDCADirty, current: amountDCACurrent, setAmountDCA} = useConfigurableAmountDCA()
+
+  return useCallback(
+    () => {
+      if (tokenInDirty) {
+        setTokenIn(tokenInCurrent)
+      }
+      if (amountDCADirty) {
+        setAmountDCA(amountDCACurrent, amountDCACurrent)
+      }
+    },
+    [amountDCACurrent, amountDCADirty, setAmountDCA, setTokenIn, tokenInCurrent, tokenInDirty]
+  )
+}
+
+const empty0String = (s: string | null) => (s === '0' ? '' : s)
+export const useRevertIntervalAndMaxGasPrice = () => {
+  const {dirty: intervalDCADirty, current: intervalDCACurrent, setWeeks, setDays, setHours} = useConfigurableIntervalDCA()
+  const {dirty: maxGasPriceDirty, current: maxGasPriceCurrent, setMaxGasPrice} = useConfigurableMaxGasPrice()
+
+  return useCallback(
+    () => {
+      if (intervalDCADirty) {
+        setWeeks(empty0String(Math.floor(intervalDCACurrent / (3600 * 24 * 7)).toString()))
+        setDays(empty0String(Math.floor((intervalDCACurrent % (3600 * 24 * 7)) / (3600 * 24)).toString()))
+        setHours(empty0String(Math.floor((intervalDCACurrent % (3600 * 24)) / 3600).toString()))
+      }
+      if (maxGasPriceDirty) {
+        setMaxGasPrice(maxGasPriceCurrent)
+      }
+    },
+    [intervalDCADirty, maxGasPriceDirty, setWeeks, intervalDCACurrent, setDays, setHours, setMaxGasPrice, maxGasPriceCurrent]
+  )
+}
+
+export const useRevertOuts = () => {
+  const {dirty: outsDirty, current: outsCurrent, setOuts} = useConfigurableOuts()
+
+  return useCallback(
+    () => {
+      if (outsDirty) {
+        setOuts(outsCurrent)
+      }
+    },
+    [outsCurrent, outsDirty, setOuts]
+  )
 }

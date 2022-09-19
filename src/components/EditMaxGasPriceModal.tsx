@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useDcaTxPriceRange, usePositionMaxGasPrice } from 'state/hooks'
-import { SummitButton, Text, RowCenter, SummitPopUp, TextWithChangedButton, Column, RowBetween } from 'uikit'
+import { SummitButton, Text, RowCenter, SummitPopUp, TextButton, Column, RowBetween } from 'uikit'
 import { bnDisplay, useShowHideModal } from 'utils'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { Edit3 } from 'react-feather'
@@ -105,10 +105,10 @@ export const EditMaxGasPriceButton: React.FC = () => {
       callOnDismiss={hide}
       modal
       button={
-        <TextWithChangedButton onClick={show} bold italic changed={dirty} asterisk asteriskPosition="-6px 0px">
+        <TextButton onClick={show} bold italic changed={dirty} asterisk asteriskPosition="-6px 0px">
           {maxGasPrice} gwei
           <Edit3 size="14px" />
-        </TextWithChangedButton>
+        </TextButton>
       }
       popUpTitle="Edit Max Gas Price"
       popUpContent={<EditMaxGasPriceModal />}

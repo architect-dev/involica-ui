@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useConfigurableIntervalDCA } from "./hooks"
 
-const suffix = (intervalDCA: number | null) => {
+export const suffix = (intervalDCA: number | null) => {
   if (intervalDCA == null) return '-'
   if (intervalDCA === 3600 * 24 * 28) return 'month'
   if (intervalDCA === 3600 * 24 * 14) return 'other week'

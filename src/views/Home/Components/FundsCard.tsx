@@ -49,13 +49,13 @@ export const FundsCard: React.FC = () => {
                 DCAs covered (est):
               </Text>
               <Text bold color={errorColor}>
-                {dcasAtMinGas} DCAs ({minGasPrice} gwei)
+                {dcasAtMinGas} DCAs (@ {minGasPrice} gwei)
               </Text>
             </RowBetween>
             {maxGasPrice !== minGasPrice && (
               <RowEnd>
                 <Text bold textAlign="right" color={errorColor}>
-                  {dcasAtMaxGas} DCAs ({maxGasPrice} gwei)
+                  {dcasAtMaxGas} DCAs (@ {maxGasPrice} gwei)
                 </Text>
               </RowEnd>
             )}

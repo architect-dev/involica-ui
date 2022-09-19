@@ -119,7 +119,7 @@ export interface PositionConfigSupplements {
 export interface PositionConfigMutators {
   getStarted: () => void
   setTokenIn: (tokenIn: string) => void
-  setOutsFromPreset: (outs: PositionOut[]) => void
+  setOuts: (outs: PositionOut[]) => void
   addOut: (token: string, weight: number, maxSlippage: number) => void
   removeOut: (index: number) => void
   updateWeights: (weights: number[]) => void
@@ -131,6 +131,7 @@ export interface PositionConfigMutators {
   setWeeks: (weeks: string) => void
   setDays: (days: string) => void
   setHours: (hours: string) => void
+  setIntervalDCA: (intervalDCA: number) => void
 }
 
 // DEBUG

@@ -36,7 +36,7 @@ export const Text = styled.div<TextProps>`
   ${typography};
 `
 
-export const TextWithChanged = styled(Text)<{ changed?: boolean; asterisk?: boolean, asteriskPosition?: string }>`
+export const TextWithChanged = styled(Text)<{ changed?: boolean; asterisk?: boolean; asteriskPosition?: string }>`
   display: flex;
   position: relative;
   ${({ changed, asterisk, asteriskPosition, theme }) =>
@@ -64,12 +64,13 @@ export const TextWithChanged = styled(Text)<{ changed?: boolean; asterisk?: bool
         `)}
 `
 
-export const TextWithChangedButton = styled(TextWithChanged)`
+export const TextButton = styled(TextWithChanged)`
   cursor: pointer;
   line-height: 24px;
   cursor: pointer;
   padding: 0px 8px;
   margin: 0px -8px;
+  color: ${({ theme }) => theme.colors.text};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,7 +81,11 @@ export const TextWithChangedButton = styled(TextWithChanged)`
   &:hover {
     font-weight: bold;
     text-decoration: underline;
+    > * {
+      stroke-width: 3;
+    }
   }
+
 `
 
 Text.defaultProps = {

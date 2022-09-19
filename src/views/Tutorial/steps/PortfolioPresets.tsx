@@ -90,7 +90,7 @@ const presets: Array<Preset> = [
 ]
 
 const PresetButton: React.FC<{ preset: Preset }> = ({ preset }) => {
-  const { setOutsFromPreset } = useConfigurableOuts()
+  const { setOuts: setOutsFromPreset } = useConfigurableOuts()
   const [open, setOpen] = useState(false)
   const show = useCallback(() => setOpen(true), [setOpen])
   const hide = useCallback(() => setOpen(false), [setOpen])

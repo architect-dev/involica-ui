@@ -88,7 +88,7 @@ export const useInvolicaStore = create<State>()(
         set((state) => {
           state.config.tokenIn = tokenIn
         }),
-      setOutsFromPreset: (outs: PositionOut[]) =>
+      setOuts: (outs: PositionOut[]) =>
         set((state) => {
           state.config.outs = outs
         }),
@@ -148,6 +148,10 @@ export const useInvolicaStore = create<State>()(
           state.config.fundingInvalidReason = fundingInvalidReason
         })
       },
+      setIntervalDCA: (intervalDCA: number) =>
+        set((state) => {
+          state.config.intervalDCA = intervalDCA
+        }),
       setMaxGasPrice: (maxGasPrice: MaxGasPriceOptions) =>
         set((state) => {
           state.config.maxGasPrice = maxGasPrice

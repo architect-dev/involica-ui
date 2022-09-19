@@ -65,24 +65,22 @@ export const TopUpFundsModal: React.FC<{
         </Text>
       )}
 
-      <SummitButton
-        isLoading={pending}
-        onClick={handleDepositTreasury}
-        activeText="Add Funds"
-        loadingText="Adding"
-        disabled={fundingInvalidReason != null || fundingAmount === ''}
-      />
-
       <br />
-      <br />
-      <RowCenter>
+      <RowCenter gap='18px'>
         <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton
+          isLoading={pending}
+          onClick={handleDepositTreasury}
+          activeText="Add Funds"
+          loadingText="Adding"
+          disabled={fundingInvalidReason != null || fundingAmount === ''}
+        />
       </RowCenter>
     </ModalContentContainer>
   )
 }
 
-export const TopUpFundsButton: React.FC<{ buttonText?: string }> = ({ buttonText = 'Top Up Funds'}) => {
+export const TopUpFundsButton: React.FC<{ buttonText?: string }> = ({ buttonText = 'Top Up Funds' }) => {
   const [open, show, hide] = useShowHideModal()
   return (
     <SummitPopUp
