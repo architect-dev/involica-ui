@@ -23,8 +23,8 @@ const SummitStyledButton = styled(StyledButton)<{
   /* box-shadow: ${({ theme, disabled, $isLocked }) => disabled || $isLocked ? 'none' : `1px 1px 1px ${theme.colors.textShadow}, 1px 1px 1px inset ${theme.colors.textShadow}`}; */
   
   opacity: ${({ disabled, $isLocked }) => (disabled || $isLocked ? 0.5 : 1)};
-  background: ${({ theme }) => theme.colors.button};
-  color: ${({ theme }) => theme.colors.text};
+  /* background: ${({ theme }) => theme.colors.button}; */
+  /* color: ${({ theme }) => theme.colors.text}; */
   
   > * {
     text-align: center;

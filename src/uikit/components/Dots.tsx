@@ -2,13 +2,14 @@
 import styled, { css } from "styled-components";
 
 export const Dots = styled.span<{ loading?: boolean }>`
-  ${({ loading = true, theme }) => loading && css`
+  color: inherit;
+  ${({ loading = true }) => loading && css`
     &::after {
       display: inline-block;
       animation: ellipsis 2s infinite;
       content: ".  ";
       text-align: left;
-      color: ${theme.colors.text};
+      color: inherit;
     }
     @keyframes ellipsis {
       0% {

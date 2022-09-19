@@ -18,8 +18,9 @@ import { CellCol, CellWithChanged } from './styles'
 import { EditMaxGasPriceButton } from 'components/EditMaxGasPriceModal'
 import { suffix, useIntervalStrings } from 'state/uiHooks'
 import { OutsSelectionAndWeights } from 'components/Outs/OutsSelectionAndWeights'
-import { Edit3, RotateCcw } from 'react-feather'
+import { RotateCcw } from 'react-feather'
 import { getSymbol } from 'config/tokens'
+import { ManagePositionButton } from 'components/ManagePositionModal'
 
 const CellRow = styled.div`
   display: flex;
@@ -153,10 +154,7 @@ const ActionsCell: React.FC = () => {
   return (
     <Column width="100%" gap="18px" alignItems="center">
       <RowCenter gap="18px">
-        <TextButton>
-          Manage Position
-          <Edit3 size="14px" />
-        </TextButton>
+        <ManagePositionButton />
         <SummitButton disabled={!anyDirty}>Update Position</SummitButton>
       </RowCenter>
       {anyDirty && (
