@@ -8,7 +8,7 @@ import { bn, bnDisplay, eN } from 'utils'
 import { SetAllowanceButton } from 'components/SetAllowanceModal'
 import { useRevokeApproval } from 'hooks/useExecute'
 
-export const ApprovalCard: React.FC = () => {
+export const AllowanceCard: React.FC = () => {
   const { onRevokeApproval, pending } = useRevokeApproval()
   const { tokenInData, tokenInUserData } = usePositionTokenInWithData(true)
   const { amountDCA } = usePositionAmountDCA(true)

@@ -66,7 +66,7 @@ const TokenInCell: React.FC = () => {
   return (
     <CellWithChanged changed={tokenInDirty || amountDCADirty}>
       <TextWithChanged small italic changed={tokenInDirty || amountDCADirty}>
-        Token:
+        DCA Token and DCA Amount:
       </TextWithChanged>
       <TokenAndAmountSelector
         token={tokenIn}
@@ -123,7 +123,7 @@ const OutsCell: React.FC = () => {
   return (
     <CellWithChanged changed={dirty}>
       <TextWithChanged small italic changed={dirty}>
-        DCA Into:
+        DCA Portfolio: (Select up to 8 tokens)
       </TextWithChanged>
       <OutsSelectionAndWeights />
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { Card } from 'components/Card'
 import { Column, RowBetween, SummitButton, Text } from 'uikit'
 import { CellCol } from './styles'
-import { PositionStatus, PositionStatusRecord } from 'state/hooks'
+import { PositionStatus, PositionStatusRecord, usePositionStatus } from 'state/hooks'
 import { SetAllowanceButton } from 'components/SetAllowanceModal'
 import { Link } from 'react-router-dom'
 import { TopUpFundsButton } from 'components/TopUpFundsModal'
@@ -93,8 +93,7 @@ const StatusAction: PositionStatusRecord<React.ReactNode> = {
 }
 
 export const PositionStatusCard: React.FC = () => {
-  // const statusRaw = usePositionStatus()
-  const status = PositionStatus.Active
+  const status = usePositionStatus()
 
   return (
     <Card title="Status" padding="24px" halfWidth>

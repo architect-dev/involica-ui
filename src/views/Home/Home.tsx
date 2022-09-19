@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
 import { PositionCard } from './Components/PositionCard'
-import { ApprovalCard } from './Components/ApprovalCard'
+import { AllowanceCard } from './Components/AllowanceCard'
 import { PositionStatusCard } from './Components/PositionStatusCard'
 import { FundsCard } from './Components/FundsCard'
 import { UpcomingExecutionsCard } from './Components/UpcomingExecutionsCard'
@@ -51,7 +51,7 @@ const Home: React.FC = () => {
           <PositionStatusCard/>
           <FundsCard/>
           <PositionCard/>
-          <ApprovalCard/>
+          <AllowanceCard/>
           <UpcomingExecutionsCard/>
         </CardsWrapper>
       </Hero>

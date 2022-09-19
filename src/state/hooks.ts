@@ -324,6 +324,15 @@ export const usePositionStatus = () => {
   ])
 }
 
+export const useAllowanceIsSufficient = () => {
+  const { tokenInUserData } = usePositionTokenInWithData(true)
+  const { amountDCA } = usePositionAmountDCA(true)
+
+  return useMemo(() => 
+    new BigNumber(tokenInUserData?.allowance).gte(amountDCA)
+  , [amountDCA, tokenInUserData?.allowance])
+}
+
 // REVERT CONFIG
 export const useRevertTokenAndAmount = () => {
   const {dirty: tokenInDirty, current: tokenInCurrent, setTokenIn} = useConfigurableTokenIn()

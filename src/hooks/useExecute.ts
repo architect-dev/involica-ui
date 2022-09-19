@@ -171,6 +171,26 @@ export const useSetPosition = () => {
   return { onSetPosition, pending }
 }
 
+export const useManuallyExecuteDCA = () => {
+  const { account } = useWeb3React()
+  const involica = useInvolica()
+  const { handleExecute, pending } = useExecuteTx()
+  const { tokenInData } = usePositionTokenInWithData()
+
+  const onManuallyExecuteDCA = useCallback(() => {
+    handleExecute(
+      involica,
+      'executeDCA',
+      [account, tokenInData?.price],
+      undefined,
+      'DCA Executed Manually',
+      'Manual DCA Execution Failed',
+    )
+  }, [account, handleExecute, involica, tokenInData?.price])
+
+  return { onManuallyExecuteDCA, pending }
+}
+
 export const usePausePosition = () => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
