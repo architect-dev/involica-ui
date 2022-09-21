@@ -9,6 +9,7 @@ import { TopUpFundsButton } from 'components/TopUpFundsModal'
 import { TimeUntilNextDca } from 'components/TimeUntilNextDca'
 import { ManagePositionButton } from 'components/ManagePositionModal'
 import { ManuallyExecuteDCAButton } from 'components/ManuallyExecuteDCAButton'
+import { DCAsRemaining } from 'components/DCAsRemaining'
 
 const StatusString: PositionStatusRecord<React.ReactNode> = {
   [PositionStatus.Active]: 'Active',
@@ -66,12 +67,20 @@ const StatusColor: Record<PositionStatusType, string> = {
 
 const StatusAction: PositionStatusRecord<React.ReactNode> = {
   [PositionStatus.Active]: (
+    <>
     <RowBetween>
       <Text small italic>
         Next DCA In:
       </Text>
       <TimeUntilNextDca />
     </RowBetween>
+    <RowBetween>
+      <Text small italic>
+        DCAs Remaining:
+      </Text>
+      <DCAsRemaining />
+    </RowBetween>
+    </>
   ),
   [PositionStatus.ActiveManualOnly]: <ManuallyExecuteDCAButton />,
 

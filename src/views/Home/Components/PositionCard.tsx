@@ -21,6 +21,7 @@ import { OutsSelectionAndWeights } from 'components/Outs/OutsSelectionAndWeights
 import { RotateCcw } from 'react-feather'
 import { getSymbol } from 'config/tokens'
 import { ManagePositionButton } from 'components/ManagePositionModal'
+import { useSetPosition } from 'hooks/useExecute'
 
 const CellRow = styled.div`
   display: flex;
@@ -151,11 +152,19 @@ const ActionsCell: React.FC = () => {
     amountDCADirty,
   ])
 
+  const { onSetPosition, pending } = useSetPosition()
+
   return (
     <Column width="100%" gap="18px" alignItems="center">
       <RowCenter gap="18px">
         <ManagePositionButton />
-        <SummitButton disabled={!anyDirty}>Update Position</SummitButton>
+        <SummitButton
+          disabled={!anyDirty}
+          onClick={onSetPosition}
+          isLoading={pending}
+          activeText="Update Position"
+          loadingText="Updating"
+        />
       </RowCenter>
       {anyDirty && (
         <Column width="100%" alignItems="center">

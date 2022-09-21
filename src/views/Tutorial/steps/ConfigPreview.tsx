@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { useIntroActiveStep } from 'state/introHooks'
+import { useIntroActiveStep } from 'state/configHooks'
 import { IntroStep } from 'state/types'
 import styled from 'styled-components'
 import { SummitButton, SummitPopUp } from 'uikit'

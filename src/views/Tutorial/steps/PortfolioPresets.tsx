@@ -10,18 +10,9 @@ import {
   Text,
   TokenSymbolImage,
   SummitPopUp,
+  ModalContentContainer,
 } from 'uikit'
 import { PositionSwapsOverviewOverride } from './PositionOverviewElements'
-
-const ModalWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  max-width: 400px;
-  max-height: 90%;
-  gap: 24px;
-`
 
 interface Preset {
   name: string
@@ -121,11 +112,11 @@ const PresetButton: React.FC<{ preset: Preset }> = ({ preset }) => {
           </RowBetween>
         </SummitButton>
       }
+      popUpTitle='Preset Position:'
       popUpContent={
-        <ModalWrapper>
-          <Text bold>Preset Position:</Text>
+        <ModalContentContainer minWidth='300px' maxWidth='400px'>
           <Text italic small textAlign="center" px="48px">
-            The preset tokens and percentages can be edited after they've been
+            The preset tokens and weights can be edited after they've been
             imported.
           </Text>
           <PositionSwapsOverviewOverride outs={preset.outs} />
@@ -133,7 +124,7 @@ const PresetButton: React.FC<{ preset: Preset }> = ({ preset }) => {
             activeText="Use this Preset"
             onClick={handleUsePreset}
           />
-        </ModalWrapper>
+        </ModalContentContainer>
       }
     />
   )

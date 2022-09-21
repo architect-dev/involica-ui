@@ -58,7 +58,7 @@ export const useInvolicaStore = create<State>()(
       config: {
         tokenIn: null,
         outs: [],
-        amountDCA: null,
+        amountDCA: '',
         amountDCAInvalidReason: 'DCA Amount required',
         intervalDCA: null,
         maxGasPrice: '100',
@@ -208,7 +208,6 @@ export const useInvolicaStore = create<State>()(
         })
       },
 
-
       // DEBUG
       hydrateConfig: () => {
         const position = get().userData?.position
@@ -221,11 +220,11 @@ export const useInvolicaStore = create<State>()(
           config: {
             tokenIn: position.tokenIn,
             outs: position.outs,
-            amountDCA: position.amountDCA,
+            amountDCA: empty0String(position.amountDCA),
             intervalDCA: position.intervalDCA,
             maxGasPrice: position.maxGasPrice,
             executeImmediately: position.executeImmediately,
-            
+
             amountDCAInvalidReason: null,
             startIntro: true,
             fundingAmount: '1',
@@ -246,7 +245,7 @@ export const useInvolicaStore = create<State>()(
           config: {
             tokenIn: null,
             outs: [],
-            amountDCA: null,
+            amountDCA: '',
             amountDCAInvalidReason: 'DCA Amount required',
             intervalDCA: null,
             maxGasPrice: '100',
@@ -263,9 +262,9 @@ export const useInvolicaStore = create<State>()(
             daysInvalidReason: null,
             hours: '',
             hoursInvalidReason: null,
-          }
+          },
         })
-      }
+      },
     })),
     {
       name: `involica_${CHAIN_ID}`,

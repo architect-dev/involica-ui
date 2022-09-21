@@ -64,6 +64,7 @@ export interface Position extends PositionConfig {
   maxGasPrice: MaxGasPriceOptions
   taskId: string
   finalizationReason: string
+  paused: boolean
 }
 export interface UserTokenData {
   address: string

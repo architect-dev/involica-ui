@@ -7,7 +7,8 @@ import { Contract, PayableOverrides } from '@ethersproject/contracts'
 import { callWithEstimateGas } from 'utils/estimateGas'
 import { ethers } from 'ethers'
 import { eN } from 'utils'
-import { usePositionTokenInWithData } from 'state/hooks'
+import { usePositionTokenInWithData, useUserHasPosition } from 'state/hooks'
+import { useSubmissionReadyPositionConfig } from 'state/configHooks'
 
 const useExecuteTx = () => {
   const fetchUserData = useInvolicaStore((state) => state.fetchUserData)
@@ -153,19 +154,21 @@ export const useCreateAndFundPosition = () => {
 export const useSetPosition = () => {
   const involica = useInvolica()
   const { handleExecute, pending } = useExecuteTx()
+  const userHasPosition = useUserHasPosition()
+  const positionConfig = useSubmissionReadyPositionConfig()
 
   const onSetPosition = useCallback(
-    (config: any[], isNewPosition: boolean) => {
+    () => {
       handleExecute(
         involica,
         'setPosition',
-        config,
+        positionConfig,
         undefined,
-        isNewPosition ? 'Position Created' : 'Position Updated',
-        isNewPosition ? 'Error Creating Position' : 'Error Updating Position',
+        userHasPosition ? 'Position Updated' : 'Position Created',
+        userHasPosition ? 'Error Updating Position' : 'Error Creating Position',
       )
     },
-    [handleExecute, involica],
+    [handleExecute, involica, userHasPosition, positionConfig],
   )
 
   return { onSetPosition, pending }

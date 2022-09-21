@@ -1,7 +1,7 @@
 import { Card } from 'components/Card'
 import React from 'react'
 import { useConfigurableGetStarted } from 'state/hooks'
-import { useIntroActiveStep } from 'state/introHooks'
+import { useIntroActiveStep } from 'state/configHooks'
 import { IntroStep } from 'state/types'
 import styled from 'styled-components'
 import { SummitButton, Text } from 'uikit'

@@ -5,6 +5,7 @@ import { useInterval } from 'hooks/useInterval'
 import useRefresh from 'hooks/useRefresh'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { bnDisplay, eN } from 'utils'
+import { timestampToDateTime } from 'utils/timestamp'
 import { useInvolicaStore } from './store'
 import {
   Position,
@@ -236,13 +237,14 @@ export const usePositionTokenInWithData = (positionOnly?: boolean) => {
 export const useUserHasPosition = () => useInvolicaStore((state) => state.userData?.userHasPosition)
 export const useUserTreasury = () => useInvolicaStore((state) => state.userData?.userTreasury)
 export const useDcasRemaining = () => useInvolicaStore((state) => state.userData?.dcasRemaining)
+export const useIsPositionPaused = () => useInvolicaStore((state) => state.userData?.position?.paused)
 export const useNextDCATimestamp = () => {
   const lastDCA = useInvolicaStore((state) => state.userData?.position?.lastDCA)
   const intervalDCA = useInvolicaStore((state) => state.userData?.position?.intervalDCA)
 
   return useMemo(() => {
     if (lastDCA == null || lastDCA === 0 || intervalDCA == null || intervalDCA === 0) return null
-    return lastDCA + intervalDCA + 375500
+    return lastDCA + intervalDCA
   }, [intervalDCA, lastDCA])
 }
 
@@ -260,6 +262,20 @@ export const useTimeUntilNextDCA = () => {
   )
 
   return timeUntilNextDCA
+}
+
+export const useUpcomingDCAs = () => {
+  const lastDCA = useInvolicaStore((state) => state.userData?.position?.lastDCA)
+  const intervalDCA = useInvolicaStore((state) => state.userData?.position?.intervalDCA)
+
+  return useMemo(() => {
+    if (lastDCA == null || lastDCA === 0 || intervalDCA == null || intervalDCA === 0) return null
+    const upcomingDCAs = []
+    ;[1, 2, 3, 4, 5].forEach((i) => {
+      upcomingDCAs.push(timestampToDateTime(lastDCA + (intervalDCA * (i + 1))))
+    })
+    return upcomingDCAs
+  }, [intervalDCA, lastDCA])
 }
 
 export const baseGasPrice = 450000
@@ -309,7 +325,7 @@ export const usePositionStatus = () => {
   const userTreasury = useUserTreasury()
   const { amountDCA } = usePositionAmountDCA(true)
   const { minTxPrice, maxTxPrice } = useDcaTxPriceRange(true)
-  const positionPaused = true
+  const positionPaused = useIsPositionPaused()
   const positionManualOnly = false
 
   return useMemo(() => {

@@ -26,6 +26,7 @@ const userDataFields: Record<string, ParseFieldConfig> = {
       maxGasPrice: { type: ParseFieldType.gwei },
       taskId: { type: ParseFieldType.string },
       finalizationReason: { type: ParseFieldType.string },
+      paused: { type: ParseFieldType.bool },
     },
   },
   allowance: { type: ParseFieldType.bignumber },

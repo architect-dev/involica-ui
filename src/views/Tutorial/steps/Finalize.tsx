@@ -10,7 +10,7 @@ import {
   useConfigFundingAmount,
   usePositionTokenInWithData,
 } from 'state/hooks'
-import { useSubmissionReadyPositionConfig } from 'state/introHooks'
+import { useSubmissionReadyPositionConfig } from 'state/configHooks'
 
 export const Finalize: React.FC = () => {
   const { tokenInData, tokenInUserData } = usePositionTokenInWithData()

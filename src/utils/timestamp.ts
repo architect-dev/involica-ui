@@ -9,7 +9,9 @@ export const getTimestampDiff = (a: number, b: number): number => {
 }
 export const getTimeRemainingText = (timeRemaining: number): string => {
   return getTimeRemainingBreakdown(timeRemaining)
-    .map((val, index) => (val === 0 && index < 2 ? '' : `${index < 3 ? val : `00${val}`.slice(-2)}${getTimeDenom(index)}`))
+    .map((val, index) =>
+      val === 0 && index < 2 ? '' : `${index < 3 ? val : `00${val}`.slice(-2)}${getTimeDenom(index)}`,
+    )
     .filter((val) => val !== '')
     .slice(0, 2)
     .join(' ')
@@ -35,17 +37,29 @@ export const stakeDurationToText = (dur: number): string => {
 }
 export const getTimeDenom = (index: number): string => {
   switch (index) {
-    case 0: return 'd'
-    case 1: return 'h'
-    case 2: return 'm'
+    case 0:
+      return 'd'
+    case 1:
+      return 'h'
+    case 2:
+      return 'm'
     default:
-    case 3: return 's'
+    case 3:
+      return 's'
   }
 }
 export const timestampToDate = (timestamp: number): string => {
   if (timestamp < 10000000) return '---'
   const date = new Date(timestamp * 1000)
   return date.toLocaleDateString('en', { month: 'short', day: 'numeric' }).toUpperCase()
+}
+export const timestampToDateTime = (timestamp: number): string => {
+  if (timestamp < 10000000) return '---'
+  const date = new Date(timestamp * 1000)
+  return `${date.toLocaleDateString('en', { month: 'short', day: 'numeric' })} ${date.toLocaleTimeString('en', {
+    hour: 'numeric',
+    minute: 'numeric',
+  })}`
 }
 export const timestampToDateWithYear = (timestamp: number): string => {
   if (timestamp < 10000000) return '---'

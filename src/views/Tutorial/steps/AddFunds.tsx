@@ -1,51 +1,36 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Column, Text } from 'uikit'
-import TokenInput from 'components/TokenInput'
 import { getNativeTokenSymbol } from 'config/constants'
 import { bnDisplay } from 'utils'
 import MaxGasPriceSelector from './MaxGasPriceSelector'
 import styled from 'styled-components'
 import { useConfigurableFundingAmount, useDcaTxPriceRange, useNativeTokenFullData } from 'state/hooks'
 import { MaxGasPriceOptions } from 'state/types'
-
-
+import TokenAndAmountSelector from 'components/TokenAndAmountSelector'
 
 const IntroText = styled(Text)`
   max-width: 500px;
 `
 
 export const AddFunds: React.FC = () => {
-  const { nativeTokenData, nativeTokenUserData } = useNativeTokenFullData()
+  const { nativeTokenData } = useNativeTokenFullData()
   const { fundingAmount, fundingInvalidReason, setFundingAmount } = useConfigurableFundingAmount()
   const { minTxPrice, maxTxPrice, maxGasPrice } = useDcaTxPriceRange()
   const minGasPrice: MaxGasPriceOptions = '100'
 
-  const fullBalance = useMemo(
-    () => bnDisplay(nativeTokenUserData?.balance, nativeTokenData?.decimals),
-    [nativeTokenData?.decimals, nativeTokenUserData?.balance],
-  )
-
-  const handleChange = useCallback(
-    (e: React.FormEvent<HTMLInputElement>) => {
-      setFundingAmount(e.currentTarget.value, fullBalance)
-    },
-    [fullBalance, setFundingAmount],
-  )
-
-  const handleSelectPreset = useCallback(
-    () => setFundingAmount('10', fullBalance),
-    [fullBalance, setFundingAmount],
-  )
-
-  const handleSelectMax = useCallback(() => {
-    setFundingAmount(fullBalance, fullBalance)
-  }, [setFundingAmount, fullBalance])
+  const maxTxPriceDisplay = useMemo(() => {
+    if (maxTxPrice == null || maxTxPrice === '' || maxTxPrice === '0') return '-'
+    return bnDisplay(maxTxPrice, 18, 4)
+  }, [maxTxPrice])
+  const minTxPriceDisplay = useMemo(() => {
+    if (minTxPrice == null || minTxPrice === '' || minTxPrice === '0') return '-'
+    return bnDisplay(minTxPrice, 18, 4)
+  }, [minTxPrice])
 
   return (
     <>
       <IntroText small>
-        Funds are only used to pay for the gas of each DCA transaction,
-        and can be removed at any time.
+        Funds are only used to pay for the gas of each DCA transaction, and can be removed at any time.
         <br />
         <br />
         <i>
@@ -54,16 +39,13 @@ export const AddFunds: React.FC = () => {
           (10 FTM should cover you for a while)
         </i>
       </IntroText>
-      <TokenInput
-        symbol={getNativeTokenSymbol()}
-        balanceText="Wallet Balance"
-        onChange={handleChange}
-        onSelectPreset={handleSelectPreset}
-        presetValue="10"
-        onSelectMax={handleSelectMax}
+      <TokenAndAmountSelector
+        token={nativeTokenData?.address}
         value={fundingAmount}
-        max={fullBalance}
+        setValue={setFundingAmount}
         invalid={fundingInvalidReason != null && fundingAmount !== ''}
+        tokenSelectDisabled
+        isNativeDeposit
       />
       {fundingInvalidReason != null && (
         <Text red italic mt="-12px">
@@ -76,7 +58,7 @@ export const AddFunds: React.FC = () => {
           Minimum Gas Price is hard coded by Gelato to be 100 gwei
           <br />
           <Text small italic bold>
-            Min DCA execution price: {minTxPrice ?? '-'} FTM (@{' '}
+            Min DCA execution price: {minTxPriceDisplay ?? '-'} FTM (@{' '}
             {minGasPrice !== null ? Number(minGasPrice).toFixed(0) : '-'} gwei)
           </Text>
           <br />
@@ -90,7 +72,7 @@ export const AddFunds: React.FC = () => {
 
         {maxGasPrice !== '100' && (
           <Text small italic bold>
-            Max DCA execution price: {maxTxPrice ?? '-'} FTM (@{' '}
+            Max DCA execution price: {maxTxPriceDisplay ?? '-'} FTM (@{' '}
             {maxGasPrice !== null ? Number(maxGasPrice).toFixed(0) : '-'} gwei)
           </Text>
         )}

@@ -51,9 +51,9 @@ export const useIntroActiveStep = () => {
     'fundingInvalidReason',
   ])
 
-    if (!startIntro) return IntroStep.NotStarted
+  if (!startIntro) return IntroStep.NotStarted
 
-  if (tokenIn == null) return IntroStep.TokenIn
+  if (tokenIn == null || tokenIn === ethers.constants.AddressZero) return IntroStep.TokenIn
 
   if (amountDCA == null || amountDCA === '' || amountDCA === '0') return IntroStep.Amount
 
