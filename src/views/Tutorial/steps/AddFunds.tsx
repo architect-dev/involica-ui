@@ -43,15 +43,10 @@ export const AddFunds: React.FC = () => {
         token={nativeTokenData?.address}
         value={fundingAmount}
         setValue={setFundingAmount}
-        invalid={fundingInvalidReason != null && fundingAmount !== ''}
+        invalidReason={fundingAmount === '' ? null : fundingInvalidReason}
         tokenSelectDisabled
         isNativeDeposit
       />
-      {fundingInvalidReason != null && (
-        <Text red italic mt="-12px">
-          {fundingInvalidReason}
-        </Text>
-      )}
       <br />
       <Column alignItems="flex-start">
         <Text small italic mb="4px">

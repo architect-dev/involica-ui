@@ -7,6 +7,7 @@ import { AllowanceCard } from './Components/AllowanceCard'
 import { PositionStatusCard } from './Components/PositionStatusCard'
 import { FundsCard } from './Components/FundsCard'
 import { UpcomingExecutionsCard } from './Components/UpcomingExecutionsCard'
+import { PastTxsCard } from './Components/PastTxsCard'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -40,22 +41,18 @@ const Home: React.FC = () => {
   return (
     <Page>
       <Hero>
-        <StyledHighlightedText
-          className="sticky"
-          fontSize="34px"
-          letterSpacing="16px"
-        >
+        <StyledHighlightedText className="sticky" fontSize="34px" letterSpacing="16px">
           INVOLICA
         </StyledHighlightedText>
         <CardsWrapper>
-          <PositionStatusCard/>
-          <FundsCard/>
-          <PositionCard/>
-          <AllowanceCard/>
-          <UpcomingExecutionsCard/>
+          <PositionStatusCard />
+          <FundsCard />
+          <PositionCard />
+          <AllowanceCard />
+          <UpcomingExecutionsCard />
+          <PastTxsCard />
         </CardsWrapper>
       </Hero>
-
     </Page>
   )
 }

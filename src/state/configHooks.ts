@@ -32,6 +32,7 @@ export const useSubmissionReadyPositionConfig = (): any[] => {
       intervalDCA,
       getChainGwei(maxGasPrice),
       executeImmediately,
+      false,
     ],
     [amountDCA, executeImmediately, intervalDCA, maxGasPrice, outs, tokenIn, tokenInData?.decimals],
   )
@@ -50,6 +51,8 @@ export const useIntroActiveStep = () => {
     'fundingAmount',
     'fundingInvalidReason',
   ])
+
+  return IntroStep.Finalize
 
   if (!startIntro) return IntroStep.NotStarted
 

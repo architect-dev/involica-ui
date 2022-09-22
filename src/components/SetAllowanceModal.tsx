@@ -179,14 +179,9 @@ export const SetAllowanceModal: React.FC<{
         token={tokenIn}
         value={rawApprovalAmount}
         setValue={handleSetApprovalAmount}
-        invalid={approvalAmountInvalidReason != null}
+        invalidReason={approvalAmountInvalidReason}
         tokenSelectDisabled
       />
-      {approvalAmountInvalidReason != null && (
-        <Text red italic>
-          {approvalAmountInvalidReason}
-        </Text>
-      )}
       <SummitButton
         disabled={approvalAmountInvalidReason != null || rawApprovalAmount === '' || rawApprovalAmount == null}
         isLoading={pending}

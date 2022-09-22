@@ -65,6 +65,11 @@ export const OutsSelectionAndWeights: React.FC<{ intro?: boolean }> = ({ intro =
             <EmptyOut key={i} />
           ))}
       </OutsRow>
+      {outs.length === 0 && (
+          <Text red italic>
+            Must have at least one DCA out
+          </Text>
+        )}
       {intro && (
         <Text small italic>
           <br />

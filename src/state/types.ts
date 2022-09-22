@@ -71,6 +71,20 @@ export interface UserTokenData {
   allowance: BigNumber
   balance: BigNumber
 }
+export interface UserTx {
+  timestamp: number
+  tokenIn: string
+  txFee: BigNumber
+  tokenTxs: UserTokenTx[]
+}
+export interface UserTokenTx {
+  tokenIn: string
+  tokenInPrice: BigNumber
+  tokenOut: string
+  amountIn: BigNumber
+  amountOut: BigNumber
+  err: string
+}
 export interface UserData {
   userHasPosition: boolean
   userTreasury: BigNumber
@@ -80,6 +94,7 @@ export interface UserData {
   dcasRemaining: number
   userTokensData: AddressRecord<UserTokenData>
   userNativeTokenData: UserTokenData
+  userTxs: UserTx[]
 }
 interface UserDataState {
   userData?: UserData

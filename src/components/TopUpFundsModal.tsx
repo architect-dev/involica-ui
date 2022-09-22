@@ -85,15 +85,10 @@ export const TopUpFundsModal: React.FC<{
         token={nativeTokenData?.address}
         value={fundingAmount}
         setValue={handleSetFundingAmount}
-        invalid={fundingInvalidReason != null}
+        invalidReason={fundingInvalidReason}
         tokenSelectDisabled
         isNativeDeposit
       />
-      {fundingInvalidReason != null && (
-        <Text red italic mt="-12px">
-          {fundingInvalidReason}
-        </Text>
-      )}
 
       <br />
       <RowCenter gap='18px'>

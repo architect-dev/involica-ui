@@ -6,6 +6,10 @@ export const decOffset = (ish: BigNumberish | null, decimals: number | null = 18
   if (ish == null || decimals == null) return null
   return bn(ish).dividedBy(bnExp(decimals)).toNumber()
 }
+export const bnDecOffset = (ish: BigNumberish | null, decimals: number | null = 18): BigNumber => {
+  if (ish == null || decimals == null) return null
+  return bn(ish).dividedBy(bnExp(decimals))
+}
 
 export const bnZero = new BigNumber(0)
 

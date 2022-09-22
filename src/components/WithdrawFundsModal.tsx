@@ -55,16 +55,11 @@ export const WithdrawFundsModal: React.FC<{
         token={nativeTokenData?.address}
         value={withdrawAmount}
         setValue={handleSetFundingAmount}
-        invalid={withdrawInvalidReason != null}
+        invalidReason={withdrawInvalidReason}
         max={userTreasuryDisplay}
         balanceText='Current Funding'
         tokenSelectDisabled
       />
-      {withdrawInvalidReason != null && (
-        <Text red italic mt="-12px">
-          {withdrawInvalidReason}
-        </Text>
-      )}
 
       <SummitButton
         isLoading={pending}

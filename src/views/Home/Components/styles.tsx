@@ -1,5 +1,5 @@
-import { transparentize } from "polished"
-import styled from "styled-components"
+import { transparentize } from 'polished'
+import styled from 'styled-components'
 
 export const CellRow = styled.div`
   display: flex;
@@ -22,8 +22,9 @@ export const CellCol = styled.div<{ justifyContent?: string }>`
   gap: 18px;
   width: 100%;
 `
-export const CellWithChanged = styled(CellCol)<{ changed?: boolean, gap?: string }>`
-  background-color: ${({ theme, changed }) => (changed ? transparentize(0.8, theme.colors.warning) : 'transparent')};
+export const CellWithChanged = styled(CellCol)<{ changed?: boolean; error?: boolean; gap?: string }>`
+  background-color: ${({ theme, changed, error }) =>
+    changed ? transparentize(0.9, error ? theme.colors.failure : theme.colors.warning) : 'transparent'};
   padding: 12px;
   width: 100%;
   gap: ${({ gap }) => gap ?? '24px'};
@@ -38,5 +39,3 @@ export const DesktopOnlyPre = styled.pre`
     display: initial;
   }
 `
-
-

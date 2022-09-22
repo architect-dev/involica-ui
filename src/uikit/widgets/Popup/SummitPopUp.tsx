@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { Text } from '../../components/Text/Text'
 
 interface Props {
-  button: JSX.Element
+  button?: JSX.Element
   position?: any
   contentPadding?: string
   popUpContent: JSX.Element

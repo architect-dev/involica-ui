@@ -3,11 +3,14 @@ import BigNumber from 'bignumber.js'
 import { nativeAdd } from 'config/constants'
 import { useInterval } from 'hooks/useInterval'
 import useRefresh from 'hooks/useRefresh'
+import { pick } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { bnDisplay, eN } from 'utils'
 import { timestampToDateTime } from 'utils/timestamp'
+import { PositionStatus } from './status'
 import { useInvolicaStore } from './store'
 import {
+  AddressRecord,
   Position,
   PositionConfig,
   PositionConfigMutators,
@@ -191,6 +194,8 @@ export const useConfigurableGetStarted = () => ({
 export const useTokenPublicData = (token: string | undefined): { data: Token | undefined } => ({
   data: useInvolicaStore((state) => state?.tokens?.[token]),
 })
+export const useTokensPublicData = (tokens: string[]): AddressRecord<Token> =>
+  useInvolicaStore((state) => pick(state.tokens, tokens))
 export const useTokenUserData = (token: string | undefined): { userData: UserTokenData | undefined } => ({
   userData: useInvolicaStore((state) => state?.userData?.userTokensData?.[token]),
 })
@@ -238,6 +243,7 @@ export const useUserHasPosition = () => useInvolicaStore((state) => state.userDa
 export const useUserTreasury = () => useInvolicaStore((state) => state.userData?.userTreasury)
 export const useDcasRemaining = () => useInvolicaStore((state) => state.userData?.dcasRemaining)
 export const useIsPositionPaused = () => useInvolicaStore((state) => state.userData?.position?.paused)
+export const useUserTxs = () => useInvolicaStore((state) => state.userData?.userTxs)
 export const useNextDCATimestamp = () => {
   const lastDCA = useInvolicaStore((state) => state.userData?.position?.lastDCA)
   const intervalDCA = useInvolicaStore((state) => state.userData?.position?.intervalDCA)
@@ -272,7 +278,7 @@ export const useUpcomingDCAs = () => {
     if (lastDCA == null || lastDCA === 0 || intervalDCA == null || intervalDCA === 0) return null
     const upcomingDCAs = []
     ;[1, 2, 3, 4, 5].forEach((i) => {
-      upcomingDCAs.push(timestampToDateTime(lastDCA + (intervalDCA * (i + 1))))
+      upcomingDCAs.push(timestampToDateTime(lastDCA + intervalDCA * (i + 1)))
     })
     return upcomingDCAs
   }, [intervalDCA, lastDCA])
@@ -305,20 +311,6 @@ export const useDcaTxPriceRange = (positionOnly?: boolean) => {
   }
 }
 
-export enum PositionStatus {
-  NoPosition = 'NoPosition',
-  Active = 'Active',
-  ActiveManualOnly = 'ActiveManualOnly',
-
-  WarnPaused = 'Paused',
-  WarnGasFunds = 'WarnGasFunds',
-
-  ErrorNoDcaAmount = 'ErrorNoDcaAmount',
-  ErrorGasFunds = 'ErrorGasFunds',
-  ErrorInsufficientAllowance = 'ErrorInsufficientAllowance',
-  ErrorInsufficientBalance = 'ErrorInsufficientBalance',
-}
-export type PositionStatusRecord<T> = Record<PositionStatus, T>
 export const usePositionStatus = () => {
   const { tokenInUserData } = usePositionTokenInWithData(true)
   const userHasPosition = useUserHasPosition()

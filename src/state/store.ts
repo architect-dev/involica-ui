@@ -1,11 +1,12 @@
 /* eslint-disable no-param-reassign */
 import { CHAIN_ID } from 'utils'
 import create from 'zustand'
+import { ethers } from 'ethers'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import fetchPublicData from './fetchPublicData'
 import fetchUserData from './fetchUserData'
-import { State, MaxGasPriceOptions, PositionOut } from './types'
+import { State, MaxGasPriceOptions, PositionOut, PositionConfig, PositionConfigSupplements } from './types'
 
 const weights = {
   0: [100],
@@ -17,6 +18,28 @@ const weights = {
   6: [31, 24, 18, 12, 9, 6],
   7: [30, 23, 17, 11, 8, 6, 5],
   8: [30, 22, 16, 12, 8, 5, 4, 3],
+}
+
+const emptyConfig: PositionConfig & PositionConfigSupplements = {
+  tokenIn: null,
+  outs: [],
+  amountDCA: '',
+  amountDCAInvalidReason: 'DCA Amount required',
+  intervalDCA: null,
+  maxGasPrice: '100',
+  executeImmediately: true,
+  startIntro: false,
+  fundingAmount: '',
+  fundingInvalidReason: 'Funding required',
+
+  dcasCount: '',
+  dcasCountInvalidReason: null,
+  weeks: '',
+  weeksInvalidReason: null,
+  days: '',
+  daysInvalidReason: null,
+  hours: '',
+  hoursInvalidReason: null,
 }
 
 const sToF = (s: string): number => {
@@ -55,28 +78,7 @@ export const useInvolicaStore = create<State>()(
       },
 
       // Position Config,
-      config: {
-        tokenIn: null,
-        outs: [],
-        amountDCA: '',
-        amountDCAInvalidReason: 'DCA Amount required',
-        intervalDCA: null,
-        maxGasPrice: '100',
-        executeImmediately: true,
-        startIntro: false,
-        fundingAmount: '',
-        fundingInvalidReason: 'Funding required',
-
-        dcasCount: '',
-        dcasCountInvalidReason: null,
-
-        weeks: '',
-        weeksInvalidReason: null,
-        days: '',
-        daysInvalidReason: null,
-        hours: '',
-        hoursInvalidReason: null,
-      },
+      config: emptyConfig,
 
       // Config Mutators
       getStarted: () => {
@@ -125,7 +127,7 @@ export const useInvolicaStore = create<State>()(
         }),
       setAmountDCA: (amountDCA: string, fullBalance: string | null) => {
         let amountDCAInvalidReason = null
-        if (amountDCA === '') amountDCAInvalidReason = 'Funding required'
+        if (amountDCA === '') amountDCAInvalidReason = 'DCA Amount required'
         else if (isNaN(parseFloat(amountDCA))) amountDCAInvalidReason = 'Not a number'
         else if (parseFloat(amountDCA) <= 0) amountDCAInvalidReason = 'Must be greater than 0'
         else if (parseFloat(amountDCA ?? '0') > parseFloat(fullBalance ?? '0'))
@@ -215,6 +217,10 @@ export const useInvolicaStore = create<State>()(
           console.error('No position to hydrate')
           return
         }
+        if (position.user === ethers.constants.AddressZero) {
+          set({ config: emptyConfig })
+          return
+        }
         const empty0String = (s: string | null) => (s === '0' ? '' : s)
         set({
           config: {
@@ -242,27 +248,7 @@ export const useInvolicaStore = create<State>()(
       },
       resetConfig: () => {
         set({
-          config: {
-            tokenIn: null,
-            outs: [],
-            amountDCA: '',
-            amountDCAInvalidReason: 'DCA Amount required',
-            intervalDCA: null,
-            maxGasPrice: '100',
-            executeImmediately: true,
-            startIntro: false,
-            fundingAmount: '',
-            fundingInvalidReason: 'Funding required',
-
-            dcasCount: '',
-            dcasCountInvalidReason: null,
-            weeks: '',
-            weeksInvalidReason: null,
-            days: '',
-            daysInvalidReason: null,
-            hours: '',
-            hoursInvalidReason: null,
-          },
+          config: emptyConfig,
         })
       },
     })),

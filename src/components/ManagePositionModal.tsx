@@ -34,19 +34,20 @@ export const ManagePositionModal: React.FC<{
         <Text bold>{paused ? 'Paused' : 'Active'}</Text>
       </RowBetween>
 
-      <SummitButton
-        isLoading={pausePending}
-        onClick={handleTogglePaused}
-        activeText={`${paused ? 'Unpause' : 'Pause'} Position`}
-        loadingText={paused ? 'Unpausing' : 'Pausing'}
-      />
-
-      <br />
-
       {!unpauseOnly && (
         <>
+          <SummitButton
+            isLoading={pausePending}
+            onClick={handleTogglePaused}
+            activeText={`${paused ? 'Unpause' : 'Pause'} Position`}
+            loadingText={paused ? 'Unpausing' : 'Pausing'}
+          />
+
+          <br />
+
           <Text small italic red>
-            Exiting your position will delete all position data and return your unused gas funds ({userTreasuryDisplay} {getNativeTokenSymbol()}):
+            Exiting your position will delete all position data and return your unused gas funds ({userTreasuryDisplay}{' '}
+            {getNativeTokenSymbol()}):
           </Text>
           <SummitButton
             isLoading={exitPending}
@@ -55,13 +56,23 @@ export const ManagePositionModal: React.FC<{
             loadingText="Exiting"
             variant="danger"
           />
+
+          <br />
         </>
       )}
+      <br />
 
-      <br />
-      <br />
-      <RowCenter>
+      <RowCenter gap="18px">
         <SummitButton onClick={onDismiss} activeText="Close" />
+        {unpauseOnly && (
+          <SummitButton
+            isLoading={pausePending}
+            onClick={handleTogglePaused}
+            activeText="Unpause Position"
+            loadingText="Unpausing"
+            padding="0 18px"
+          />
+        )}
       </RowCenter>
     </ModalContentContainer>
   )

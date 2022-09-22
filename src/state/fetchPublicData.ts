@@ -11,7 +11,7 @@ const tokensFields: Record<string, ParseFieldConfig> = {
     nestedFields: {
       token: { type: ParseFieldType.address, stateField: 'address' },
       decimals: { type: ParseFieldType.number },
-      price: { type: ParseFieldType.number },
+      price: { type: ParseFieldType.numberPrice },
     },
   },
 }
@@ -32,7 +32,7 @@ const fetchPublicData = async (): Promise<{
   if (res == null) return null
 
   const { tokens } = res[0]
-  const popTokens = tokens.map((token: Token) => ({ ...token, symbol: getSymbol(token.address), price: token.price / 1e6 }))
+  const popTokens = tokens.map((token: Token) => ({ ...token, symbol: getSymbol(token.address) }))
   const nonNatives = popTokens.slice(0, -1)
   const nativeToken = popTokens[popTokens.length - 1]
 

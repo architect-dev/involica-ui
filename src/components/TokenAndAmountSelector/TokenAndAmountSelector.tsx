@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import styled, { css } from 'styled-components'
-import { Text } from 'uikit'
+import { Column, Text } from 'uikit'
 import { TokenSelectButton } from 'components/TokenSelect/TokenSelectButton'
 import { AddressRecord } from 'state/types'
 import { useTokenOrNativeFullData } from 'state/hooks'
@@ -131,7 +131,7 @@ interface TokenInputProps {
   placeholder?: string
   disabled?: boolean
   isLocked?: boolean
-  invalid?: boolean
+  invalidReason?: string
 
   tokenChanged?: boolean
   amountChanged?: boolean
@@ -155,7 +155,7 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
   placeholder = '0.0',
   disabled,
   isLocked,
-  invalid,
+  invalidReason,
 
   tokenChanged,
   amountChanged,
@@ -198,49 +198,57 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
   }, [setValue, fullBalance])
 
   return (
-    <StyledInputWrapper disabled={disabled} isLocked={isLocked} invalid={invalid}>
-      <ThinRow>
-        {isNativeDeposit ? (
-          <>
-            <TextButton onClick={handleSelect10Native}>10 {getNativeTokenSymbol()}</TextButton>
-            <TextButton onClick={handleSelect20Native}>20 {getNativeTokenSymbol()}</TextButton>
-          </>
-        ) : (
-          <>
-            <TextButton onClick={handleSelect10}>10%</TextButton>
-            <TextButton onClick={handleSelect50}>50%</TextButton>
-            <TextButton onClick={handleSelectMax}>MAX</TextButton>
-          </>
-        )}
-      </ThinRow>
-      <InputRow>
-        {tokenSelectDisabled ? (
-          <TokenIndicator token={token} />
-        ) : (
-          <TokenSelectButton
-            token={token}
-            setToken={setToken}
-            noTokenString="select"
-            disabledTokens={disabledReasons}
-            modalVariant="tokenIn"
-            changed={tokenChanged}
-          />
-        )}
-        <InputWrapper changed={amountChanged}>
-          <StyledInput
-            disabled={disabled || isLocked}
-            placeholder={placeholder}
-            value={value}
-            onChange={handleChange}
-            invalid={invalid}
-          />
-        </InputWrapper>
-      </InputRow>
-      <BalanceRow>
-        <Text>{balanceText}:</Text>
-        <Text>{fullBalance != null ? parseFloat(fullBalance).toFixed(4) : '-'}</Text>
-      </BalanceRow>
-    </StyledInputWrapper>
+    <Column width="100%" maxWidth="320px" gap="4px">
+      <StyledInputWrapper disabled={disabled} isLocked={isLocked} invalid={invalidReason != null}>
+        <ThinRow>
+          {isNativeDeposit ? (
+            <>
+              <TextButton onClick={handleSelect10Native}>10 {getNativeTokenSymbol()}</TextButton>
+              <TextButton onClick={handleSelect20Native}>20 {getNativeTokenSymbol()}</TextButton>
+            </>
+          ) : (
+            <>
+              <TextButton onClick={handleSelect10}>10%</TextButton>
+              <TextButton onClick={handleSelect50}>50%</TextButton>
+              <TextButton onClick={handleSelectMax}>MAX</TextButton>
+            </>
+          )}
+        </ThinRow>
+        <InputRow>
+          {tokenSelectDisabled ? (
+            <TokenIndicator token={token} />
+          ) : (
+            <TokenSelectButton
+              token={token}
+              setToken={setToken}
+              noTokenString="select"
+              disabledTokens={disabledReasons}
+              modalVariant="tokenIn"
+              changed={tokenChanged}
+            />
+          )}
+          <InputWrapper changed={amountChanged}>
+            <StyledInput
+              disabled={disabled || isLocked}
+              placeholder={placeholder}
+              value={value}
+              onChange={handleChange}
+              invalid={invalidReason != null}
+            />
+          </InputWrapper>
+        </InputRow>
+        <BalanceRow>
+          <Text>{balanceText}:</Text>
+          <Text>{fullBalance != null ? parseFloat(fullBalance).toFixed(4) : '-'}</Text>
+        </BalanceRow>
+      </StyledInputWrapper>
+
+      {invalidReason != null && (
+        <Text red italic>
+          {invalidReason}
+        </Text>
+      )}
+    </Column>
   )
 }
 

@@ -22,6 +22,7 @@ import { RotateCcw } from 'react-feather'
 import { getSymbol } from 'config/tokens'
 import { ManagePositionButton } from 'components/ManagePositionModal'
 import { useSetPosition } from 'hooks/useExecute'
+import { useInvolicaStore } from 'state/store'
 
 const CellRow = styled.div`
   display: flex;
@@ -52,7 +53,7 @@ const RevertChangesButton: React.FC<{ onClick }> = ({ onClick }) => {
 const TokenInCell: React.FC = () => {
   const { dirty: tokenInDirty, tokenIn, setTokenIn } = useConfigurableTokenIn()
   const { outs } = usePositionOuts()
-  const { dirty: amountDCADirty, amountDCA, setAmountDCA } = useConfigurableAmountDCA()
+  const { dirty: amountDCADirty, amountDCA, setAmountDCA, amountDCAInvalidReason } = useConfigurableAmountDCA()
   const revertTokenAndAmount = useRevertTokenAndAmount()
 
   const disabledReasons = useMemo(() => {
@@ -65,7 +66,7 @@ const TokenInCell: React.FC = () => {
   }, [outs, tokenIn])
 
   return (
-    <CellWithChanged changed={tokenInDirty || amountDCADirty}>
+    <CellWithChanged changed={tokenInDirty || amountDCADirty} error={amountDCAInvalidReason != null}>
       <TextWithChanged small italic changed={tokenInDirty || amountDCADirty}>
         DCA Token and DCA Amount:
       </TextWithChanged>
@@ -77,6 +78,7 @@ const TokenInCell: React.FC = () => {
         disabledReasons={disabledReasons}
         tokenChanged={tokenInDirty}
         amountChanged={amountDCADirty}
+        invalidReason={amountDCAInvalidReason}
       />
 
       {(tokenInDirty || amountDCADirty) && <RevertChangesButton onClick={revertTokenAndAmount} />}
@@ -85,13 +87,14 @@ const TokenInCell: React.FC = () => {
 }
 
 const OptionsCell: React.FC = () => {
-  const { dirty: intervalDirty } = usePositionIntervalDCA()
+  const { dirty: intervalDirty, intervalDCA } = usePositionIntervalDCA()
+  const intervalInvalid = useMemo(() => intervalDCA == null || intervalDCA === 0, [intervalDCA])
   const { dirty: maxGasPriceDirty } = usePositionMaxGasPrice()
   const { intervalStringly } = useIntervalStrings()
   const revertIntervalAndMaxGasPrice = useRevertIntervalAndMaxGasPrice()
 
   return (
-    <CellWithChanged changed={intervalDirty || maxGasPriceDirty}>
+    <CellWithChanged changed={intervalDirty || maxGasPriceDirty} error={intervalInvalid}>
       <TextWithChanged small italic changed={intervalDirty || maxGasPriceDirty}>
         DCA Options:
       </TextWithChanged>
@@ -119,10 +122,11 @@ const OptionsCell: React.FC = () => {
 }
 
 const OutsCell: React.FC = () => {
-  const { dirty } = usePositionOuts()
+  const { dirty, outs } = usePositionOuts()
+  const outsInvalid = useMemo(() => outs == null || outs.length === 0, [outs])
   const revertOuts = useRevertOuts()
   return (
-    <CellWithChanged changed={dirty}>
+    <CellWithChanged changed={dirty} error={outsInvalid}>
       <TextWithChanged small italic changed={dirty}>
         DCA Portfolio: (Select up to 8 tokens)
       </TextWithChanged>
@@ -152,6 +156,14 @@ const ActionsCell: React.FC = () => {
     amountDCADirty,
   ])
 
+  const { amountDCAInvalidReason, intervalDCA, outs } = useInvolicaStore((state) => ({
+    amountDCAInvalidReason: state.config.amountDCAInvalidReason,
+    intervalDCA: state.config.intervalDCA,
+    outs: state.config.outs,
+  }))
+  const intervalDCAInvalid = useMemo(() => intervalDCA == null || intervalDCA === 0, [intervalDCA])
+  const outsInvalid = useMemo(() => outs == null || outs.length === 0, [outs])
+
   const { onSetPosition, pending } = useSetPosition()
 
   return (
@@ -159,7 +171,7 @@ const ActionsCell: React.FC = () => {
       <RowCenter gap="18px">
         <ManagePositionButton />
         <SummitButton
-          disabled={!anyDirty}
+          disabled={!anyDirty || intervalDCAInvalid || outsInvalid || amountDCAInvalidReason != null}
           onClick={onSetPosition}
           isLoading={pending}
           activeText="Update Position"
@@ -168,7 +180,7 @@ const ActionsCell: React.FC = () => {
       </RowCenter>
       {anyDirty && (
         <Column width="100%" alignItems="center">
-          <Text bold color="warning" mb="8px">
+          <Text bold color="warning" mb="8px" red={amountDCAInvalidReason != null || intervalDCAInvalid || outsInvalid}>
             Pending Changes:
           </Text>
           {tokenInDirty && (
@@ -177,12 +189,12 @@ const ActionsCell: React.FC = () => {
             </Text>
           )}
           {amountDCADirty && (
-            <Text italic small>
+            <Text italic small red={amountDCAInvalidReason != null}>
               DCA Amount: <s>{dcaAmountCurrent}</s> {'>'} <b>{dcaAmountPending}</b>
             </Text>
           )}
           {intervalDirty && (
-            <Text italic small>
+            <Text italic small red={intervalDCAInvalid}>
               DCA Interval: every <s>{suffix(intervalCurrent)}</s> {'>'} <b>{suffix(intervalPending)}</b>
             </Text>
           )}
@@ -192,8 +204,8 @@ const ActionsCell: React.FC = () => {
             </Text>
           )}
           {outsDirty && (
-            <Text italic small>
-              DCA Out tokens or weights
+            <Text italic small red={outsInvalid}>
+              DCA Portfolio Tokens or Weights Changed
             </Text>
           )}
         </Column>

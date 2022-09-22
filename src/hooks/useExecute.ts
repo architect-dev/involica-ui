@@ -10,27 +10,41 @@ import { eN } from 'utils'
 import { usePositionTokenInWithData, useUserHasPosition } from 'state/hooks'
 import { useSubmissionReadyPositionConfig } from 'state/configHooks'
 
+interface ExecuteParams {
+  contract: Contract
+  method: string
+  args?: any[]
+  overrides?: PayableOverrides
+  successMsg: string
+  errorMsg: string
+  callback?: (...cbArgs: any[]) => void
+  hydrateConfig?: boolean
+}
+
 const useExecuteTx = () => {
   const fetchUserData = useInvolicaStore((state) => state.fetchUserData)
   const fetchPublicData = useInvolicaStore((state) => state.fetchPublicData)
+  const onHydrateConfig = useInvolicaStore((state) => state.hydrateConfig)
   const [pending, setPending] = useState(false)
   const { toastSuccess, toastError } = useToast()
   const { account } = useWeb3React()
 
   const handleExecute = useCallback(
-    async (
-      contract: Contract,
-      method: string,
-      args: any[],
-      overrides: PayableOverrides | undefined,
-      successMsg: string,
-      errorMsg: string,
-      callback?: (...cbArgs: any[]) => void,
-    ) => {
+    async ({
+      contract,
+      method,
+      args = [],
+      overrides = undefined,
+      successMsg,
+      errorMsg,
+      callback,
+      hydrateConfig = false,
+    }: ExecuteParams) => {
       try {
         setPending(true)
         await callWithEstimateGas(contract, method, args, overrides)
         toastSuccess(successMsg)
+        if (hydrateConfig) onHydrateConfig()
       } catch (error) {
         toastError(errorMsg, (error as Error).message)
       } finally {
@@ -40,7 +54,7 @@ const useExecuteTx = () => {
         if (callback != null) callback()
       }
     },
-    [toastSuccess, toastError, fetchUserData, account, fetchPublicData],
+    [toastSuccess, toastError, fetchUserData, account, fetchPublicData, onHydrateConfig],
   )
 
   return { handleExecute, pending }
@@ -52,27 +66,25 @@ export const useApprove = (symbol: string, erc20Address: string) => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onInfApprove = useCallback(() => {
-    handleExecute(
-      erc20Contract,
-      'approve',
-      [involica.address, ethers.constants.MaxUint256],
-      undefined,
-      `Approved ${symbol}`,
-      `${symbol} Approval Failed`,
-    )
+    handleExecute({
+      contract: erc20Contract,
+      method: 'approve',
+      args: [involica.address, ethers.constants.MaxUint256],
+      successMsg: `Approved ${symbol}`,
+      errorMsg: `${symbol} Approval Failed`,
+    })
   }, [erc20Contract, involica, handleExecute, symbol])
 
   const onApprove = useCallback(
     (amount: string, decimals: number) => {
       const amountRaw = eN(amount, decimals)
-      handleExecute(
-        erc20Contract,
-        'approve',
-        [involica.address, amountRaw],
-        undefined,
-        `Approved ${symbol}`,
-        `${symbol} Approval Failed`,
-      )
+      handleExecute({
+        contract: erc20Contract,
+        method: 'approve',
+        args: [involica.address, amountRaw],
+        successMsg: `Approved ${symbol}`,
+        errorMsg: `${symbol} Approval Failed`,
+      })
     },
     [erc20Contract, involica, handleExecute, symbol],
   )
@@ -87,14 +99,13 @@ export const useRevokeApproval = () => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onRevokeApproval = useCallback(() => {
-    handleExecute(
-      erc20Contract,
-      'approve',
-      [involica.address, '0'],
-      undefined,
-      `Revoked ${tokenInData?.symbol} Approval, DCAs halted`,
-      `${tokenInData?.symbol} Approval Revocation Failed`,
-    )
+    handleExecute({
+      contract: erc20Contract,
+      method: 'approve',
+      args: [involica.address, '0'],
+      successMsg: `Revoked ${tokenInData?.symbol} Approval, DCAs halted`,
+      errorMsg: `${tokenInData?.symbol} Approval Revocation Failed`,
+    })
   }, [handleExecute, erc20Contract, involica.address, tokenInData?.symbol])
 
   return { onRevokeApproval, pending }
@@ -107,7 +118,13 @@ export const useDepositTreasury = () => {
   const onDepositTreasury = useCallback(
     (amount: string, decimals: number) => {
       const amountRaw = eN(amount, decimals)
-      handleExecute(involica, 'depositTreasury', [], { value: amountRaw }, `Funds Added`, 'Error Adding Funds')
+      handleExecute({
+        contract: involica,
+        method: 'depositTreasury',
+        overrides: { value: amountRaw },
+        successMsg: `Funds Added`,
+        errorMsg: 'Error Adding Funds',
+      })
     },
     [handleExecute, involica],
   )
@@ -122,7 +139,13 @@ export const useWithdrawTreasury = () => {
   const onWithdrawTreasury = useCallback(
     (amount: string, decimals: number) => {
       const amountRaw = eN(amount, decimals)
-      handleExecute(involica, 'withdrawTreasury', [amountRaw], undefined, `Withdrew Funds`, 'Error Withdrawing Funds')
+      handleExecute({
+        contract: involica,
+        method: 'withdrawTreasury',
+        args: [amountRaw],
+        successMsg: `Withdrew Funds`,
+        errorMsg: 'Error Withdrawing Funds',
+      })
     },
     [handleExecute, involica],
   )
@@ -136,14 +159,15 @@ export const useCreateAndFundPosition = () => {
 
   const onCreateAndFundPosition = useCallback(
     (config: any[], treasuryValue: string) => {
-      handleExecute(
-        involica,
-        'createAndFundPosition',
-        config,
-        { value: treasuryValue },
-        'Position Created',
-        'Error Creating Position',
-      )
+      handleExecute({
+        contract: involica,
+        method: 'createAndFundPosition',
+        args: config,
+        overrides: { value: treasuryValue },
+        successMsg: 'Position Created',
+        errorMsg: 'Error Creating Position',
+        hydrateConfig: true,
+      })
     },
     [handleExecute, involica],
   )
@@ -157,19 +181,16 @@ export const useSetPosition = () => {
   const userHasPosition = useUserHasPosition()
   const positionConfig = useSubmissionReadyPositionConfig()
 
-  const onSetPosition = useCallback(
-    () => {
-      handleExecute(
-        involica,
-        'setPosition',
-        positionConfig,
-        undefined,
-        userHasPosition ? 'Position Updated' : 'Position Created',
-        userHasPosition ? 'Error Updating Position' : 'Error Creating Position',
-      )
-    },
-    [handleExecute, involica, userHasPosition, positionConfig],
-  )
+  const onSetPosition = useCallback(() => {
+    handleExecute({
+      contract: involica,
+      method: 'setPosition',
+      args: positionConfig,
+      successMsg: userHasPosition ? 'Position Updated' : 'Position Created',
+      errorMsg: userHasPosition ? 'Error Updating Position' : 'Error Creating Position',
+      hydrateConfig: true,
+    })
+  }, [handleExecute, involica, userHasPosition, positionConfig])
 
   return { onSetPosition, pending }
 }
@@ -181,14 +202,13 @@ export const useManuallyExecuteDCA = () => {
   const { tokenInData } = usePositionTokenInWithData()
 
   const onManuallyExecuteDCA = useCallback(() => {
-    handleExecute(
-      involica,
-      'executeDCA',
-      [account, tokenInData?.price],
-      undefined,
-      'DCA Executed Manually',
-      'Manual DCA Execution Failed',
-    )
+    handleExecute({
+      contract: involica,
+      method: 'executeDCA',
+      args: [account, tokenInData?.price],
+      successMsg: 'DCA Executed Manually',
+      errorMsg: 'Manual DCA Execution Failed',
+    })
   }, [account, handleExecute, involica, tokenInData?.price])
 
   return { onManuallyExecuteDCA, pending }
@@ -200,14 +220,13 @@ export const usePausePosition = () => {
 
   const onPausePosition = useCallback(
     (pause: boolean) => {
-      handleExecute(
-        involica,
-        'pausePosition',
-        [pause],
-        undefined,
-        pause ? 'Position Paused' : 'Position Unpaused',
-        pause ? 'Error Pausing Position' : 'Error Unpausing Position',
-      )
+      handleExecute({
+        contract: involica,
+        method: 'pausePosition',
+        args: [pause],
+        successMsg: pause ? 'Position Paused' : 'Position Unpaused',
+        errorMsg: pause ? 'Error Pausing Position' : 'Error Unpausing Position',
+      })
     },
     [handleExecute, involica],
   )
@@ -220,14 +239,13 @@ export const useReInitPosition = () => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onReInitPosition = useCallback(() => {
-    handleExecute(
-      involica,
-      'reInitPosition',
-      [],
-      undefined,
-      `Position Re-Initialized`,
-      'Error Re-Initializing Position',
-    )
+    handleExecute({
+      contract: involica,
+      method: 'reInitPosition',
+      successMsg: `Position Re-Initialized`,
+      errorMsg: 'Error Re-Initializing Position',
+      hydrateConfig: true,
+    })
   }, [handleExecute, involica])
 
   return { onReInitPosition, pending }
@@ -238,7 +256,13 @@ export const useExitPosition = () => {
   const { handleExecute, pending } = useExecuteTx()
 
   const onExitPosition = useCallback(() => {
-    handleExecute(involica, 'exitPosition', [], undefined, `Position Exited`, 'Error Exiting Position')
+    handleExecute({
+      contract: involica,
+      method: 'exitPosition',
+      successMsg: `Position Exited`,
+      errorMsg: 'Error Exiting Position',
+      hydrateConfig: true,
+    })
   }, [handleExecute, involica])
 
   return { onExitPosition, pending }

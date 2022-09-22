@@ -2,7 +2,7 @@ import React from 'react'
 import { Card } from 'components/Card'
 import { Column, RowBetween, SummitButton, Text } from 'uikit'
 import { CellCol } from './styles'
-import { PositionStatus, PositionStatusRecord, usePositionStatus } from 'state/hooks'
+import { usePositionStatus } from 'state/hooks'
 import { SetAllowanceButton } from 'components/SetAllowanceModal'
 import { Link } from 'react-router-dom'
 import { TopUpFundsButton } from 'components/TopUpFundsModal'
@@ -10,60 +10,7 @@ import { TimeUntilNextDca } from 'components/TimeUntilNextDca'
 import { ManagePositionButton } from 'components/ManagePositionModal'
 import { ManuallyExecuteDCAButton } from 'components/ManuallyExecuteDCAButton'
 import { DCAsRemaining } from 'components/DCAsRemaining'
-
-const StatusString: PositionStatusRecord<React.ReactNode> = {
-  [PositionStatus.Active]: 'Active',
-  [PositionStatus.ActiveManualOnly]: 'Manual DCAs Only',
-
-  [PositionStatus.WarnPaused]: 'Paused',
-  [PositionStatus.WarnGasFunds]: 'Warning: Gas Funds Low',
-
-  [PositionStatus.NoPosition]: 'No Position',
-  [PositionStatus.ErrorNoDcaAmount]: 'No Amount to DCA Set',
-  [PositionStatus.ErrorGasFunds]: 'Out of Gas Funds',
-  [PositionStatus.ErrorInsufficientAllowance]: (
-    <>
-      Insufficient
-      <br />
-      Allowance
-    </>
-  ),
-  [PositionStatus.ErrorInsufficientBalance]: (
-    <>
-      Insufficient
-      <br />
-      Wallet Balance
-    </>
-  ),
-}
-
-enum PositionStatusType {
-  Default,
-  Active,
-  Warning,
-  Error,
-}
-
-const StatusType: PositionStatusRecord<PositionStatusType> = {
-  [PositionStatus.NoPosition]: PositionStatusType.Default,
-  [PositionStatus.Active]: PositionStatusType.Active,
-  [PositionStatus.ActiveManualOnly]: PositionStatusType.Active,
-
-  [PositionStatus.WarnPaused]: PositionStatusType.Warning,
-  [PositionStatus.WarnGasFunds]: PositionStatusType.Warning,
-
-  [PositionStatus.ErrorNoDcaAmount]: PositionStatusType.Error,
-  [PositionStatus.ErrorGasFunds]: PositionStatusType.Error,
-  [PositionStatus.ErrorInsufficientAllowance]: PositionStatusType.Error,
-  [PositionStatus.ErrorInsufficientBalance]: PositionStatusType.Error,
-}
-
-const StatusColor: Record<PositionStatusType, string> = {
-  [PositionStatusType.Default]: 'text',
-  [PositionStatusType.Active]: 'success',
-  [PositionStatusType.Warning]: 'warning',
-  [PositionStatusType.Error]: 'failure',
-}
+import { PositionStatusRecord, PositionStatus, StatusColor, StatusType, StatusString } from 'state/status'
 
 const StatusAction: PositionStatusRecord<React.ReactNode> = {
   [PositionStatus.Active]: (

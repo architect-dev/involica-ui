@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { BigNumberish, CHAIN_ID, eN } from 'utils'
 import { ftmDecimals, ftmStables, ftmSymbols } from './ftm'
 
@@ -7,6 +8,9 @@ export const getSymbol = (address: string): string => {
     default:
       return ftmSymbols[address] ?? 'UNKNOWN'
   }
+}
+export const useSymbol = (address: string): string => {
+  return useMemo(() => getSymbol(address), [address])
 }
 
 export const getIsStable = (address: string): boolean => {
