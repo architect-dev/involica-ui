@@ -69,7 +69,7 @@ export const EditMaxGasPriceModal: React.FC<{
         {dirty && (
           <>
             <RowCenter gap="6px">
-              <Text bold color="warning">
+              <Text color="warning">
                 Max Gas Changed: <s>{currentMaxGasPrice}</s> {'>'}
               </Text>
               <Text color="text" bold>

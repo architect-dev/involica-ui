@@ -6,11 +6,12 @@ import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 
 const buttonHeight = 28
 
-const SelectorWrapper = styled(SelectorWrapperBase)<{
+type SelectorWrapperProps = {
   buttonWidth: number
   optionCount: number
   selectedIndex: number | null
-}>`
+}
+const SelectorWrapper = styled(SelectorWrapperBase)<SelectorWrapperProps>`
   display: flex;
   justify-content: center;
   height: ${buttonHeight}px;
@@ -71,9 +72,10 @@ const OptionSelector: React.FC<Props> = ({ buttonWidth, options, selected, selec
   const selectedOption = useMemo(() => {
     return options[selectedIndex]
   }, [options, selectedIndex])
+
   return (
     <SelectorWrapper buttonWidth={buttonWidth} optionCount={options.length} selectedIndex={selectedIndex}>
-      {selectedIndex != null && (
+      {selectedIndex !== -1 && (
         <SelectedSummitButton className="selectedButton" selectedIndex={selectedIndex} padding="0px">
           {selectedOption.label}
         </SelectedSummitButton>

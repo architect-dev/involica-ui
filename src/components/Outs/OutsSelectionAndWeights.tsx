@@ -4,7 +4,7 @@ import { usePositionTokenIn, useConfigurableOuts, usePositionOutsDirtyData } fro
 import { AddressRecord } from 'state/types'
 import { Text } from 'uikit'
 import styled from 'styled-components'
-import { OutTokenButton } from './OutTokenButton'
+import { ManageOutTokenButton } from './ManageOutTokenModal'
 import { WeightsSlider } from './WeightsSlider'
 
 const OutsRow = styled.div`
@@ -47,7 +47,7 @@ export const OutsSelectionAndWeights: React.FC<{ intro?: boolean }> = ({ intro =
     <>
       <OutsRow>
         {outs.map(({ token }, i) => (
-          <OutTokenButton key={token} token={token} changed={dirtyData != null && dirtyData[i].slippage} />
+          <ManageOutTokenButton key={token} token={token} changed={dirtyData != null && dirtyData[i].slippage} />
         ))}
         {outs.length < 8 && (
           <TokenSelectButton

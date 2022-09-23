@@ -1,6 +1,6 @@
 import React from 'react'
-import { useInvolicaStore } from 'state/store'
-import { SummitButton, RowBetween, TokenSymbolImage } from 'uikit'
+import { SummitButton, RowBetween } from 'uikit'
+import TokenIconAndSymbol from './TokenIconAndSymbol'
 
 export const TokenButton: React.FC<{
   onClick?: () => void
@@ -8,19 +8,16 @@ export const TokenButton: React.FC<{
   noTokenString: string
   changed?: boolean
 }> = ({ onClick, token, noTokenString, changed }) => {
-  const tokenData = useInvolicaStore((state) => state.tokens?.[token])
-
   return (
     <SummitButton
       onClick={onClick}
-      padding={tokenData == null ? '0px 12px' : '0 12px 0 2px'}
+      padding={token == null ? '0px 12px' : '0 12px 0 2px'}
       width="100px"
       changed={changed}
     >
-      {tokenData != null ? (
+      {token != null ? (
         <RowBetween>
-          <TokenSymbolImage symbol={tokenData?.symbol} width={24} height={24} />
-          {tokenData?.symbol}
+          <TokenIconAndSymbol token={token}/>
         </RowBetween>
       ) : (
         noTokenString

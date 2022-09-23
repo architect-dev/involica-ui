@@ -17,6 +17,7 @@ interface NumericInputProps {
   leftBlend?: boolean
   rightBlend?: boolean
   changed?: boolean
+  width?: string
 }
 
 const NumericInput: React.FC<NumericInputProps> = ({
@@ -29,10 +30,11 @@ const NumericInput: React.FC<NumericInputProps> = ({
   leftBlend = false,
   rightBlend = false,
   changed,
+  width,
   ...rest
 }) => {
   return (
-    <StyledNumericInput>
+    <StyledNumericInput width={width}>
       <StyledInputWrapper disabled={disabled} invalid={invalid} leftBlend={leftBlend} rightBlend={rightBlend}>
         <InputWrapper>
           <StyledInput
@@ -54,9 +56,9 @@ const NumericInput: React.FC<NumericInputProps> = ({
   )
 }
 
-const StyledNumericInput = styled.div`
+const StyledNumericInput = styled.div<{ width?: string }>`
   position: relative;
-  width: 100px;
+  width: ${({ width }) => width ?? '100px'};
 `
 
 const StyledInputWrapper = styled(SelectorWrapperBase)<{ leftBlend: boolean; rightBlend: boolean }>`

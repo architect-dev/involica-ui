@@ -10,7 +10,7 @@ interface Props {
   position?: any
   contentPadding?: string
   popUpContent: JSX.Element
-  popUpTitle?: string
+  popUpTitle?: React.ReactNode
   open?: boolean
   modal?: boolean
   callOnDismiss?: () => void
