@@ -58,7 +58,7 @@ export const MaxSlippageSelector: React.FC<{ token: string }> = ({ token }) => {
             onChange={handleSetValue}
             endText="%"
             invalid={invalidReason != null}
-            width="70px"
+            width="90px"
           />
         </RowBetween>
         {invalidReason && (

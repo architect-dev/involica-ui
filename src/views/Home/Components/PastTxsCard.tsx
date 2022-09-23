@@ -18,38 +18,113 @@ const FlexText = styled(Text)`
   text-align: right;
 `
 
-const StyledTable = styled.table`
+const Table = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
+
+  .head {
+    border-bottom: 1px dashed ${({ theme }) => theme.colors.text};
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 400px;
+    overflow-y: scroll;
+  }
+  .row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  & .row:nth-child(even) {
+    background-color: ${({ theme }) => transparentize(0.95, theme.colors.text)};
+  }
+
+  .item {
+    display: flex;
+    padding: 6px;
+    align-items: center;
+    flex: 1;
+  }
+  .item_1 {
+    display: flex;
+    flex-basis: 22%;
+    justify-content: flex-start;
+  }
+  .item_2 {
+    display: flex;
+    flex-basis: 22%;
+    justify-content: flex-end;
+  }
+  .item_3 {
+    display: flex;
+    flex-basis: 56%;
+    justify-content: flex-end;
+  }
+
+  ${({ theme }) => theme.mediaQueries.invNav} {
+    .item_1 {
+      flex-basis: 0;
+      min-width: 150px;
+      flex: unset;
+    }
+    .item_2 {
+      flex-basis: 0;
+      min-width: 150px;
+      justify-content: flex-start;
+    }
+    .item_3 {
+      flex-basis: 100%;
+      justify-content: flex-start;
+    }
+  }
 `
-const StyledTh = styled.th`
-  vertical-align: middle;
-`
-const StyledThead = styled.thead`
-  height: 48px;
-  border-bottom: 1px dashed ${({ theme }) => theme.colors.text};
-`
-const StyledTr = styled.tr`
-  height: 48px;
+
+const Row = styled.div`
   ${({ theme }) =>
     pressableMixin({
       theme,
       hoverStyles: css`
-        background-color: ${transparentize(0.9, theme.colors.text)};
+        background-color: ${transparentize(0.85, theme.colors.text)} !important;
       `,
     })};
 `
-const StyledTd = styled.td`
-  vertical-align: middle;
+
+const DesktopVerticalText = styled(Text)`
+  display: flex;
+  flex-direction: column;
+  ${({ theme }) => theme.mediaQueries.invNav} {
+    flex-direction: row;
+    gap: 8px;
+  }
 `
 
-const TokensWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
+const OutsGrid = styled.div`
+  display: grid;
+  grid-template-columns: min-content min-content min-content;
+  gap: 6px;
+  justify-items: center;
   align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  width: 210px;
-  gap: 2px 6px;
+
+  ${({ theme }) => theme.mediaQueries.invNav} {
+    display: flex;
+  }
+`
+
+const OutsTokenGrid = styled.div`
+  display: grid;
+  grid-columns: 3/fill;
+  grid-template-columns: min-content min-content min-content;
+  gap: 6px;
+
+
+  ${({ theme }) => theme.mediaQueries.invNav} {
+    display: flex;
+    flex-wrap: wrap;
+  }
 `
 
 const PastTxCard: React.FC<{ tx: UserTxWithTradeData; index: number; openModal: (index: number) => void }> = ({
@@ -67,25 +142,22 @@ const PastTxCard: React.FC<{ tx: UserTxWithTradeData; index: number; openModal: 
   } = tx
   const handleOpenModal = useCallback(() => openModal(index), [index, openModal])
   return (
-    <StyledTr onClick={handleOpenModal}>
-      <StyledTd>
-        <Text bold pl="8px">
-          {timestampDisplay}
-        </Text>
-      </StyledTd>
-      <StyledTd>
+    <Row className="row" onClick={handleOpenModal}>
+      <div className="item item_1">
+        <Text bold>{timestampDisplay}</Text>
+      </div>
+      <div className="item item_2">
         <FlexText color={ValueChangeStatusColor[valueChangeStatus]}>
           {ValueChangeStatusIcon[valueChangeStatus]}
-          <Text color={ValueChangeStatusColor[valueChangeStatus]}>
+          <DesktopVerticalText color={ValueChangeStatusColor[valueChangeStatus]}>
             <b>{valueChangeUsdDisplay}</b>
-            <br />
             <i>{valueChangePercDisplay}</i>
-          </Text>
+          </DesktopVerticalText>
         </FlexText>
-      </StyledTd>
+      </div>
 
-      <StyledTd>
-        <Flex gap="6px" alignItems="center" justifyContent="flex-end" pr="8px">
+      <div className="item item_3">
+        <OutsGrid>
           <Flex alignItems="center" gap="2px">
             <Text bold>{tokenInData.tradeAmountUsdDisplay}</Text>
             <TokenSymbolImage symbol={tokenInData.symbol} width={24} height={24} />
@@ -93,22 +165,22 @@ const PastTxCard: React.FC<{ tx: UserTxWithTradeData; index: number; openModal: 
           <Text small mx="8px">
             {'>>'}
           </Text>
-          <TokensWrapper>
-          {tokenTxsData.map((tokenTx, i) => (
-            <Flex alignItems="center" gap="2px" key={tokenTx.address}>
-              <Text bold>{tokenTx.tradeAmountUsdDisplay}</Text>
-              <TokenSymbolImage key={tokenTx.tokenOut} symbol={tokenTx.symbol} width={24} height={24} />
-            </Flex>
-          ))}
-          </TokensWrapper>
-        </Flex>
-      </StyledTd>
-    </StyledTr>
+          <OutsTokenGrid>
+            {tokenTxsData.map((tokenTx) => (
+              <Flex alignItems="center" gap="2px" key={tokenTx.address}>
+                <Text bold>{tokenTx.tradeAmountUsdDisplay}</Text>
+                <TokenSymbolImage key={tokenTx.tokenOut} symbol={tokenTx.symbol} width={24} height={24} />
+              </Flex>
+            ))}
+          </OutsTokenGrid>
+        </OutsGrid>
+      </div>
+    </Row>
   )
 }
 
 export const PastTxsCard: React.FC = () => {
-  const userTxsWithDisplayData = useUserTxsWithDisplayData()
+  const { txs: userTxsWithDisplayData } = useUserTxsWithDisplayData()
   const [modalTxIndex, setModalTxIndex] = React.useState<number | null>(null)
   const hideTxModal = useCallback(() => setModalTxIndex(null), [])
   const openUserTxModal = useCallback((i: number) => {
@@ -118,33 +190,25 @@ export const PastTxsCard: React.FC = () => {
   return (
     <Card title="Executed DCAs" padding="24px">
       <CellCol>
-        <StyledTable>
-          <StyledThead>
-            <tr>
-              <StyledTh>
-                <Text small pl="8px">
-                  Date
-                </Text>
-              </StyledTh>
-              <StyledTh>
-                <Text small textAlign="right">
-                  DCA Performance
-                </Text>
-              </StyledTh>
-              <StyledTh>
-                <Text small textAlign="right" pr="8px">
-                  Trade Breakdown
-                </Text>
-              </StyledTh>
-            </tr>
-          </StyledThead>
-          <tbody>
+        <Table>
+          <div className="row head">
+            <div className="item item_1">
+              <Text small>Date</Text>
+            </div>
+            <div className="item item_2">
+              <Text small>DCA Performance</Text>
+            </div>
+            <div className="item item_3">
+              <Text small>Trade Breakdown</Text>
+            </div>
+          </div>
+          <div className="body">
             {userTxsWithDisplayData != null &&
               userTxsWithDisplayData.map((userTx, i) => (
                 <PastTxCard tx={userTx} key={userTx.timestamp} index={i} openModal={openUserTxModal} />
               ))}
-          </tbody>
-        </StyledTable>
+          </div>
+        </Table>
       </CellCol>
       <SummitPopUp
         open={modalTxIndex != null}

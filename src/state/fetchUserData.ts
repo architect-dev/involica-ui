@@ -116,7 +116,7 @@ const fetchUserData = async (account): Promise<UserData | null> => {
       (token: UserTokenData) => token,
     ),
     userNativeTokenData: userData.userTokensData[userData.userTokensData.length - 1],
-    userTxs,
+    userTxs: userTxs.reverse(),
   }
 }
 

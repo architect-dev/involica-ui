@@ -1,11 +1,12 @@
 import BigNumber from 'bignumber.js'
+import { cloneDeep } from 'lodash'
 import { useMemo } from 'react'
 import { bn, bnDecOffset, bnZero } from 'utils'
 import { timestampToDateTime } from 'utils/timestamp'
 import { useConfigurableIntervalDCA, useUserTxs } from './hooks'
-import { ValueChangeStatus } from './status'
+import { getValueChangeStatus, ValueChangeStatus } from './status'
 import { useInvolicaStore } from './store'
-import { Token, UserTokenTx } from './types'
+import { AddressRecord, Token, UserTokenTx } from './types'
 
 export const suffix = (intervalDCA: number | null) => {
   if (intervalDCA == null) return '-'
@@ -87,7 +88,7 @@ export const useUserTxsWithDisplayData = () => {
   const userTxs = useUserTxs()
   const tokensData = useInvolicaStore((state) => state.tokens)
 
-  return useMemo(() => {
+  const txs = useMemo(() => {
     return userTxs.map(
       ({ timestamp, tokenIn, tokenTxs }): UserTxWithTradeData => {
         const tokenInDecimals = tokensData?.[tokenIn]?.decimals
@@ -124,7 +125,7 @@ export const useUserTxsWithDisplayData = () => {
           valueChangePerc: tokenInValueChangePerc,
           valueChangePercDisplay:
           tokenInValueChangePerc == null ? '-' : `${Math.abs(tokenInValueChangePerc).toFixed(2)}%`,
-          valueChangeStatus: Math.abs(tokenInValueChangePerc) < 2 ? ValueChangeStatus.Neutral : tokenInValueChangePerc > 0 ? ValueChangeStatus.Positive : ValueChangeStatus.Negative,
+          valueChangeStatus: getValueChangeStatus(tokenInValueChangePerc),
         }
 
         const tokenTxsData = tokenTxs.map(
@@ -172,7 +173,7 @@ export const useUserTxsWithDisplayData = () => {
               valueChangeUsdDisplay: valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`,
               valueChangePerc,
               valueChangePercDisplay: valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`,
-              valueChangeStatus: Math.abs(valueChangePerc) < 2 ? ValueChangeStatus.Neutral : valueChangePerc > 0 ? ValueChangeStatus.Positive : ValueChangeStatus.Negative,
+              valueChangeStatus: getValueChangeStatus(valueChangePerc),
             }
           },
         )
@@ -191,9 +192,85 @@ export const useUserTxsWithDisplayData = () => {
           valueChangeUsdDisplay: valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`,
           valueChangePerc,
           valueChangePercDisplay: valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`,
-          valueChangeStatus: Math.abs(valueChangePerc) < 2 ? ValueChangeStatus.Neutral : valueChangePerc > 0 ? ValueChangeStatus.Positive : ValueChangeStatus.Negative,
+          valueChangeStatus: getValueChangeStatus(valueChangePerc),
         }
       },
     )
   }, [userTxs, tokensData])
+
+  const derivedData = useMemo(() => {
+    let totalValueChangeUsd = 0
+    let totalTradeAmountUsd = 0
+    const inTokens: AddressRecord<TokenWithTradeData> = {}
+    const outTokens: AddressRecord<TokenWithTradeData> = {}
+
+    txs.forEach((tx) => {
+      totalValueChangeUsd += tx.valueChangeUsd
+      totalTradeAmountUsd += tx.tokenInData.tradeAmountUsd
+
+      if (inTokens[tx.tokenInData.address] == null) {
+        inTokens[tx.tokenInData.address] = cloneDeep(tx.tokenInData)
+      } else {
+        inTokens[tx.tokenInData.address].tradeAmountUsd += tx.tokenInData.tradeAmountUsd
+        inTokens[tx.tokenInData.address].currentAmountUsd += tx.tokenInData.currentAmountUsd
+      }
+      
+      tx.tokenTxsData.forEach((tokenTx) => {
+        if (outTokens[tokenTx.address] == null) {
+          outTokens[tokenTx.address] = cloneDeep(tokenTx)
+        } else {
+          outTokens[tokenTx.address].tradeAmountUsd += tokenTx.tradeAmountUsd
+          outTokens[tokenTx.address].currentAmountUsd += tokenTx.currentAmountUsd
+        }
+      })
+    })
+
+    const totalValueChangeUsdDisplay = totalValueChangeUsd == null ? '-' : `$${Math.abs(totalValueChangeUsd).toFixed(2)}`
+    const totalValueChangePerc = totalValueChangeUsd * 100 / totalTradeAmountUsd
+    const totalValueChangePercDisplay = totalValueChangePerc == null ? '-' : `${Math.abs(totalValueChangePerc).toFixed(2)}%`
+    const totalValueChangeStatus = getValueChangeStatus(totalValueChangePerc)
+
+
+    Object.values(inTokens).forEach((inToken) => {
+      inTokens[inToken.address].tradeAmountUsdDisplay = inToken.tradeAmountUsd == null ? '-' : `$${Math.abs(inToken.tradeAmountUsd).toFixed(2)}`
+      inTokens[inToken.address].currentAmountUsdDisplay = inToken.currentAmountUsd == null ? '-' : `$${Math.abs(inToken.currentAmountUsd).toFixed(2)}`
+
+      const valueChangeUsd = inToken.currentAmountUsd - inToken.tradeAmountUsd
+      const valueChangePerc = inToken.valueChangeUsd * 100 / inToken.tradeAmountUsd
+      inTokens[inToken.address].valueChangeUsd = valueChangeUsd
+      inTokens[inToken.address].valueChangeUsdDisplay = valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`
+      inTokens[inToken.address].valueChangePerc = valueChangePerc
+      inTokens[inToken.address].valueChangePercDisplay = valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`
+      inTokens[inToken.address].valueChangeStatus = getValueChangeStatus(inToken.valueChangePerc)
+    })
+    Object.values(outTokens).forEach((outToken) => {
+      outTokens[outToken.address].tradeAmountUsdDisplay = outToken.tradeAmountUsd == null ? '-' : `$${Math.abs(outToken.tradeAmountUsd).toFixed(2)}`
+      outTokens[outToken.address].currentAmountUsdDisplay = outToken.currentAmountUsd == null ? '-' : `$${Math.abs(outToken.currentAmountUsd).toFixed(2)}`
+
+      const valueChangeUsd = outToken.currentAmountUsd - outToken.tradeAmountUsd
+      const valueChangePerc = outToken.valueChangeUsd * 100 / outToken.tradeAmountUsd
+      outTokens[outToken.address].valueChangeUsd = valueChangeUsd
+      outTokens[outToken.address].valueChangeUsdDisplay = valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`
+      outTokens[outToken.address].valueChangePerc = valueChangePerc
+      outTokens[outToken.address].valueChangePercDisplay = valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`
+      outTokens[outToken.address].valueChangeStatus = getValueChangeStatus(outToken.valueChangePerc)
+    })
+
+    return {
+      totalValueChangeUsd,
+      totalValueChangeUsdDisplay,
+      totalValueChangePerc,
+      totalValueChangePercDisplay,
+      totalValueChangeStatus,
+
+      inTokens,
+      outTokens,
+    }
+  }, [txs])
+
+
+  return {
+    txs,
+    derivedData
+  }
 }
