@@ -106,11 +106,11 @@ export const useInvolicaStore = create<State>()(
             .map((out, i) => ({ ...out, weight: w[i] }))
         })
       },
-      removeOut: (index: number) => {
+      removeOut: (token: string) => {
         const w = weights[get().config.outs.length - 1]
         set((state) => {
           state.config.outs = get()
-            .config.outs.filter((_, i) => index !== i)
+            .config.outs.filter((out) => out.token !== token)
             .map((out, i) => ({ ...out, weight: w[i] }))
         })
       },

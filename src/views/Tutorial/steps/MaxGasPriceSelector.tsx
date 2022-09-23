@@ -1,79 +1,25 @@
-import React from 'react'
+import OptionSelector from 'components/OptionSelector'
+import React, { useCallback } from 'react'
 import { useConfigurableMaxGasPrice } from 'state/hooks'
-import styled from 'styled-components'
-import SummitButton from 'uikit/components/Button/SummitButton'
-import { pressableMixin } from 'uikit/util/styledMixins'
-import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
-
-const buttonWidth = 100
-const buttonHeight = 28
-
-const SelectorWrapper = styled(SelectorWrapperBase)`
-  display: flex;
-  justify-content: center;
-  height: ${buttonHeight}px;
-  width: ${buttonWidth * 3};
-  border-radius: 22px;
-  position: relative;
-`
-
-const SelectedSummitButton = styled(SummitButton)<{ selectedIndex: number }>`
-  pointer-events: none;
-  position: absolute;
-  top: 0px;
-  height: ${buttonHeight - 0}px;
-  max-height: ${buttonHeight - 0}px;
-  min-height: ${buttonHeight - 0}px;
-  width: ${buttonWidth - 0}px;
-  left: ${({ selectedIndex }) => selectedIndex * buttonWidth + 0}px;
-  z-index: 3;
-  font-size: 14px;
-  cursor: default;
-`
-
-const TextButton = styled.div<{ selected: boolean }>`
-  width: ${buttonWidth}px;
-  cursor: pointer;
-  color: ${({ theme, selected }) =>
-    selected ? 'transparent' : theme.colors.text};
-  font-family: Courier Prime, monospace;
-  font-size: 14px;
-  height: ${buttonHeight}px;
-  line-height: ${buttonHeight}px;
-  text-align: center;
-  
-  ${pressableMixin};
-  
-  cursor: ${({ selected }) => selected ? 'default' : 'pointer'};
-`
+import { MaxGasPriceOptions } from 'state/types'
 
 const MaxGasPriceSelector = () => {
   const { maxGasPrice, setMaxGasPrice } = useConfigurableMaxGasPrice()
-  const selectedIndex = maxGasPrice === '100' ? 0 : maxGasPrice === '200' ? 1 : 2
+  const handleSetMaxGasPrice = useCallback((maxGasPriceRaw: string) => {
+    setMaxGasPrice(maxGasPriceRaw as MaxGasPriceOptions)
+  }, [setMaxGasPrice])
+
   return (
-    <SelectorWrapper>
-      <SelectedSummitButton selectedIndex={selectedIndex} padding="0px">
-        {maxGasPrice} gwei
-      </SelectedSummitButton>
-      <TextButton
-        onClick={() => setMaxGasPrice('100')}
-        selected={selectedIndex === 0}
-      >
-        100 gwei
-      </TextButton>
-      <TextButton
-        onClick={() => setMaxGasPrice('200')}
-        selected={selectedIndex === 1}
-      >
-        200 gwei
-      </TextButton>
-      <TextButton
-        onClick={() => setMaxGasPrice('500')}
-        selected={selectedIndex === 2}
-      >
-        500 gwei
-      </TextButton>
-    </SelectorWrapper>
+    <OptionSelector
+      buttonWidth={100}
+      options={[
+        { value: '100', label: '100 gwei' },
+        { value: '200', label: '200 gwei' },
+        { value: '500', label: '500 gwei' },
+      ]}
+      selected={maxGasPrice}
+      select={handleSetMaxGasPrice}
+    />
   )
 }
 

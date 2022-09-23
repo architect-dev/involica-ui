@@ -109,8 +109,28 @@ export const useConfigurableTokenIn = () => ({ ...useConfigurablePositionValue('
 
 export const usePositionOuts = (positionOnly?: boolean) => ({ ...useDirtyablePositionValue('outs', positionOnly) })
 export const useConfigurableOuts = () => ({
-  ...useConfigurablePositionValue('outs', ['setOuts', 'addOut', 'removeOut', 'updateWeights', 'updateOutMaxSlippage']),
+  ...useConfigurablePositionValue('outs', ['setOuts', 'addOut', 'removeOut', 'updateWeights']),
 })
+
+export const usePositionOutConfigurableMaxSlippage = (token: string) => {
+  const { updateOutMaxSlippage } = usePositionSetters(['updateOutMaxSlippage'])
+  const positionMaxSlippage: number | null = useInvolicaStore((state) => (state.userData?.position?.outs.find((out) => out.token === token))?.maxSlippage)
+  const configMaxSlippage: number | null = useInvolicaStore((state) => (state.config.outs.find((out) => out.token === token))?.maxSlippage)
+
+  const updateMaxSlippage = useCallback((maxSlippage: string) => {
+    updateOutMaxSlippage(token, parseFloat(maxSlippage))
+  }, [token, updateOutMaxSlippage])
+  const maxSlippage = useMemo(() => configMaxSlippage ?? positionMaxSlippage, [configMaxSlippage, positionMaxSlippage])
+  const dirty = useMemo(() => JSON.stringify(configMaxSlippage) !== JSON.stringify(positionMaxSlippage), [configMaxSlippage, positionMaxSlippage])
+
+  return {
+    maxSlippage,
+    dirty,
+    current: positionMaxSlippage,
+    updateMaxSlippage
+  }
+}
+
 export const usePositionOutWeightsDirty = () => {
   const positionOuts = useInvolicaStore((state) => state.userData?.position?.outs ?? [])
   const configOuts = useInvolicaStore((state) => state.config?.outs ?? [])

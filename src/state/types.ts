@@ -137,7 +137,7 @@ export interface PositionConfigMutators {
   setTokenIn: (tokenIn: string) => void
   setOuts: (outs: PositionOut[]) => void
   addOut: (token: string, weight: number, maxSlippage: number) => void
-  removeOut: (index: number) => void
+  removeOut: (token: string) => void
   updateWeights: (weights: number[]) => void
   updateOutMaxSlippage: (token: string, maxSlippage: number) => void
   setAmountDCA: (amountDCA: string, fullBalance: string | null) => void

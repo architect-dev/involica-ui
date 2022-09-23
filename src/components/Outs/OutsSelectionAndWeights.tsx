@@ -47,7 +47,7 @@ export const OutsSelectionAndWeights: React.FC<{ intro?: boolean }> = ({ intro =
     <>
       <OutsRow>
         {outs.map(({ token }, i) => (
-          <OutTokenButton key={token} token={token} index={i} changed={dirtyData != null && dirtyData[i].slippage} />
+          <OutTokenButton key={token} token={token} changed={dirtyData != null && dirtyData[i].slippage} />
         ))}
         {outs.length < 8 && (
           <TokenSelectButton
