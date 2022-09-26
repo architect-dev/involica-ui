@@ -38,6 +38,7 @@
     ]
   },
   "dependencies": {
+    "@apollo/client": "^3.6.9",
     "@binance-chain/bsc-use-wallet": "^0.8.1",
     "@crowdin/crowdin-api-client": "^1.10.1",
     "@ethersproject/abi": "^5.0.7",
@@ -62,6 +63,7 @@
     "fast-memoize": "^2.5.2",
     "firebase-tools": "^10.2.1",
     "global": "^4.4.0",
+    "graphql": "^16.6.0",
     "iframe-resizer-react": "^1.1.0",
     "lodash": "^4.17.20",
     "merge-images-v2": "^2.0.1",

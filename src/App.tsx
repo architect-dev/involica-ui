@@ -13,6 +13,7 @@ import useEagerConnect from 'hooks/useEagerConnect'
 
 const Home = lazy(() => import('./views/Home'))
 const Tutorial = lazy(() => import('./views/Tutorial'))
+const Stats = lazy(() => import('./views/Stats'))
 const NotFound = lazy(() => import('./views/NotFound'))
 
 const StyledRouter = styled(Router)`
@@ -53,6 +54,9 @@ const App: React.FC = () => {
             </Route>
             <Route path="/tutorial" exact>
               <Tutorial />
+            </Route>
+            <Route path='/stats' exact>
+              <Stats />
             </Route>
             <Route component={NotFound} />
           </Switch>

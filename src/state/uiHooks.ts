@@ -1,6 +1,9 @@
+import { useQuery } from '@apollo/client'
 import BigNumber from 'bignumber.js'
+import { DAY_TOKEN_DATA } from 'config/constants/graph'
 import { cloneDeep } from 'lodash'
 import { useMemo } from 'react'
+import { getAddress } from '@ethersproject/address'
 import { bn, bnDecOffset, bnZero } from 'utils'
 import { timestampToDateTime } from 'utils/timestamp'
 import { useConfigurableIntervalDCA, useUserTxs } from './hooks'
@@ -296,7 +299,9 @@ export const useUserTxsWithDisplayData = () => {
       totalCurrentInAmountUsd,
       totalCurrentInAmountUsdDisplay:
         totalCurrentInAmountUsd == null ? '-' : `$${Math.abs(totalCurrentInAmountUsd).toFixed(2)}`,
-      totalInStatus: getValueChangeStatus(((totalCurrentInAmountUsd - totalTradeInAmountUsd) * 100) / totalTradeInAmountUsd),
+      totalInStatus: getValueChangeStatus(
+        ((totalCurrentInAmountUsd - totalTradeInAmountUsd) * 100) / totalTradeInAmountUsd,
+      ),
 
       totalTradeOutAmountUsd,
       totalTradeOutAmountUsdDisplay:
@@ -304,7 +309,9 @@ export const useUserTxsWithDisplayData = () => {
       totalCurrentOutAmountUsd,
       totalCurrentOutAmountUsdDisplay:
         totalCurrentOutAmountUsd == null ? '-' : `$${Math.abs(totalCurrentOutAmountUsd).toFixed(2)}`,
-      totalOutStatus: getValueChangeStatus(((totalCurrentOutAmountUsd - totalCurrentInAmountUsd) * 100) / totalTradeOutAmountUsd),
+      totalOutStatus: getValueChangeStatus(
+        ((totalCurrentOutAmountUsd - totalCurrentInAmountUsd) * 100) / totalTradeOutAmountUsd,
+      ),
 
       totalValueChangeUsd,
       totalValueChangeUsdDisplay,
@@ -321,4 +328,41 @@ export const useUserTxsWithDisplayData = () => {
     txs,
     derived,
   }
+}
+
+export const useChartPriceInfo = () => {
+  const txs = useUserTxs()
+  const [inTokens, outTokens] = useMemo(() => {
+    const ins: AddressRecord<boolean> = {}
+    const outs: AddressRecord<boolean> = {}
+    txs.forEach((tx) => {
+      ins[tx.tokenIn] = true
+      tx.tokenTxs.forEach((tokenTx) => {
+        outs[tokenTx.tokenOut] = true
+      })
+    })
+    return [
+      Object.keys(ins).map((address) => address.toLowerCase()),
+      Object.keys(outs).map((address) => address.toLowerCase()),
+    ]
+  }, [txs])
+
+  const { loading, error, data } = useQuery(DAY_TOKEN_DATA, {
+    variables: { tokens: inTokens.concat(outTokens), timestamp: 1663674332 },
+  })
+
+  const dayPrices = useMemo(() => {
+    if (loading || error || data?.tokenDayDatas == null) return null
+    const prices: AddressRecord<Record<number, string>> = {}
+
+    data.tokenDayDatas.forEach(({ date, priceUSD, id }: { date: number; priceUSD: string; id: string }) => {
+      const address = getAddress(id.split('-')[0])
+      if (prices[address] == null) prices[address] = {}
+      prices[address][date] = priceUSD
+    })
+    
+    return prices
+  }, [loading, error, data])
+
+  
 }
