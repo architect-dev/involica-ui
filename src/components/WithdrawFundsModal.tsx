@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useNativeTokenFullData, useUserTreasury } from 'state/hooks'
 import { SummitButton, Text, RowCenter, SummitPopUp } from 'uikit'
-import { bnDisplay, useShowHideModal } from 'utils'
+import { bn, bnDisplay, useShowHideModal } from 'utils'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
@@ -12,10 +12,14 @@ export const WithdrawFundsModal: React.FC<{
   onDismiss?: () => void
 }> = ({ onDismiss }) => {
   const userTreasury = useUserTreasury()
+  const { nativeTokenData } = useNativeTokenFullData()
   const userTreasuryDisplay = useMemo(() => (userTreasury == null ? '-' : bnDisplay(userTreasury, 18, 4)), [
     userTreasury,
   ])
-  const { nativeTokenData } = useNativeTokenFullData()
+  const userTreasuryUsdDisplay = useMemo(() => {
+    if (userTreasury == null || nativeTokenData?.price == null) return '-'
+    return `$${bnDisplay(bn(userTreasury).times(nativeTokenData.price), 18, 2)}`
+  }, [nativeTokenData?.price, userTreasury])
   const { onWithdrawTreasury, pending } = useWithdrawTreasury()
 
   const [withdrawAmount, setWithdrawAmount] = useState<string>('')
@@ -39,7 +43,16 @@ export const WithdrawFundsModal: React.FC<{
 
   return (
     <ModalContentContainer alignItems="flex-start" minWidth="300px" maxWidth="400px" gap="12px">
-      <DataRow t='Current Funding:' v={`${userTreasuryDisplay} ${getNativeTokenSymbol()}`} />
+      <DataRow
+        t="Current Funding:"
+        v={
+          <Text textAlign='right'>
+            <b>{userTreasuryDisplay} {getNativeTokenSymbol()}</b>
+            <br/>
+            <i>{userTreasuryUsdDisplay}</i>
+          </Text>
+        }
+      />
 
       <br />
       <Text small italic>
@@ -51,28 +64,27 @@ export const WithdrawFundsModal: React.FC<{
         setValue={handleSetFundingAmount}
         invalidReason={withdrawInvalidReason}
         max={userTreasuryDisplay}
-        balanceText='Current Funding'
+        balanceText="Current Funding"
         tokenSelectDisabled
       />
 
-      <SummitButton
-        isLoading={pending}
-        onClick={handleWithdrawTreasury}
-        activeText="Withdraw Funds"
-        loadingText="Withdrawing"
-        disabled={withdrawInvalidReason != null || withdrawAmount === ''}
-      />
-
       <br />
-      <br />
-      <RowCenter>
+      <RowCenter gap="18px">
         <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton
+          isLoading={pending}
+          onClick={handleWithdrawTreasury}
+          activeText="Withdraw Funds"
+          loadingText="Withdrawing"
+          disabled={withdrawInvalidReason != null || withdrawAmount === ''}
+          padding="0px 24px"
+        />
       </RowCenter>
     </ModalContentContainer>
   )
 }
 
-export const WithdrawFundsButton: React.FC<{ buttonText?: string }> = ({ buttonText = 'Withdraw Funds'}) => {
+export const WithdrawFundsButton: React.FC<{ buttonText?: string }> = ({ buttonText = 'Withdraw Funds' }) => {
   const [open, show, hide] = useShowHideModal()
   return (
     <SummitPopUp

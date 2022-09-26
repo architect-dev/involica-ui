@@ -1,11 +1,11 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import styled, { css } from 'styled-components'
 import { Column, Text } from 'uikit'
 import { TokenSelectButton } from 'components/TokenSelect/TokenSelectButton'
-import { AddressRecord } from 'state/types'
+import { AddressRecord, Token } from 'state/types'
 import { useTokenOrNativeFullData } from 'state/hooks'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
-import { bn, bnDisplay } from 'utils'
+import { bn, bnDisplay, toFixedMaxPrecision } from 'utils'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { transparentize } from 'polished'
 import { TokenIndicator } from 'components/TokenSelect/TokenIndicator'
@@ -91,8 +91,6 @@ export const StyledInput = styled.input<{ invalid?: boolean }>`
   font-size: 20px;
   font-weight: bold;
   font-style: italic;
-  height: 52px;
-  line-height: 52px;
   padding-right: 30px;
   flex: 1;
   margin: 0;
@@ -124,7 +122,7 @@ interface TokenInputProps {
   token: string | null
   setToken?: (token: string) => void
   value: string
-  setValue: (val: string, max: string) => void
+  setValue: (val: string, max: string, token: Token) => void
 
   disabledReasons?: AddressRecord<string>
 
@@ -176,26 +174,36 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
 
   const handleChange = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
-      setValue(e.currentTarget.value, fullBalance)
+      setValue(e.currentTarget.value, fullBalance, tokenData)
     },
-    [setValue, fullBalance],
+    [setValue, fullBalance, tokenData],
   )
 
+  // If full balance or token changes, call handleChange to update error
+  useEffect(() => {
+    setValue(value, fullBalance, tokenData)
+  }, [fullBalance, value, setValue, tokenData])
+
   const handleSelect10Native = useCallback(() => {
-    setValue('10', fullBalance)
-  }, [setValue, fullBalance])
+    setValue('10', fullBalance, tokenData)
+  }, [setValue, fullBalance, tokenData])
   const handleSelect20Native = useCallback(() => {
-    setValue('20', fullBalance)
-  }, [setValue, fullBalance])
+    setValue('20', fullBalance, tokenData)
+  }, [setValue, fullBalance, tokenData])
   const handleSelect10 = useCallback(() => {
-    setValue(bn(fullBalance).div(10).toString(), fullBalance)
-  }, [setValue, fullBalance])
+    setValue(toFixedMaxPrecision(bn(fullBalance).div(10).toString(), tokenData?.decimals), fullBalance, tokenData)
+  }, [setValue, fullBalance, tokenData])
   const handleSelect50 = useCallback(() => {
-    setValue(bn(fullBalance).div(5).toString(), fullBalance)
-  }, [setValue, fullBalance])
+    setValue(toFixedMaxPrecision(bn(fullBalance).div(5).toString(), tokenData?.decimals), fullBalance, tokenData)
+  }, [setValue, fullBalance, tokenData])
   const handleSelectMax = useCallback(() => {
-    setValue(fullBalance, fullBalance)
-  }, [setValue, fullBalance])
+    setValue(fullBalance, fullBalance, tokenData)
+  }, [setValue, fullBalance, tokenData])
+
+  const valUsd = useMemo(() => {
+    if (tokenData?.price == null || value == null || value === '') return '-'
+    return `$${bn(value).times(tokenData.price).toFixed(2)}`
+  }, [tokenData, value])
 
   return (
     <Column width="100%" maxWidth="320px" gap="4px">
@@ -227,15 +235,20 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
               changed={tokenChanged}
             />
           )}
-          <InputWrapper changed={amountChanged}>
-            <StyledInput
-              disabled={disabled || isLocked}
-              placeholder={placeholder}
-              value={value}
-              onChange={handleChange}
-              invalid={invalidReason != null}
-            />
-          </InputWrapper>
+          <Column alignItems="flex-end">
+            <InputWrapper changed={amountChanged}>
+              <StyledInput
+                disabled={disabled || isLocked}
+                placeholder={placeholder}
+                value={value}
+                onChange={handleChange}
+                invalid={invalidReason != null}
+              />
+            </InputWrapper>
+            <Text small italic lineHeight="14px">
+              {valUsd}
+            </Text>
+          </Column>
         </InputRow>
         <BalanceRow>
           <Text>{balanceText}:</Text>

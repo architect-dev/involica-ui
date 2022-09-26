@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Card } from 'components/Card'
 import { Column, ColumnStart, RowCenter, RowEnd, Text } from 'uikit'
 import { CellCol } from './styles'
-import { useDcaTxPriceRange, useUserTreasury } from 'state/hooks'
+import { useDcaTxPriceRange, useNativeTokenPublicData, useUserTreasury } from 'state/hooks'
 import { getNativeTokenSymbol } from 'config/constants'
 import { bn, bnDisplay } from 'utils'
 import { TopUpFundsButton } from 'components/TopUpFundsModal'
@@ -10,10 +10,15 @@ import { WithdrawFundsButton } from 'components/WithdrawFundsModal'
 import { DataRow } from 'components/DataRow'
 
 export const FundsCard: React.FC = () => {
+  const { nativeTokenData } = useNativeTokenPublicData()
   const userTreasury = useUserTreasury()
   const userTreasuryDisplay = useMemo(() => (userTreasury == null ? '-' : bnDisplay(userTreasury, 18, 4)), [
     userTreasury,
   ])
+  const userTreasuryUsdDisplay = useMemo(() => {
+    if (userTreasury == null || nativeTokenData?.price == null) return '-'
+    return `$${bnDisplay(bn(userTreasury).times(nativeTokenData.price), 18, 2)}`
+  }, [nativeTokenData?.price, userTreasury])
   const minGasPrice = '100'
   const { maxGasPrice, minTxPrice, maxTxPrice } = useDcaTxPriceRange(true)
   const dcasAtMinGas = useMemo(() => {
@@ -39,8 +44,10 @@ export const FundsCard: React.FC = () => {
           <DataRow
             t="Current Funding:"
             v={
-              <Text bold color={errorColor}>
-                {userTreasuryDisplay} {getNativeTokenSymbol()}
+              <Text color={errorColor} textAlign='right'>
+                <b>{userTreasuryDisplay} {getNativeTokenSymbol()}</b>
+                <br/>
+                <i>{userTreasuryUsdDisplay}</i>
               </Text>
             }
           />

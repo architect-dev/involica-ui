@@ -26,3 +26,21 @@ export const bnDisplay = (balance: BigNumberish | null, decimals: number | null,
   if (balance == null || decimals == null) return null
   return bn(balance).dividedBy(bnExp(decimals)).toFixed(precision)
 }
+
+export const getPrecision = (n: string) => {
+  if (isNaN(parseFloat(n))) return null
+  const decimals = n.split('.')[1]
+  if (decimals) return decimals.length
+  return 0
+}
+export const checkPrecisionValid = (n: string, decimals: number): boolean => {
+  const precision = getPrecision(n)
+  if (precision == null) return true
+  return precision <= decimals
+}
+export const toFixedMaxPrecision = (n?: string, decimals?: number): string => {
+  if (n == null || decimals == null) return n
+  const precision = getPrecision(n)
+  if (precision <= decimals) return n
+  return parseFloat(n).toFixed(decimals)
+}

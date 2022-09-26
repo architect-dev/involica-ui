@@ -114,20 +114,30 @@ export const useConfigurableOuts = () => ({
 
 export const usePositionOutConfigurableMaxSlippage = (token: string) => {
   const { updateOutMaxSlippage } = usePositionSetters(['updateOutMaxSlippage'])
-  const positionMaxSlippage: number | null = useInvolicaStore((state) => (state.userData?.position?.outs.find((out) => out.token === token))?.maxSlippage)
-  const configMaxSlippage: number | null = useInvolicaStore((state) => (state.config.outs.find((out) => out.token === token))?.maxSlippage)
+  const positionMaxSlippage: number | null = useInvolicaStore(
+    (state) => state.userData?.position?.outs.find((out) => out.token === token)?.maxSlippage,
+  )
+  const configMaxSlippage: number | null = useInvolicaStore(
+    (state) => state.config.outs.find((out) => out.token === token)?.maxSlippage,
+  )
 
-  const updateMaxSlippage = useCallback((maxSlippage: string) => {
-    updateOutMaxSlippage(token, parseFloat(maxSlippage))
-  }, [token, updateOutMaxSlippage])
+  const updateMaxSlippage = useCallback(
+    (maxSlippage: string) => {
+      updateOutMaxSlippage(token, parseFloat(maxSlippage))
+    },
+    [token, updateOutMaxSlippage],
+  )
   const maxSlippage = useMemo(() => configMaxSlippage ?? positionMaxSlippage, [configMaxSlippage, positionMaxSlippage])
-  const dirty = useMemo(() => JSON.stringify(configMaxSlippage) !== JSON.stringify(positionMaxSlippage), [configMaxSlippage, positionMaxSlippage])
+  const dirty = useMemo(() => JSON.stringify(configMaxSlippage) !== JSON.stringify(positionMaxSlippage), [
+    configMaxSlippage,
+    positionMaxSlippage,
+  ])
 
   return {
     maxSlippage,
     dirty,
     current: positionMaxSlippage,
-    updateMaxSlippage
+    updateMaxSlippage,
   }
 }
 
@@ -379,6 +389,7 @@ export const useAllowanceIsSufficient = () => {
 // REVERT CONFIG
 export const useRevertTokenAndAmount = () => {
   const { dirty: tokenInDirty, current: tokenInCurrent, setTokenIn } = useConfigurableTokenIn()
+  const { data: tokenInCurrentData } = useTokenPublicData(tokenInCurrent)
   const { dirty: amountDCADirty, current: amountDCACurrent, setAmountDCA } = useConfigurableAmountDCA()
 
   return useCallback(() => {
@@ -386,9 +397,9 @@ export const useRevertTokenAndAmount = () => {
       setTokenIn(tokenInCurrent)
     }
     if (amountDCADirty) {
-      setAmountDCA(amountDCACurrent, amountDCACurrent)
+      setAmountDCA(amountDCACurrent, amountDCACurrent, tokenInCurrentData)
     }
-  }, [amountDCACurrent, amountDCADirty, setAmountDCA, setTokenIn, tokenInCurrent, tokenInDirty])
+  }, [amountDCACurrent, amountDCADirty, setAmountDCA, setTokenIn, tokenInCurrent, tokenInCurrentData, tokenInDirty])
 }
 
 const empty0String = (s: string | null) => (s === '0' ? '' : s)

@@ -140,7 +140,7 @@ export interface PositionConfigMutators {
   removeOut: (token: string) => void
   updateWeights: (weights: number[]) => void
   updateOutMaxSlippage: (token: string, maxSlippage: number) => void
-  setAmountDCA: (amountDCA: string, fullBalance: string | null) => void
+  setAmountDCA: (amountDCA: string, fullBalance: string | null, token: Token) => void
   setFundingAmount: (fundingAmount: string, fullBalance: string | null) => void
   setMaxGasPrice: (maxGasPrice: MaxGasPriceOptions) => void
   setDcasCount: (dcasCount: string) => void

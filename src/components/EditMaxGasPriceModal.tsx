@@ -7,6 +7,7 @@ import { Edit3 } from 'react-feather'
 import MaxGasPriceSelector from 'views/Tutorial/steps/MaxGasPriceSelector'
 import { MaxGasPriceOptions } from 'state/types'
 import { DataRow } from './DataRow'
+import { getNativeTokenSymbol } from 'config/constants'
 
 export const EditMaxGasPriceModal: React.FC<{
   onDismiss?: () => void
@@ -29,7 +30,7 @@ export const EditMaxGasPriceModal: React.FC<{
       <Column alignItems="flex-start" gap="18px" width="100%">
         <Column alignItems="flex-start" width="100%">
           <DataRow t="Min Gas Price (Hard Coded):" v={`${minGasPrice} gwei`} />
-          <DataRow t="Min DCA Tx Gas:" v={`${minTxPriceDisplay ?? '-'} FTM`} />
+          <DataRow t="Min DCA Tx Gas:" v={`${minTxPriceDisplay ?? '-'} ${getNativeTokenSymbol()}`} />
         </Column>
 
         <Text small italic>
@@ -44,7 +45,7 @@ export const EditMaxGasPriceModal: React.FC<{
 
         <Column alignItems="flex-start" width="100%">
           <DataRow t="Max Gas Price:" v={`${maxGasPrice} gwei`} />
-          <DataRow t="Max DCA Tx Gas:" v={`${maxTxPriceDisplay ?? '-'} FTM`} />
+          <DataRow t="Max DCA Tx Gas:" v={`${maxTxPriceDisplay ?? '-'} ${getNativeTokenSymbol()}`} />
         </Column>
 
         {dirty && (

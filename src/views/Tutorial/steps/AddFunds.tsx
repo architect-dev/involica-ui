@@ -36,7 +36,7 @@ export const AddFunds: React.FC = () => {
         <i>
           Deposit <b>{getNativeTokenSymbol()}</b> below to fund your account.
           <br />
-          (10 FTM should cover you for a while)
+          (10 ${getNativeTokenSymbol()} should cover you for a while)
         </i>
       </IntroText>
       <TokenAndAmountSelector
@@ -53,7 +53,7 @@ export const AddFunds: React.FC = () => {
           Minimum Gas Price is hard coded by Gelato to be 100 gwei
           <br />
           <Text small italic bold>
-            Min DCA execution price: {minTxPriceDisplay ?? '-'} FTM (@{' '}
+            Min DCA execution price: {minTxPriceDisplay ?? '-'} {getNativeTokenSymbol()} (@{' '}
             {minGasPrice !== null ? Number(minGasPrice).toFixed(0) : '-'} gwei)
           </Text>
           <br />
@@ -67,7 +67,7 @@ export const AddFunds: React.FC = () => {
 
         {maxGasPrice !== '100' && (
           <Text small italic bold>
-            Max DCA execution price: {maxTxPriceDisplay ?? '-'} FTM (@{' '}
+            Max DCA execution price: {maxTxPriceDisplay ?? '-'} {getNativeTokenSymbol()} (@{' '}
             {maxGasPrice !== null ? Number(maxGasPrice).toFixed(0) : '-'} gwei)
           </Text>
         )}

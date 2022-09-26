@@ -1,12 +1,12 @@
 /* eslint-disable no-param-reassign */
-import { CHAIN_ID } from 'utils'
+import { CHAIN_ID, checkPrecisionValid } from 'utils'
 import create from 'zustand'
 import { ethers } from 'ethers'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import fetchPublicData from './fetchPublicData'
 import fetchUserData from './fetchUserData'
-import { State, MaxGasPriceOptions, PositionOut, PositionConfig, PositionConfigSupplements } from './types'
+import { State, MaxGasPriceOptions, PositionOut, PositionConfig, PositionConfigSupplements, Token } from './types'
 
 const weights = {
   0: [100],
@@ -125,13 +125,15 @@ export const useInvolicaStore = create<State>()(
         set((state) => {
           state.config.outs = get().config.outs.map((out) => (out.token === token ? { ...out, maxSlippage } : out))
         }),
-      setAmountDCA: (amountDCA: string, fullBalance: string | null) => {
+      setAmountDCA: (amountDCA: string, fullBalance: string | null, token: Token) => {
         let amountDCAInvalidReason = null
         if (amountDCA === '') amountDCAInvalidReason = 'DCA Amount required'
         else if (isNaN(parseFloat(amountDCA))) amountDCAInvalidReason = 'Not a number'
+        else if (!checkPrecisionValid(amountDCA, token.decimals)) amountDCAInvalidReason = `${token.symbol} only supports ${token.decimals} decimals`
         else if (parseFloat(amountDCA) <= 0) amountDCAInvalidReason = 'Must be greater than 0'
         else if (parseFloat(amountDCA ?? '0') > parseFloat(fullBalance ?? '0'))
           amountDCAInvalidReason = 'Insufficient wallet balance to cover 1 DCA'
+
         set((state) => {
           state.config.amountDCA = amountDCA
           state.config.amountDCAInvalidReason = amountDCAInvalidReason
