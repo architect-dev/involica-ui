@@ -89,10 +89,13 @@ export interface DerivedTxsStats {
   totalTradeInAmountUsdDisplay: string
   totalCurrentInAmountUsd: number
   totalCurrentInAmountUsdDisplay: string
+  totalInStatus: ValueChangeStatus
+
   totalTradeOutAmountUsd: number
   totalTradeOutAmountUsdDisplay: string
   totalCurrentOutAmountUsd: number
   totalCurrentOutAmountUsdDisplay: string
+  totalOutStatus: ValueChangeStatus
 
   totalValueChangeUsd: number
   totalValueChangeUsdDisplay: string
@@ -293,12 +296,15 @@ export const useUserTxsWithDisplayData = () => {
       totalCurrentInAmountUsd,
       totalCurrentInAmountUsdDisplay:
         totalCurrentInAmountUsd == null ? '-' : `$${Math.abs(totalCurrentInAmountUsd).toFixed(2)}`,
+      totalInStatus: getValueChangeStatus(((totalCurrentInAmountUsd - totalTradeInAmountUsd) * 100) / totalTradeInAmountUsd),
+
       totalTradeOutAmountUsd,
       totalTradeOutAmountUsdDisplay:
         totalTradeOutAmountUsd == null ? '-' : `$${Math.abs(totalTradeOutAmountUsd).toFixed(2)}`,
       totalCurrentOutAmountUsd,
       totalCurrentOutAmountUsdDisplay:
         totalCurrentOutAmountUsd == null ? '-' : `$${Math.abs(totalCurrentOutAmountUsd).toFixed(2)}`,
+      totalOutStatus: getValueChangeStatus(((totalCurrentOutAmountUsd - totalCurrentInAmountUsd) * 100) / totalTradeOutAmountUsd),
 
       totalValueChangeUsd,
       totalValueChangeUsdDisplay,

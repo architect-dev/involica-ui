@@ -1,6 +1,6 @@
 import { orderBy } from 'lodash'
 import React, { useMemo } from 'react'
-import { InvValueChangeStatusColor, ValueChangeStatus, ValueChangeStatusColor } from 'state/status'
+import { InvValueChangeStatusColor, ValueChangeStatusColor } from 'state/status'
 import { DerivedTxsStats } from 'state/uiHooks'
 import { Column, Text } from 'uikit'
 import { CellCol, CellRow } from 'views/Home/Components/styles'
@@ -16,8 +16,10 @@ export const DerivedStatsTable: React.FC<Props> = ({ derived }) => {
   const {
     totalTradeInAmountUsdDisplay,
     totalCurrentInAmountUsdDisplay,
+    totalInStatus,
     totalTradeOutAmountUsdDisplay,
     totalCurrentOutAmountUsdDisplay,
+    totalOutStatus,
     totalValueChangeStatus,
     totalValueChangeUsdDisplay,
     totalValueChangePercDisplay,
@@ -32,19 +34,6 @@ export const DerivedStatsTable: React.FC<Props> = ({ derived }) => {
   const sortedOutTokens = useMemo(() => {
     return orderBy(Object.values(outTokens), ['tradeAmountUsd'], ['desc'])
   }, [outTokens])
-
-  const tradeInStatus = useMemo(() => {
-    if (totalTradeInAmountUsdDisplay === totalCurrentInAmountUsdDisplay) return ValueChangeStatus.Neutral
-    if (parseFloat(totalTradeInAmountUsdDisplay) < parseFloat(totalCurrentInAmountUsdDisplay))
-      return ValueChangeStatus.Positive
-    return ValueChangeStatus.Negative
-  }, [totalTradeInAmountUsdDisplay, totalCurrentInAmountUsdDisplay])
-  const tradeOutStatus = useMemo(() => {
-    if (totalTradeOutAmountUsdDisplay === totalCurrentOutAmountUsdDisplay) return ValueChangeStatus.Neutral
-    if (parseFloat(totalTradeOutAmountUsdDisplay) < parseFloat(totalCurrentOutAmountUsdDisplay))
-      return ValueChangeStatus.Positive
-    return ValueChangeStatus.Negative
-  }, [totalTradeOutAmountUsdDisplay, totalCurrentOutAmountUsdDisplay])
 
   return (
     <CellRow>
@@ -66,12 +55,12 @@ export const DerivedStatsTable: React.FC<Props> = ({ derived }) => {
           <DataRow
             px="6px"
             t={
-              <Text small italic color={InvValueChangeStatusColor[tradeInStatus]}>
+              <Text small italic color={InvValueChangeStatusColor[totalInStatus]}>
                 Current Value:
               </Text>
             }
             v={
-              <Text small color={InvValueChangeStatusColor[tradeInStatus]}>
+              <Text small color={InvValueChangeStatusColor[totalInStatus]}>
                 {totalCurrentInAmountUsdDisplay}
               </Text>
             }
@@ -82,12 +71,12 @@ export const DerivedStatsTable: React.FC<Props> = ({ derived }) => {
           <DataRow
             px="6px"
             t={
-              <Text small italic color={ValueChangeStatusColor[tradeOutStatus]}>
+              <Text small italic color={ValueChangeStatusColor[totalOutStatus]}>
                 Current Value:
               </Text>
             }
             v={
-              <Text small color={ValueChangeStatusColor[tradeOutStatus]}>
+              <Text small color={ValueChangeStatusColor[totalOutStatus]}>
                 {totalCurrentOutAmountUsdDisplay}
               </Text>
             }
