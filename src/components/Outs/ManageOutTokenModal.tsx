@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react'
 import { TokenButton } from 'components/TokenButton'
-import { ModalContentContainer, RowBetween, RowCenter, SummitButton, SummitPopUp, Text } from 'uikit'
+import { ModalContentContainer, RowCenter, SummitButton, SummitPopUp, Text } from 'uikit'
 import { useConfigurableOuts } from 'state/hooks'
 import { useShowHideModal } from 'utils'
 import { MaxSlippageSelector } from './MaxSlippageSelector'
 import TokenIconAndSymbol from 'components/TokenIconAndSymbol'
 import styled from 'styled-components'
+import { DataRow } from 'components/DataRow'
 
 export const ManageOutTokenModal: React.FC<{
   token: string
@@ -17,17 +18,15 @@ export const ManageOutTokenModal: React.FC<{
     onDismiss()
   }, [removeOut, token, onDismiss])
   return (
-    <ModalContentContainer minWidth="300px" alignItems="flex-start" gap='12px'>
+    <ModalContentContainer minWidth="300px" alignItems="flex-start" gap="12px">
       <Text small>Set Max Slippage:</Text>
       <MaxSlippageSelector token={token} />
-      <br/>
-      <RowBetween>
-        <Text small italic>
-          Remove Token from Position:
-        </Text>
-        <SummitButton onClick={handleRemove} variant="danger" activeText="-" padding="0" width="28px" />
-      </RowBetween>
-      <br/>
+      <br />
+      <DataRow
+        t="Remove Token from Position:"
+        v={<SummitButton onClick={handleRemove} variant="danger" activeText="-" padding="0" width="28px" />}
+      />
+      <br />
       <RowCenter>
         <SummitButton onClick={onDismiss} activeText="Close" />
       </RowCenter>

@@ -1,11 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useNativeTokenFullData, useUserTreasury } from 'state/hooks'
-import { SummitButton, Text, RowBetween, RowCenter, SummitPopUp } from 'uikit'
+import { SummitButton, Text, RowCenter, SummitPopUp } from 'uikit'
 import { bnDisplay, useShowHideModal } from 'utils'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useWithdrawTreasury } from 'hooks/useExecute'
+import { DataRow } from './DataRow'
 
 export const WithdrawFundsModal: React.FC<{
   onDismiss?: () => void
@@ -38,14 +39,7 @@ export const WithdrawFundsModal: React.FC<{
 
   return (
     <ModalContentContainer alignItems="flex-start" minWidth="300px" maxWidth="400px" gap="12px">
-      <RowBetween>
-        <Text small italic>
-          Current Funding:
-        </Text>
-        <Text bold>
-          {userTreasuryDisplay} {getNativeTokenSymbol()}
-        </Text>
-      </RowBetween>
+      <DataRow t='Current Funding:' v={`${userTreasuryDisplay} ${getNativeTokenSymbol()}`} />
 
       <br />
       <Text small italic>

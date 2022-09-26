@@ -53,7 +53,6 @@ export const useIntervalStrings = () => {
   )
 }
 
-
 export interface TokenWithTradeData extends Token {
   tradeAmount: BigNumber
 
@@ -84,6 +83,25 @@ export interface UserTxWithTradeData {
   valueChangePercDisplay: string
   valueChangeStatus: ValueChangeStatus
 }
+
+export interface DerivedTxsStats {
+  totalTradeInAmountUsd: number
+  totalTradeInAmountUsdDisplay: string
+  totalCurrentInAmountUsd: number
+  totalCurrentInAmountUsdDisplay: string
+  totalTradeOutAmountUsd: number
+  totalTradeOutAmountUsdDisplay: string
+  totalCurrentOutAmountUsd: number
+  totalCurrentOutAmountUsdDisplay: string
+
+  totalValueChangeUsd: number
+  totalValueChangeUsdDisplay: string
+  totalValueChangePerc: number
+  totalValueChangePercDisplay: string
+  totalValueChangeStatus: ValueChangeStatus
+  inTokens: AddressRecord<TokenWithTradeData>
+  outTokens: AddressRecord<TokenWithTradeData>
+}
 export const useUserTxsWithDisplayData = () => {
   const userTxs = useUserTxs()
   const tokensData = useInvolicaStore((state) => state.tokens)
@@ -104,7 +122,7 @@ export const useUserTxsWithDisplayData = () => {
           .toNumber()
 
         const tokenInValueChangeUsd = totalTokenInCurrentAmountUsd - totalTokenInTradeAmountUsd
-        const tokenInValueChangePerc = tokenInValueChangeUsd * 100 / totalTokenInTradeAmountUsd
+        const tokenInValueChangePerc = (tokenInValueChangeUsd * 100) / totalTokenInTradeAmountUsd
 
         const tokenInData: TokenWithTradeData = {
           ...tokensData[tokenIn],
@@ -124,7 +142,7 @@ export const useUserTxsWithDisplayData = () => {
           valueChangeUsdDisplay: tokenInValueChangeUsd == null ? '-' : `$${Math.abs(tokenInValueChangeUsd).toFixed(2)}`,
           valueChangePerc: tokenInValueChangePerc,
           valueChangePercDisplay:
-          tokenInValueChangePerc == null ? '-' : `${Math.abs(tokenInValueChangePerc).toFixed(2)}%`,
+            tokenInValueChangePerc == null ? '-' : `${Math.abs(tokenInValueChangePerc).toFixed(2)}%`,
           valueChangeStatus: getValueChangeStatus(tokenInValueChangePerc),
         }
 
@@ -142,18 +160,14 @@ export const useUserTxsWithDisplayData = () => {
                     .times(tokenTx.tokenInPrice)
                     .toNumber()
             const tradeAmountUsd =
-              tradePrice == null || outDecimals == null
-                ? null
-                : amountOutDecOffset.times(tradePrice).toNumber()
+              tradePrice == null || outDecimals == null ? null : amountOutDecOffset.times(tradePrice).toNumber()
 
             const currentPrice = tokensData?.[tokenTx.tokenOut]?.price
             const currentAmountUsd =
-              currentPrice == null || outDecimals == null
-                ? null
-                : amountOutDecOffset.times(currentPrice).toNumber()
+              currentPrice == null || outDecimals == null ? null : amountOutDecOffset.times(currentPrice).toNumber()
 
             const valueChangeUsd = currentAmountUsd - tradeAmountUsd
-            const valueChangePerc = valueChangeUsd * 100 / tradeAmountUsd
+            const valueChangePerc = (valueChangeUsd * 100) / tradeAmountUsd
 
             return {
               ...tokenTx,
@@ -181,7 +195,7 @@ export const useUserTxsWithDisplayData = () => {
         const outValueChangeUsd = tokenTxsData.reduce((acc, tokenTx) => acc + tokenTx.valueChangeUsd, 0)
 
         const valueChangeUsd = outValueChangeUsd - tokenInData.valueChangeUsd
-        const valueChangePerc = valueChangeUsd * 100 / tokenInData.tradeAmountUsd
+        const valueChangePerc = (valueChangeUsd * 100) / tokenInData.tradeAmountUsd
 
         return {
           timestamp,
@@ -198,15 +212,19 @@ export const useUserTxsWithDisplayData = () => {
     )
   }, [userTxs, tokensData])
 
-  const derivedData = useMemo(() => {
+  const derived = useMemo((): DerivedTxsStats => {
     let totalValueChangeUsd = 0
-    let totalTradeAmountUsd = 0
+    let totalTradeInAmountUsd = 0
+    let totalCurrentInAmountUsd = 0
+    let totalTradeOutAmountUsd = 0
+    let totalCurrentOutAmountUsd = 0
     const inTokens: AddressRecord<TokenWithTradeData> = {}
     const outTokens: AddressRecord<TokenWithTradeData> = {}
 
     txs.forEach((tx) => {
       totalValueChangeUsd += tx.valueChangeUsd
-      totalTradeAmountUsd += tx.tokenInData.tradeAmountUsd
+      totalTradeInAmountUsd += tx.tokenInData.tradeAmountUsd
+      totalCurrentInAmountUsd += tx.tokenInData.currentAmountUsd
 
       if (inTokens[tx.tokenInData.address] == null) {
         inTokens[tx.tokenInData.address] = cloneDeep(tx.tokenInData)
@@ -214,8 +232,11 @@ export const useUserTxsWithDisplayData = () => {
         inTokens[tx.tokenInData.address].tradeAmountUsd += tx.tokenInData.tradeAmountUsd
         inTokens[tx.tokenInData.address].currentAmountUsd += tx.tokenInData.currentAmountUsd
       }
-      
+
       tx.tokenTxsData.forEach((tokenTx) => {
+        totalTradeOutAmountUsd += tokenTx.tradeAmountUsd
+        totalCurrentOutAmountUsd += tokenTx.currentAmountUsd
+
         if (outTokens[tokenTx.address] == null) {
           outTokens[tokenTx.address] = cloneDeep(tokenTx)
         } else {
@@ -225,38 +246,60 @@ export const useUserTxsWithDisplayData = () => {
       })
     })
 
-    const totalValueChangeUsdDisplay = totalValueChangeUsd == null ? '-' : `$${Math.abs(totalValueChangeUsd).toFixed(2)}`
-    const totalValueChangePerc = totalValueChangeUsd * 100 / totalTradeAmountUsd
-    const totalValueChangePercDisplay = totalValueChangePerc == null ? '-' : `${Math.abs(totalValueChangePerc).toFixed(2)}%`
+    const totalValueChangeUsdDisplay =
+      totalValueChangeUsd == null ? '-' : `$${Math.abs(totalValueChangeUsd).toFixed(2)}`
+    const totalValueChangePerc = (totalValueChangeUsd * 100) / totalTradeInAmountUsd
+    const totalValueChangePercDisplay =
+      totalValueChangePerc == null ? '-' : `${Math.abs(totalValueChangePerc).toFixed(2)}%`
     const totalValueChangeStatus = getValueChangeStatus(totalValueChangePerc)
 
-
     Object.values(inTokens).forEach((inToken) => {
-      inTokens[inToken.address].tradeAmountUsdDisplay = inToken.tradeAmountUsd == null ? '-' : `$${Math.abs(inToken.tradeAmountUsd).toFixed(2)}`
-      inTokens[inToken.address].currentAmountUsdDisplay = inToken.currentAmountUsd == null ? '-' : `$${Math.abs(inToken.currentAmountUsd).toFixed(2)}`
+      inTokens[inToken.address].tradeAmountUsdDisplay =
+        inToken.tradeAmountUsd == null ? '-' : `$${Math.abs(inToken.tradeAmountUsd).toFixed(2)}`
+      inTokens[inToken.address].currentAmountUsdDisplay =
+        inToken.currentAmountUsd == null ? '-' : `$${Math.abs(inToken.currentAmountUsd).toFixed(2)}`
 
       const valueChangeUsd = inToken.currentAmountUsd - inToken.tradeAmountUsd
-      const valueChangePerc = inToken.valueChangeUsd * 100 / inToken.tradeAmountUsd
+      const valueChangePerc = (inToken.valueChangeUsd * 100) / inToken.tradeAmountUsd
       inTokens[inToken.address].valueChangeUsd = valueChangeUsd
-      inTokens[inToken.address].valueChangeUsdDisplay = valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`
+      inTokens[inToken.address].valueChangeUsdDisplay =
+        valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`
       inTokens[inToken.address].valueChangePerc = valueChangePerc
-      inTokens[inToken.address].valueChangePercDisplay = valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`
+      inTokens[inToken.address].valueChangePercDisplay =
+        valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`
       inTokens[inToken.address].valueChangeStatus = getValueChangeStatus(inToken.valueChangePerc)
     })
     Object.values(outTokens).forEach((outToken) => {
-      outTokens[outToken.address].tradeAmountUsdDisplay = outToken.tradeAmountUsd == null ? '-' : `$${Math.abs(outToken.tradeAmountUsd).toFixed(2)}`
-      outTokens[outToken.address].currentAmountUsdDisplay = outToken.currentAmountUsd == null ? '-' : `$${Math.abs(outToken.currentAmountUsd).toFixed(2)}`
+      outTokens[outToken.address].tradeAmountUsdDisplay =
+        outToken.tradeAmountUsd == null ? '-' : `$${Math.abs(outToken.tradeAmountUsd).toFixed(2)}`
+      outTokens[outToken.address].currentAmountUsdDisplay =
+        outToken.currentAmountUsd == null ? '-' : `$${Math.abs(outToken.currentAmountUsd).toFixed(2)}`
 
       const valueChangeUsd = outToken.currentAmountUsd - outToken.tradeAmountUsd
-      const valueChangePerc = outToken.valueChangeUsd * 100 / outToken.tradeAmountUsd
+      const valueChangePerc = (outToken.valueChangeUsd * 100) / outToken.tradeAmountUsd
       outTokens[outToken.address].valueChangeUsd = valueChangeUsd
-      outTokens[outToken.address].valueChangeUsdDisplay = valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`
+      outTokens[outToken.address].valueChangeUsdDisplay =
+        valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`
       outTokens[outToken.address].valueChangePerc = valueChangePerc
-      outTokens[outToken.address].valueChangePercDisplay = valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`
+      outTokens[outToken.address].valueChangePercDisplay =
+        valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`
       outTokens[outToken.address].valueChangeStatus = getValueChangeStatus(outToken.valueChangePerc)
     })
 
     return {
+      totalTradeInAmountUsd,
+      totalTradeInAmountUsdDisplay:
+        totalTradeInAmountUsd == null ? '-' : `$${Math.abs(totalTradeInAmountUsd).toFixed(2)}`,
+      totalCurrentInAmountUsd,
+      totalCurrentInAmountUsdDisplay:
+        totalCurrentInAmountUsd == null ? '-' : `$${Math.abs(totalCurrentInAmountUsd).toFixed(2)}`,
+      totalTradeOutAmountUsd,
+      totalTradeOutAmountUsdDisplay:
+        totalTradeOutAmountUsd == null ? '-' : `$${Math.abs(totalTradeOutAmountUsd).toFixed(2)}`,
+      totalCurrentOutAmountUsd,
+      totalCurrentOutAmountUsdDisplay:
+        totalCurrentOutAmountUsd == null ? '-' : `$${Math.abs(totalCurrentOutAmountUsd).toFixed(2)}`,
+
       totalValueChangeUsd,
       totalValueChangeUsdDisplay,
       totalValueChangePerc,
@@ -268,9 +311,8 @@ export const useUserTxsWithDisplayData = () => {
     }
   }, [txs])
 
-
   return {
     txs,
-    derivedData
+    derived,
   }
 }

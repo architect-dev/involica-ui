@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react'
 import { Card } from 'components/Card'
-import { Column, ColumnStart, RowBetween, RowCenter, RowEnd, Text } from 'uikit'
+import { Column, ColumnStart, RowCenter, RowEnd, Text } from 'uikit'
 import { CellCol } from './styles'
 import { useDcaTxPriceRange, useUserTreasury } from 'state/hooks'
 import { getNativeTokenSymbol } from 'config/constants'
 import { bn, bnDisplay } from 'utils'
 import { TopUpFundsButton } from 'components/TopUpFundsModal'
 import { WithdrawFundsButton } from 'components/WithdrawFundsModal'
+import { DataRow } from 'components/DataRow'
 
 export const FundsCard: React.FC = () => {
   const userTreasury = useUserTreasury()
@@ -35,23 +36,23 @@ export const FundsCard: React.FC = () => {
     <Card title="Funds" padding="24px" halfWidth>
       <CellCol>
         <ColumnStart gap="inherit" width="100%">
-          <RowBetween>
-            <Text small italic>
-              Current Funding:
-            </Text>
-            <Text bold color={errorColor}>
-              {userTreasuryDisplay} {getNativeTokenSymbol()}
-            </Text>
-          </RowBetween>
-          <Column width="100%">
-            <RowBetween>
-              <Text small italic>
-                DCAs covered (est):
-              </Text>
+          <DataRow
+            t="Current Funding:"
+            v={
               <Text bold color={errorColor}>
-                {dcasAtMinGas} DCAs (@ {minGasPrice} gwei)
+                {userTreasuryDisplay} {getNativeTokenSymbol()}
               </Text>
-            </RowBetween>
+            }
+          />
+          <Column width="100%">
+            <DataRow
+              t="DCAs covered (est):"
+              v={
+                <Text bold color={errorColor}>
+                  {dcasAtMinGas} DCAs (@ {minGasPrice} gwei)
+                </Text>
+              }
+            />
             {maxGasPrice !== minGasPrice && (
               <RowEnd>
                 <Text bold textAlign="right" color={errorColor}>

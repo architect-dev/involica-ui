@@ -2,11 +2,12 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useApprove } from 'hooks/useExecute'
 import { MaxUint256 } from 'ethers/constants'
 import { usePositionTokenInWithData, usePositionAmountDCA } from 'state/hooks'
-import { SummitButton, Text, RowBetween, RowCenter, SummitPopUp } from 'uikit'
+import { SummitButton, Text, RowCenter, SummitPopUp } from 'uikit'
 import { bn, bnDisplay, eN, useShowHideModal } from 'utils'
 import NumericInput from './Input/NumericInput'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
+import { DataRow } from './DataRow'
 
 export const SetAllowanceModal: React.FC<{
   onDismiss?: () => void
@@ -132,14 +133,7 @@ export const SetAllowanceModal: React.FC<{
           <br />
         </>
       )}
-      <RowBetween>
-        <Text small italic>
-          Current DCA Amount:
-        </Text>
-        <Text bold>
-          {amountDCA} {tokenInData?.symbol}
-        </Text>
-      </RowBetween>
+      <DataRow t="Current DCA Amount:" v={`${amountDCA} ${tokenInData?.symbol}`} />
 
       <br />
       <Text small italic>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { TrendingDown, TrendingUp } from 'react-feather'
+import { Minus, TrendingDown, TrendingUp } from 'react-feather'
 
 export enum PositionStatus {
   NoPosition = 'NoPosition',
@@ -61,32 +61,28 @@ export const StatusColor: Record<PositionStatusType, string> = {
 // VALUE CHANGE IN TRADE
 export enum ValueChangeStatus {
   Positive = 'Positive',
-  NeutralPositive = 'NeutralPositive',
-  NeutralNegative = 'NeutralNegative',
+  Neutral = 'Neutral',
   Negative = 'Negative',
 }
 export const getValueChangeStatus = (perc: number): ValueChangeStatus => {
-  if (Math.abs(perc) < 1) {
-    return perc >= 0 ? ValueChangeStatus.NeutralPositive : ValueChangeStatus.NeutralNegative
+  if (Math.abs(perc) < 0.01) {
+    return ValueChangeStatus.Neutral
   }
   return perc >= 0 ? ValueChangeStatus.Positive : ValueChangeStatus.Negative
 }
 export type ValueChangeStatusRecord<T> = Record<ValueChangeStatus, T>
 export const ValueChangeStatusColor: ValueChangeStatusRecord<string> = {
   [ValueChangeStatus.Positive]: 'success',
-  [ValueChangeStatus.NeutralPositive]: 'text',
-  [ValueChangeStatus.NeutralNegative]: 'text',
+  [ValueChangeStatus.Neutral]: 'text',
   [ValueChangeStatus.Negative]: 'failure',
 }
 export const InvValueChangeStatusColor: ValueChangeStatusRecord<string> = {
   [ValueChangeStatus.Positive]: 'failure',
-  [ValueChangeStatus.NeutralPositive]: 'text',
-  [ValueChangeStatus.NeutralNegative]: 'text',
+  [ValueChangeStatus.Neutral]: 'text',
   [ValueChangeStatus.Negative]: 'success',
 }
 export const ValueChangeStatusIcon: ValueChangeStatusRecord<React.ReactNode> = {
   [ValueChangeStatus.Positive]: <TrendingUp size={16} />,
-  [ValueChangeStatus.NeutralPositive]: <TrendingUp size={16} />,
-  [ValueChangeStatus.NeutralNegative]: <TrendingDown size={16} />,
+  [ValueChangeStatus.Neutral]: <Minus size={16} />,
   [ValueChangeStatus.Negative]: <TrendingDown size={16} />,
 }

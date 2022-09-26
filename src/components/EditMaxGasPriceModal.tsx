@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react'
 import { useDcaTxPriceRange, usePositionMaxGasPrice } from 'state/hooks'
-import { SummitButton, Text, RowCenter, SummitPopUp, TextButton, Column, RowBetween } from 'uikit'
+import { SummitButton, Text, RowCenter, SummitPopUp, TextButton, Column } from 'uikit'
 import { bnDisplay, useShowHideModal } from 'utils'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { Edit3 } from 'react-feather'
 import MaxGasPriceSelector from 'views/Tutorial/steps/MaxGasPriceSelector'
 import { MaxGasPriceOptions } from 'state/types'
+import { DataRow } from './DataRow'
 
 export const EditMaxGasPriceModal: React.FC<{
   onDismiss?: () => void
@@ -27,18 +28,8 @@ export const EditMaxGasPriceModal: React.FC<{
     <ModalContentContainer alignItems="flex-start" minWidth="300px" maxWidth="350px" gap="12px">
       <Column alignItems="flex-start" gap="18px" width="100%">
         <Column alignItems="flex-start" width="100%">
-          <RowBetween>
-            <Text small italic>
-              Min Gas Price (Hard Coded):
-            </Text>
-            <Text bold>{minGasPrice} gwei</Text>
-          </RowBetween>
-          <RowBetween>
-            <Text small italic>
-              Min DCA Tx Gas:
-            </Text>
-            <Text bold>{minTxPriceDisplay ?? '-'} FTM</Text>
-          </RowBetween>
+          <DataRow t="Min Gas Price (Hard Coded):" v={`${minGasPrice} gwei`} />
+          <DataRow t="Min DCA Tx Gas:" v={`${minTxPriceDisplay ?? '-'} FTM`} />
         </Column>
 
         <Text small italic>
@@ -52,18 +43,8 @@ export const EditMaxGasPriceModal: React.FC<{
         </RowCenter>
 
         <Column alignItems="flex-start" width="100%">
-          <RowBetween>
-            <Text bold italic>
-              Max Gas Price:
-            </Text>
-            <Text bold>{maxGasPrice} gwei</Text>
-          </RowBetween>
-          <RowBetween>
-            <Text bold italic>
-              Max DCA Tx Gas:
-            </Text>
-            <Text bold>{maxTxPriceDisplay ?? '-'} FTM</Text>
-          </RowBetween>
+          <DataRow t="Max Gas Price:" v={`${maxGasPrice} gwei`} />
+          <DataRow t="Max DCA Tx Gas:" v={`${maxTxPriceDisplay ?? '-'} FTM`} />
         </Column>
 
         {dirty && (

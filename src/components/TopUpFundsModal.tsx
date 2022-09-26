@@ -1,11 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDcaTxPriceRange, useNativeTokenFullData, useUserTreasury } from 'state/hooks'
-import { SummitButton, Text, RowBetween, RowCenter, SummitPopUp } from 'uikit'
+import { SummitButton, Text, RowCenter, SummitPopUp } from 'uikit'
 import { bnDisplay, useShowHideModal } from 'utils'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useDepositTreasury } from 'hooks/useExecute'
+import { DataRow } from './DataRow'
 
 export const TopUpFundsModal: React.FC<{
   onDismiss?: () => void
@@ -51,31 +52,10 @@ export const TopUpFundsModal: React.FC<{
 
   return (
     <ModalContentContainer alignItems="flex-start" minWidth="300px" maxWidth="400px" gap="12px">
-      <RowBetween>
-        <Text small italic>
-          Current Funding:
-        </Text>
-        <Text bold>
-          {userTreasuryDisplay} {getNativeTokenSymbol()}
-        </Text>
-      </RowBetween>
+      <DataRow t="Current Funding:" v={`${userTreasuryDisplay} ${getNativeTokenSymbol()}`} />
       <br/>
-      <RowBetween>
-        <Text small italic>
-          DCA gas @ {minGasPrice} gwei (min):
-        </Text>
-        <Text>
-          {minTxPriceDisplay} {getNativeTokenSymbol()}
-        </Text>
-      </RowBetween>
-      <RowBetween>
-        <Text small italic>
-          DCA gas @ {maxGasPrice} gwei (max):
-        </Text>
-        <Text>
-          {maxTxPriceDisplay} {getNativeTokenSymbol()}
-        </Text>
-      </RowBetween>
+      <DataRow t={`DCA gas @ ${minGasPrice} gwei (min):`} v={`${minTxPriceDisplay} ${getNativeTokenSymbol()}`} />
+      <DataRow t={`DCA gas @ ${maxGasPrice} gwei (max):`} v={`${maxTxPriceDisplay} ${getNativeTokenSymbol()}`} />
 
       <br />
       <Text small italic>

@@ -1,11 +1,12 @@
 import React, { useCallback, useMemo } from 'react'
-import { SummitButton, Text, RowBetween, RowCenter, SummitPopUp, TextButton } from 'uikit'
+import { SummitButton, Text, RowCenter, SummitPopUp, TextButton } from 'uikit'
 import { bnDisplay, useShowHideModal } from 'utils'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { useExitPosition, usePausePosition } from 'hooks/useExecute'
 import { Edit3 } from 'react-feather'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useIsPositionPaused, useUserTreasury } from 'state/hooks'
+import { DataRow } from './DataRow'
 
 export const ManagePositionModal: React.FC<{
   unpauseOnly: boolean
@@ -27,12 +28,7 @@ export const ManagePositionModal: React.FC<{
       <Text small italic>
         Pausing your position will stop DCA execution, your position can be unpaused at any time:
       </Text>
-      <RowBetween>
-        <Text small italic>
-          Current Paused Status:
-        </Text>
-        <Text bold>{paused ? 'Paused' : 'Active'}</Text>
-      </RowBetween>
+      <DataRow t="Current Paused Status:" v={paused ? 'Paused' : 'Active'} />
 
       {!unpauseOnly && (
         <>

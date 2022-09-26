@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card } from 'components/Card'
-import { Column, RowBetween, SummitButton, Text } from 'uikit'
+import { Column, SummitButton, Text } from 'uikit'
 import { CellCol } from './styles'
 import { usePositionStatus } from 'state/hooks'
 import { SetAllowanceButton } from 'components/SetAllowanceModal'
@@ -11,22 +11,13 @@ import { ManagePositionButton } from 'components/ManagePositionModal'
 import { ManuallyExecuteDCAButton } from 'components/ManuallyExecuteDCAButton'
 import { DCAsRemaining } from 'components/DCAsRemaining'
 import { PositionStatusRecord, PositionStatus, StatusColor, StatusType, StatusString } from 'state/status'
+import { DataRow } from 'components/DataRow'
 
 const StatusAction: PositionStatusRecord<React.ReactNode> = {
   [PositionStatus.Active]: (
     <>
-    <RowBetween>
-      <Text small italic>
-        Next DCA In:
-      </Text>
-      <TimeUntilNextDca />
-    </RowBetween>
-    <RowBetween>
-      <Text small italic>
-        DCAs Remaining:
-      </Text>
-      <DCAsRemaining />
-    </RowBetween>
+      <DataRow t="Next DCA In:" v={<TimeUntilNextDca />} />
+      <DataRow t="DCAs Remaining:" v={<DCAsRemaining />} />
     </>
   ),
   [PositionStatus.ActiveManualOnly]: <ManuallyExecuteDCAButton />,
@@ -69,14 +60,14 @@ export const PositionStatusCard: React.FC = () => {
   return (
     <Card title="Status" padding="24px" halfWidth>
       <CellCol justifyContent="space-between">
-        <RowBetween>
-          <Text small italic>
-            Position Status:
-          </Text>
-          <Text bold color={StatusColor[StatusType[status]]} italic textAlign="right">
-            {StatusString[status]}
-          </Text>
-        </RowBetween>
+        <DataRow
+          t="Position Status:"
+          v={
+            <Text bold color={StatusColor[StatusType[status]]} italic textAlign="right">
+              {StatusString[status]}
+            </Text>
+          }
+        />
         <Column gap="8px" alignItems="center" width="100%" mt="12px">
           {StatusAction[status]}
         </Column>

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Card } from 'components/Card'
 import styled from 'styled-components'
-import { Column, RowBetween, Text, RowCenter, SummitButton, TextButton, TextWithChanged } from 'uikit'
+import { Column, Text, RowCenter, SummitButton, TextButton, TextWithChanged } from 'uikit'
 import TokenAndAmountSelector from 'components/TokenAndAmountSelector'
 import {
   useConfigurableAmountDCA,
@@ -23,6 +23,7 @@ import { getSymbol } from 'config/tokens'
 import { ManagePositionButton } from 'components/ManagePositionModal'
 import { useSetPosition } from 'hooks/useExecute'
 import { useInvolicaStore } from 'state/store'
+import { DataRow } from 'components/DataRow'
 
 const CellRow = styled.div`
   display: flex;
@@ -99,22 +100,28 @@ const OptionsCell: React.FC = () => {
         DCA Options:
       </TextWithChanged>
       <Column width="100%" gap="4px">
-        <RowBetween>
-          <TextWithChanged small italic changed={intervalDirty} asterisk>
-            Interval:
-          </TextWithChanged>
-          <TextWithChanged bold changed={intervalDirty} asterisk>
-            {intervalStringly}
-          </TextWithChanged>
-        </RowBetween>
+        <DataRow
+          t={
+            <TextWithChanged small italic changed={intervalDirty} asterisk>
+              Interval:
+            </TextWithChanged>
+          }
+          v={
+            <TextWithChanged bold changed={intervalDirty} asterisk>
+              {intervalStringly}
+            </TextWithChanged>
+          }
+        />
         <IntervalSelector />
       </Column>
-      <RowBetween>
-        <TextWithChanged small italic changed={maxGasPriceDirty} asterisk>
-          Max Gas Price:
-        </TextWithChanged>
-        <EditMaxGasPriceButton />
-      </RowBetween>
+      <DataRow
+        t={
+          <TextWithChanged small italic changed={maxGasPriceDirty} asterisk>
+            Max Gas Price:
+          </TextWithChanged>
+        }
+        v={<EditMaxGasPriceButton />}
+      />
 
       {(intervalDirty || maxGasPriceDirty) && <RevertChangesButton onClick={revertIntervalAndMaxGasPrice} />}
     </CellWithChanged>
