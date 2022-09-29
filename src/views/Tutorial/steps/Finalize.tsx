@@ -18,7 +18,8 @@ export const Finalize: React.FC = () => {
   const { amountDCA } = usePositionAmountDCA()
   const { fundingAmount } = useConfigFundingAmount()
 
-  const submissionReadyPosition = useSubmissionReadyPositionConfig()
+  const submissionReadyPosition = useSubmissionReadyPositionConfig(true)
+  // TODO: Make this work if the treasury fund value is 0 and already funded
   const { pending, onCreateAndFundPosition } = useCreateAndFundPosition()
 
   const handleCreatePosition = useCallback(() => {

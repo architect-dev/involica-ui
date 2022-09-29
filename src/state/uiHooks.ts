@@ -1,15 +1,25 @@
+/* eslint-disable no-loop-func */
 import { useQuery } from '@apollo/client'
 import BigNumber from 'bignumber.js'
-import { DAY_TOKEN_DATA } from 'config/constants/graph'
+import {
+  DAY_TOKEN_DATA,
+  involicaClient,
+  InvolicaDCA,
+  InvolicaStats,
+  INVOLICA_STATS_DATA,
+  transformInvolicaDCA,
+  transformInvolicaStats,
+  USER_STATS_DATA,
+} from 'config/constants/graph'
 import { cloneDeep } from 'lodash'
 import { useMemo } from 'react'
-import { getAddress } from '@ethersproject/address'
 import { bn, bnDecOffset, bnZero } from 'utils'
 import { timestampToDateTime } from 'utils/timestamp'
 import { useConfigurableIntervalDCA, useUserTxs } from './hooks'
 import { getValueChangeStatus, ValueChangeStatus } from './status'
 import { useInvolicaStore } from './store'
 import { AddressRecord, Token, UserTokenTx } from './types'
+import { useWeb3React } from '@web3-react/core'
 
 export const suffix = (intervalDCA: number | null) => {
   if (intervalDCA == null) return '-'
@@ -113,7 +123,7 @@ export const useUserTxsWithDisplayData = () => {
   const tokensData = useInvolicaStore((state) => state.tokens)
 
   const txs = useMemo(() => {
-    return userTxs.map(
+    return (userTxs ?? []).map(
       ({ timestamp, tokenIn, tokenTxs }): UserTxWithTradeData => {
         const tokenInDecimals = tokensData?.[tokenIn]?.decimals
         const tokenInTradePrice = bn(tokenTxs[0].tokenInPrice).toNumber()
@@ -330,7 +340,7 @@ export const useUserTxsWithDisplayData = () => {
   }
 }
 
-export const useChartPriceInfo = () => {
+export const useDailyTokenPrices = () => {
   const txs = useUserTxs()
   const [inTokens, outTokens] = useMemo(() => {
     const ins: AddressRecord<boolean> = {}
@@ -348,21 +358,151 @@ export const useChartPriceInfo = () => {
   }, [txs])
 
   const { loading, error, data } = useQuery(DAY_TOKEN_DATA, {
-    variables: { tokens: inTokens.concat(outTokens), timestamp: 1663674332 },
+    variables: { tokens: inTokens.concat(outTokens), timestamp: 1663242332 },
   })
 
   const dayPrices = useMemo(() => {
     if (loading || error || data?.tokenDayDatas == null) return null
-    const prices: AddressRecord<Record<number, string>> = {}
+    const prices: Record<number, AddressRecord<string>> = {}
 
     data.tokenDayDatas.forEach(({ date, priceUSD, id }: { date: number; priceUSD: string; id: string }) => {
-      const address = getAddress(id.split('-')[0])
-      if (prices[address] == null) prices[address] = {}
-      prices[address][date] = priceUSD
+      const address = id.split('-')[0]
+      if (prices[date] == null) prices[date] = {}
+      prices[date][address] = priceUSD
     })
-    
+
     return prices
   }, [loading, error, data])
 
-  
+  return dayPrices
+}
+
+export const useInvolicaStatsData = () => {
+  const { loading, data } = useQuery(INVOLICA_STATS_DATA, {
+    client: involicaClient,
+  })
+
+  return useMemo((): InvolicaStats | null => {
+    if (loading) return null
+    if (data?.involica == null) return null
+    return transformInvolicaStats(data.involica)
+  }, [loading, data])
+}
+export const useInvolicaUserStatsData = () => {
+  const { account } = useWeb3React()
+  const { loading, data } = useQuery(USER_STATS_DATA, {
+    variables: { user: account },
+    client: involicaClient,
+  })
+
+  return useMemo((): InvolicaDCA[] | null => {
+    if (loading) return null
+    if (data?.dcas == null) return null
+    return data.dcas.map((dca) => transformInvolicaDCA(dca))
+  }, [loading, data])
+}
+
+export const useInvolicaDCAChartData = (selectedToken: string | null) => {
+  const userDcas = useInvolicaUserStatsData()
+  const dailyPrices = useDailyTokenPrices()
+
+  const { userIns, userOuts } = useMemo(() => {
+    if (userDcas == null) return { userIns: null, userOuts: null }
+    const ins: AddressRecord<boolean> = {}
+    const outs: AddressRecord<boolean> = {}
+    userDcas.forEach((dca) => {
+      ins[dca.inToken] = true
+      dca.outTokens.forEach((outToken) => {
+        outs[outToken] = true
+      })
+    })
+    if (selectedToken != null)
+      return {
+        userIns: ins[selectedToken.toLowerCase()] ? [selectedToken.toLowerCase()] : [],
+        userOuts: outs[selectedToken.toLowerCase()] ? [selectedToken.toLowerCase()] : [],
+      }
+    return {
+      userIns: Object.keys(ins),
+      userOuts: Object.keys(outs),
+    }
+  }, [selectedToken, userDcas])
+
+  const dataStartDay = useMemo(() => {
+    if (userDcas == null || userDcas.length === 0) return null
+    const dayID = Math.floor(userDcas[0].timestamp / 86400)
+    return (dayID - 10) * 86400
+  }, [userDcas])
+  const dataEndDay = useMemo(() => {
+    return Math.floor(Math.floor(Date.now() / 1000) / 86400) * 86400
+  }, [])
+
+  /*
+    Zip between days to create a portfolio snapshot of everything that happened during that day
+    For each day snapshot:
+      Calculate trade dollar value
+      Use current price to determine value change of ins and outs
+      Add outs change and subtract in change to get total change
+  */
+  return useMemo(() => {
+    if (dataStartDay == null || userIns == null || userOuts == null || userDcas == null || dailyPrices == null)
+      return null
+
+    let runningTradeUsd = 0
+    const timestamps = []
+    const tradeValData = []
+    const currentValData = []
+    let dayTimestamp = dataStartDay
+    let dcaIndex = 0
+    const runningPortfolioIns: AddressRecord<number> = {}
+    const runningPortfolioOuts: AddressRecord<number> = {}
+
+    // Populate running portfolio with tokens to track
+    userIns.forEach((inToken) => {
+      runningPortfolioIns[inToken] = 0
+    })
+    userOuts.forEach((outToken) => {
+      runningPortfolioOuts[outToken] = 0
+    })
+
+    while (dayTimestamp <= Math.floor(Date.now() / 1000) + 86400) {
+      timestamps.push(dayTimestamp)
+      const yesterdayTimestamp = dayTimestamp - 86400
+
+      // Increment portfolio values with all trades that happened on this day
+      const dcasCountRemaining = userDcas.length - dcaIndex
+      for (let i = dcaIndex; i <= dcasCountRemaining; i++) {
+        const userDca = userDcas[i]
+
+        // Exit if dca didn't happen during this day
+        if (userDca.timestamp < yesterdayTimestamp || userDca.timestamp >= dayTimestamp) break
+
+        runningPortfolioIns[userDca.inToken] += parseFloat(userDca.inAmount)
+        userDca.outTokens.forEach((outToken, outTokenIndex) => {
+          const amount = parseFloat(userDcas[i].outAmounts[outTokenIndex])
+          runningPortfolioOuts[outToken] += amount
+
+          const tradePrice = dailyPrices[yesterdayTimestamp]?.[outToken] ?? '0'
+          runningTradeUsd += parseFloat(tradePrice) * amount
+        })
+
+        dcaIndex++
+      }
+      tradeValData.push(runningTradeUsd)
+
+      let currentUsd = 0
+      Object.entries(runningPortfolioOuts).forEach(([token, amount]) => {
+        const currentPrice = dailyPrices[dataEndDay]?.[token] ?? '0'
+        currentUsd += parseFloat(currentPrice) * amount
+      })
+      currentValData.push(currentUsd)
+
+      dayTimestamp += 86400
+    }
+
+    return {
+      timestamps,
+      tradeValData,
+      currentValData,
+    }
+  }, [dataStartDay, dataEndDay, userIns, userOuts, userDcas, dailyPrices])
 }

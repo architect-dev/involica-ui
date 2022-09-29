@@ -71,19 +71,6 @@
         "internalType": "address",
         "name": "user",
         "type": "address"
-      }
-    ],
-    "name": "ExitPosition",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
       },
       {
         "indexed": true,
@@ -132,9 +119,28 @@
         "internalType": "uint256",
         "name": "involicaTxFee",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "manualExecution",
+        "type": "bool"
       }
     ],
-    "name": "FinalizeDCA",
+    "name": "ExecuteDCA",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "ExitPosition",
     "type": "event"
   },
   {

@@ -15,7 +15,7 @@ export const usePositionConfig = (): PositionConfig =>
     maxGasPrice: state.config.maxGasPrice,
     executeImmediately: state.config.executeImmediately,
   }))
-export const useSubmissionReadyPositionConfig = (): any[] => {
+export const useSubmissionReadyPositionConfig = (createPosition = false): any[] => {
   const { tokenIn, outs, amountDCA, intervalDCA, maxGasPrice, executeImmediately } = usePositionConfig()
   const { data: tokenInData } = useTokenPublicData(tokenIn)
 
@@ -32,9 +32,9 @@ export const useSubmissionReadyPositionConfig = (): any[] => {
       intervalDCA,
       getChainGwei(maxGasPrice),
       executeImmediately,
-      false,
-    ],
-    [amountDCA, executeImmediately, intervalDCA, maxGasPrice, outs, tokenIn, tokenInData?.decimals],
+      createPosition ? null : false,
+    ].filter((x) => x != null),
+    [amountDCA, createPosition, executeImmediately, intervalDCA, maxGasPrice, outs, tokenIn, tokenInData?.decimals],
   )
 }
 

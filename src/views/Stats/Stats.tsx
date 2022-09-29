@@ -4,7 +4,7 @@ import { HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
 import { useQuery } from '@apollo/client'
 import { BLOCK_PRICES, DAY_TOKEN_DATA } from 'config/constants/graph'
-import { useChartPriceInfo } from 'state/uiHooks'
+import { useInvolicaUserStatsData, useDailyTokenPrices, useInvolicaDCAChartData } from 'state/uiHooks'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -59,7 +59,9 @@ const Stats: React.FC = () => {
   //   error,
   //   data
   // })
-  useChartPriceInfo()
+  // useDailyTokenPrices()
+  // useInvolicaUserStatsData()
+  useInvolicaDCAChartData(null)
   return (
     <Page>
       <Hero>

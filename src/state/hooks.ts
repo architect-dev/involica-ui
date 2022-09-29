@@ -318,7 +318,7 @@ export const baseGasPrice = 450000
 export const perSwapGasPrice = 195000
 export const usePositionOutsLength = (positionOnly?: boolean) => {
   const { outs } = usePositionOuts(positionOnly)
-  return useMemo(() => outs.length, [outs.length])
+  return useMemo(() => outs?.length ?? 0, [outs?.length])
 }
 export const useDcaTxPriceRange = (positionOnly?: boolean) => {
   const minGasPrice = '100'

@@ -31,7 +31,7 @@ export const DebugModal: React.FC<{
 }> = ({ onDismiss }) => {
   const debugActions = useDebugActions()
   return (
-    <ModalContentContainer gap='12px'>
+    <ModalContentContainer gap="12px">
       {Object.entries(debugActions).map(([key, action]) => (
         <ItemFlex
           key={key}
@@ -53,7 +53,11 @@ const DebugMenu: React.FC<{ account: string | null }> = ({ account }) => {
   const [open, setOpen] = useState(false)
   const hide = useCallback(() => setOpen(false), [setOpen])
 
-  if (account !== '0x3a7679E3662bC7c2EB2B1E71FA221dA430c6f64B') return null
+  if (
+    account !== '0x3a7679E3662bC7c2EB2B1E71FA221dA430c6f64B' &&
+    account !== '0x2370b8Ff222e12CC95b0c455B904211A58c28d21'
+  )
+    return null
 
   return (
     <SummitPopUp
@@ -63,7 +67,7 @@ const DebugMenu: React.FC<{ account: string | null }> = ({ account }) => {
           <Text className="item-label">DEBUG</Text>
         </ItemFlex>
       }
-      popUpTitle='Debug Options:'
+      popUpTitle="Debug Options:"
       popUpContent={<DebugModal />}
       modal
       open={open}
