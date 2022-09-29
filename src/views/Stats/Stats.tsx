@@ -2,9 +2,28 @@ import React from 'react'
 import styled from 'styled-components'
 import { HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
+import { Line } from 'react-chartjs-2'
 import { useQuery } from '@apollo/client'
 import { BLOCK_PRICES, DAY_TOKEN_DATA } from 'config/constants/graph'
-import { useInvolicaUserStatsData, useDailyTokenPrices, useInvolicaDCAChartData } from 'state/uiHooks'
+import 'chartjs-adapter-date-fns'
+import { enUS } from 'date-fns/locale'
+import {
+  useInvolicaUserStatsData,
+  useDailyTokenPrices,
+  useInvolicaDCAChartData,
+  useInvolicaSnapshotsData,
+} from 'state/uiHooks'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  TimeScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -49,6 +68,8 @@ export const tokens = {
   '0x6a07A792ab2965C72a5B8088d3a069A7aC3a993B': 'AAVE',
 }
 
+ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+
 const Stats: React.FC = () => {
   // const userInteractingTokens = useUserInteractingTokens()
   // const { loading, error, data } = useQuery(DAY_TOKEN_DATA, {
@@ -61,17 +82,82 @@ const Stats: React.FC = () => {
   // })
   // useDailyTokenPrices()
   // useInvolicaUserStatsData()
-  useInvolicaDCAChartData(null)
+  const chartData = useInvolicaDCAChartData(true, null)
+  const { timestamps, tradeValData, currentValData } = chartData ?? {
+    timestamps: [],
+    tradeValData: [],
+    currentValData: [],
+  }
   return (
     <Page>
       <Hero>
-        <StyledHighlightedText
-          className="sticky"
-          fontSize="34px"
-          letterSpacing="16px"
-        >
+        <StyledHighlightedText className="sticky" fontSize="34px" letterSpacing="16px">
           INVOLICA
         </StyledHighlightedText>
+        {timestamps != null && (
+          <Line
+            options={{
+              responsive: true,
+              interaction: {
+                mode: 'index',
+                intersect: false,
+              },
+              scales: {
+                xAxis: {
+                  adapters: {
+                    date: {
+                      locale: enUS,
+                    },
+                  },
+                  type: 'time',
+                  time: {
+                    unit: 'day',
+                    displayFormats: {
+                      day: 'MMM d',
+                    },
+                    tooltipFormat: 'MMM d, yyyy',
+                  },
+                  grid: {
+                    display: false,
+                  },
+                },
+              },
+              plugins: {
+                legend: {
+                  position: 'top' as const,
+                },
+                title: {
+                  display: true,
+                  text: 'Chart.js Line Chart',
+                },
+                tooltip: {
+                  xAlign: 'center',
+                  yAlign: 'bottom',
+                  caretPadding: 10,
+                },
+              },
+            }}
+            data={{
+              labels: timestamps,
+              datasets: [
+                {
+                  label: '$Current',
+                  data: currentValData,
+                  fill: false,
+                  borderColor: 'rgb(0, 115, 255)',
+                  tension: 0.1,
+                },
+                {
+                  label: '$Trade',
+                  data: tradeValData,
+                  fill: false,
+                  borderColor: 'rgb(255, 0, 0)',
+                  tension: 0.1,
+                },
+              ],
+            }}
+          />
+        )}
       </Hero>
     </Page>
   )

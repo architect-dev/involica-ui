@@ -25,19 +25,23 @@ export interface InvolicaStats {
 export const transformInvolicaStats = ({ id, __typename, ...involicaStats }) => {
   return involicaStats as InvolicaStats
 }
-export interface InvolicaDCA {
+
+export interface TimestampInsOuts {
+  timestamp: number
+
+  inToken: string
+  inAmount: string
+
+  outTokens: string[]
+  outAmounts: string[]
+}
+export interface InvolicaDCA extends TimestampInsOuts {
   txHash: string
 
   user: string
   recipient: string
-  timestamp: number
   involicaTxFee: string
   manualExecution: boolean
-
-  inToken: string
-  inAmount: string
-  outTokens: string[]
-  outAmounts: string[]
 
   dcasCount: number
   manualDcasCount: number
@@ -55,6 +59,14 @@ export const transformInvolicaDCA = ({ id, timestamp, __typename, ...dca }) => {
     timestamp: parseInt(timestamp),
     ...dca,
   } as InvolicaDCA
+}
+
+export type InvolicaSnapshot = TimestampInsOuts
+export const transformInvolicaSnapshot = ({ id, __typename, ...snapshot }) => {
+  return {
+    timestamp: parseInt(id),
+    ...snapshot,
+  } as InvolicaSnapshot
 }
 
 export const BLOCK_PRICES = gql`
@@ -88,9 +100,21 @@ export const INVOLICA_STATS_DATA = gql`
       inTokens
       outTokens
       totalDcasCount
-      totalInvolicaTxFee
+      totalInvolicaTxFeeUsd
       totalManualDcasCount
       totalTradeAmountUsd
+    }
+  }
+`
+
+export const SNAPSHOTS_DATA = gql`
+  query SnapshotsData {
+    involicaSnapshots(first: 1000) {
+      id
+      inTokens
+      inAmounts
+      outTokens
+      outAmounts
     }
   }
 `
@@ -102,7 +126,7 @@ export const USER_STATS_DATA = gql`
       user
       inAmount
       inToken
-      involicaTxFee
+      involicaTxFeeUsd
       manualDcasCount
       manualExecution
       outAmounts
@@ -113,7 +137,7 @@ export const USER_STATS_DATA = gql`
       portfolioOutTokens
       recipient
       timestamp
-      totalInvolicaTxFee
+      totalInvolicaTxFeeUsd
       dcasCount
     }
   }
