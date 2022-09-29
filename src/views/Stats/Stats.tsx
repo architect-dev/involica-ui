@@ -23,6 +23,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from 'chart.js'
 
 const Hero = styled.div`
@@ -68,7 +69,7 @@ export const tokens = {
   '0x6a07A792ab2965C72a5B8088d3a069A7aC3a993B': 'AAVE',
 }
 
-ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend)
 
 const Stats: React.FC = () => {
   // const userInteractingTokens = useUserInteractingTokens()
@@ -143,7 +144,11 @@ const Stats: React.FC = () => {
                 {
                   label: '$Current',
                   data: currentValData,
-                  fill: false,
+                  fill: {
+                    target: '1',
+                    above: 'rgba(255, 181, 221, 0.5)', // Area will be red above the origin
+                    below: 'rgba(99, 41, 41, 0.547)', // And blue below the origin
+                  },
                   borderColor: 'rgb(0, 115, 255)',
                   tension: 0.1,
                 },
