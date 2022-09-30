@@ -70,14 +70,11 @@ export const tokens = {
 }
 
 ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend)
-Tooltip.positioners.average = (elements, position) => {
+Tooltip.positioners.average = (elements) => {
   if (!elements.length) {
     return false
   }
 
-  console.log({
-    elements
-  })
   const minY = Math.min(elements[0].element.y, elements[1].element.y)
 
   return {
@@ -168,13 +165,12 @@ const Stats: React.FC = () => {
                   display: false,
                 },
                 title: {
-                  display: true,
-                  text: 'Chart.js Line Chart',
+                  display: false,
                 },
                 tooltip: {
                   xAlign: 'center',
                   yAlign: 'bottom',
-                  caretPadding: 10,
+                  caretPadding: 20,
                   displayColors: false,
                   bodyFont: {
                     family: 'Courier Price, monospace',
@@ -220,6 +216,26 @@ const Stats: React.FC = () => {
                 },
               },
             }}
+            plugins={[
+              {
+                id: 'hover_vertical_line',
+                beforeDraw: (chart) => {
+                  if (chart.tooltip?.getActiveElements()?.length > 0) {
+                    const { caretX } = chart.tooltip
+                    const { yAxis } = chart.scales
+                    const { ctx } = chart
+                    ctx.save()
+                    ctx.beginPath()
+                    ctx.moveTo(caretX, yAxis.top)
+                    ctx.lineTo(caretX, yAxis.bottom)
+                    ctx.lineWidth = 1
+                    ctx.strokeStyle = ChartJS.defaults.borderColor.toString()
+                    ctx.stroke()
+                    ctx.restore()
+                  }
+                },
+              },
+            ]}
             data={{
               labels: timestamps,
               datasets: [
@@ -229,6 +245,8 @@ const Stats: React.FC = () => {
                   fill: false,
                   borderColor: '#575757',
                   tension: 0.1,
+                  spanGaps: true,
+                  borderWidth: 2,
                 },
                 {
                   label: 'Current',
@@ -240,6 +258,8 @@ const Stats: React.FC = () => {
                   },
                   borderColor: '#F7CAC9',
                   tension: 0.1,
+                  spanGaps: true,
+                  borderWidth: 2,
                 },
               ],
             }}
