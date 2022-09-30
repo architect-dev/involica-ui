@@ -28,10 +28,6 @@ export type Shadows = {
   inset: string
 }
 
-export type Gradients = {
-  bubblegum: string
-}
-
 export type Colors = {
   primary: string
   primaryBright: string
@@ -57,27 +53,8 @@ export type Colors = {
   selectorBackground: string
   button: string
 
-  textGold: string
-
-  // Gradients
-  gradients: Gradients
-
-  // Brand colors
-  binance: string
-
-  DASH: string
-  OASIS: string
-  PLAINS: string
-  MESA: string
-  SUMMIT: string
-  EXPEDITION: string
-  GLACIER: string
-  ROADMAP: string
-
-  AUDIT: string
-  ROLLOVER: string
-  BASE: string
-  EVEREST: string
+  // BRAND COLORS
+  quartz: string
 }
 
 export type ZIndices = {

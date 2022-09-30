@@ -45,7 +45,7 @@ const ScrollableContent = styled(Flex)`
 `
 
 const StyledCloseIcon = styled(CloseIcon)`
-  fill: ${({ theme }) => (theme.isDark ? theme.colors.EXPEDITION : '')};
+  fill: ${({ theme }) => (theme.isDark ? theme.colors.text : '')};
 `
 
 const ModalHeader = styled.div`

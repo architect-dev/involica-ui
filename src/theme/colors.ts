@@ -1,5 +1,7 @@
 import { Colors } from './types'
 
+const quartz = '#F7CAC9'
+
 export const baseColors = {
   failure: '#cc0000',
   primary: '#adadad',
@@ -11,23 +13,7 @@ export const baseColors = {
 }
 
 export const brandColors = {
-  binance: '#F0B90B',
-
-  DASH: '#154463',
-
-  OASIS: '#88ACC9',
-  PLAINS: '#80B145',
-  MESA: '#D4916D',
-  SUMMIT: '#7B7D93',
-  EXPEDITION: '#ebf2fd',
-
-  AUDIT: '#000418',
-  ROLLOVER: '#DB00FF',
-  BASE: '#3e7fa2',
-  EVEREST: '#017B88',
-  GLACIER: '#39749e',
-
-  textGold: '#EE9F3D',
+  quartz,
 }
 
 export const lightColors: Colors = {
@@ -47,12 +33,8 @@ export const lightColors: Colors = {
   textSubtle: '#46557d',
   borderColor: '#98a3ac',
   card: '#FFFFFF',
-  ROADMAP: '#575757',
   selectorBackground: '#cacaca',
   button: '#adadad',
-  gradients: {
-    bubblegum: 'linear-gradient(139.73deg, #E6FDFF 0%, #F3EFFF 100%)',
-  },
   warning: '#d78400',
 }
 
@@ -75,29 +57,6 @@ export const darkColors: Colors = {
   textSubtle: '#FFFFFF',
   borderColor: '#ebf2fd',
   card: '#0F152A',
-  ROADMAP: '#E5E5E5',
   selectorBackground: '#41495f',
   button: '#adadad', // TODO: Update to dark mode color
-  DASH: '#3e7fa2',
-  gradients: {
-    bubblegum: 'linear-gradient(139.73deg, #313D5C 0%, #3D2A54 100%)',
-  },
-
-  // OVERRIDDEN BRAND COLORS
-  SUMMIT: '#A6CBDC',
-}
-
-export const textGold = '#EE9F3D'
-
-export const elevationPalette = {
-  BASE: ['#092E4E', '#0E3858', '#154463', '#3E80A2', '#609CB6', '#94BDCC'],
-  DASH: ['#092E4E', '#0E3858', '#154463', '#3E80A2', '#609CB6', '#94BDCC'],
-  OASIS: ['#1D4D57', '#35655D', '#638263', '#BBAA6A', '#C8BC89', '#D6CFB1'],
-  PLAINS: ['#044820', '#0F6330', '#2F8846', '#94BB68', '#ABC887', '#C6D6B0'],
-  MESA: ['#210402', '#370B06', '#5F2214', '#A2663E', '#B68660', '#CCAF94'],
-  SUMMIT: ['#040707', '#2B3C44', '#557280', '#7BA6BB', '#A6CBDC', '#C3D8E0'],
-  EXPEDITION: ['#3B2F60', '#865075', '#B16684', '#D48B8A', '#DDA4A8', '#DDA4A8'],
-  GOLD: ['#FCC965', '#F7BA56', '#F3AC4A', '#EE9F3D', '#EA9130', '#EA9130'],
-  EVEREST: ['#017B88', '#30A0A4', '#90B7B4', '#AECEBF', '#DEDDBE', '#D9B28B', '#D9B28B'],
-  RED: ['#FFBABA', '#FF7B7B', '#FF5252', '#FF0000', '#A70000', '#900000', '#900000']
 }

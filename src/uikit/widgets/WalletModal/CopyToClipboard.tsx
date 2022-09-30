@@ -10,7 +10,7 @@ interface Props {
 }
 
 const StyledCopyIcon = styled(CopyIcon)`
-  fill: ${({ theme }) => darken(0.2, theme.colors.OASIS)};
+  fill: ${({ theme }) => darken(0.2, theme.colors.text)};
   width: 16px;
   height: 16px;
 `
@@ -20,7 +20,7 @@ const StyleButton = styled(Text).attrs({ role: 'button' })`
   display: flex;
   gap: 8px;
   align-items: center;
-  color: ${({ theme }) => darken(0.2, theme.colors.OASIS)};
+  color: ${({ theme }) => darken(0.2, theme.colors.text)};
 
   ${pressableMixin}
 `
