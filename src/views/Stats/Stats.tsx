@@ -70,6 +70,21 @@ export const tokens = {
 }
 
 ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend)
+Tooltip.positioners.average = (elements, position) => {
+  if (!elements.length) {
+    return false
+  }
+
+  console.log({
+    elements
+  })
+  const minY = Math.min(elements[0].element.y, elements[1].element.y)
+
+  return {
+    x: elements[0].element.x,
+    y: minY,
+  }
+}
 
 const Stats: React.FC = () => {
   // const userInteractingTokens = useUserInteractingTokens()
@@ -89,6 +104,8 @@ const Stats: React.FC = () => {
     tradeValData: [],
     currentValData: [],
   }
+
+  // const maxTimestamp = Math.max(timestamps[0] + (60 * 86400 * 1000), (Math.floor(Date.now() / (1000 * 86400)) + 1) * 1000 * 86400)
   return (
     <Page>
       <Hero>
@@ -104,6 +121,22 @@ const Stats: React.FC = () => {
                 intersect: false,
               },
               scales: {
+                yAxis: {
+                  type: 'linear',
+                  grace: '50%',
+                  beginAtZero: true,
+                  ticks: {
+                    // Include a dollar sign in the ticks
+                    callback: (value): string => {
+                      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                        parseFloat(`${value}`),
+                      )
+                    },
+                    font: {
+                      family: 'Courier Prime, monospace',
+                    },
+                  },
+                },
                 xAxis: {
                   adapters: {
                     date: {
@@ -113,19 +146,26 @@ const Stats: React.FC = () => {
                   type: 'time',
                   time: {
                     unit: 'day',
+                    round: 'day',
                     displayFormats: {
                       day: 'MMM d',
                     },
                     tooltipFormat: 'MMM d, yyyy',
                   },
                   grid: {
-                    display: false,
+                    display: true,
+                    drawOnChartArea: false,
+                  },
+                  ticks: {
+                    font: {
+                      family: 'Courier Prime, monospace',
+                    },
                   },
                 },
               },
               plugins: {
                 legend: {
-                  position: 'top' as const,
+                  display: false,
                 },
                 title: {
                   display: true,
@@ -135,6 +175,48 @@ const Stats: React.FC = () => {
                   xAlign: 'center',
                   yAlign: 'bottom',
                   caretPadding: 10,
+                  displayColors: false,
+                  bodyFont: {
+                    family: 'Courier Price, monospace',
+                  },
+                  titleFont: {
+                    family: 'Courier Price, monospace',
+                  },
+                  footerFont: {
+                    family: 'Courier Price, monospace',
+                  },
+                  titleAlign: 'right',
+                  titleMarginBottom: 6,
+                  footerAlign: 'right',
+                  footerMarginTop: 6,
+                  footerColor: '#F7CAC9',
+                  callbacks: {
+                    label: (context) => {
+                      let label = context.dataset.label || ''
+
+                      if (label) {
+                        label += context.datasetIndex === 0 ? ':\t\t\t\t' : ':\t\t'
+                      }
+                      if (context.parsed.y !== null) {
+                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                          context.parsed.y,
+                        )
+                      }
+                      return label
+                    },
+                    footer: (tooltipItems) => {
+                      const current = tooltipItems[1].raw as number
+                      const trade = tooltipItems[0].raw as number
+                      const delta = current - trade
+                      return `${delta === 0 ? '' : delta > 0 ? '▲' : '▼'} ${new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      }).format(delta)}`
+                    },
+                    labelTextColor: (context) => {
+                      return context.datasetIndex < 0.1 ? '#ffffff' : '#F7CAC9'
+                    },
+                  },
                 },
               },
             }}
@@ -142,21 +224,21 @@ const Stats: React.FC = () => {
               labels: timestamps,
               datasets: [
                 {
-                  label: '$Current',
-                  data: currentValData,
-                  fill: {
-                    target: '1',
-                    above: 'rgba(255, 181, 221, 0.5)', // Area will be red above the origin
-                    below: 'rgba(99, 41, 41, 0.547)', // And blue below the origin
-                  },
-                  borderColor: 'rgb(0, 115, 255)',
+                  label: 'Trade',
+                  data: tradeValData,
+                  fill: false,
+                  borderColor: '#575757',
                   tension: 0.1,
                 },
                 {
-                  label: '$Trade',
-                  data: tradeValData,
-                  fill: false,
-                  borderColor: 'rgb(255, 0, 0)',
+                  label: 'Current',
+                  data: currentValData,
+                  fill: {
+                    target: '-1',
+                    above: '#f7cac96d', // Area will be red above the origin
+                    below: 'transparent', // And blue below the origin
+                  },
+                  borderColor: '#F7CAC9',
                   tension: 0.1,
                 },
               ],

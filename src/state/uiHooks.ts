@@ -452,8 +452,7 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
 
   const dataStartDay = useMemo(() => {
     if (dcasOrSnapshots == null || dcasOrSnapshots.length === 0) return null
-    const dayID = Math.floor(dcasOrSnapshots[0].timestamp / 86400)
-    return (dayID - 10) * 86400
+    return Math.floor(dcasOrSnapshots[0].timestamp / 86400) * 86400
   }, [dcasOrSnapshots])
   const dataEndDay = useMemo(() => {
     return Math.floor(Math.floor(Date.now() / 1000) / 86400) * 86400
@@ -517,7 +516,7 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
         const currentPrice = dailyPrices[dataEndDay]?.[token] ?? '0'
         currentUsd += parseFloat(currentPrice) * amount
       })
-      currentValData.push(currentUsd)
+      currentValData.push(currentUsd * 2)
 
       dayTimestamp += 86400
     }
