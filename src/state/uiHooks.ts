@@ -1,6 +1,7 @@
 /* eslint-disable no-loop-func */
 import { useQuery } from '@apollo/client'
 import BigNumber from 'bignumber.js'
+import { ethers } from 'ethers'
 import {
   DAY_TOKEN_DATA,
   involicaClient,
@@ -14,7 +15,7 @@ import {
   transformInvolicaStats,
   USER_STATS_DATA,
 } from 'config/constants/graph'
-import { cloneDeep } from 'lodash'
+import { clone, cloneDeep } from 'lodash'
 import { useMemo } from 'react'
 import { bn, bnDecOffset, bnZero } from 'utils'
 import { timestampToDateTime } from 'utils/timestamp'
@@ -402,7 +403,7 @@ export const useInvolicaSnapshotsData = () => {
     return data.involicaSnapshots.map((snapshot) => transformInvolicaSnapshot(snapshot))
   }, [loading, data])
 }
-export const useInvolicaUserStatsData = () => {
+export const useInvolicaUserDcasData = () => {
   const { account } = useWeb3React()
   const { loading, data } = useQuery(USER_STATS_DATA, {
     variables: { user: account },
@@ -415,9 +416,22 @@ export const useInvolicaUserStatsData = () => {
     return data.dcas.map((dca) => transformInvolicaDCA(dca))
   }, [loading, data])
 }
+export const useUserPortfolioOutTokens = () => {
+  const userDcas = useInvolicaUserDcasData()
+  return useMemo(() => {
+    if (userDcas == null) return null
+    const outs: AddressRecord<boolean> = {}
+    userDcas.forEach((dca) => {
+      dca.outTokens.forEach((outToken) => {
+        outs[outToken] = true
+      })
+    })
+    return Object.keys(outs).map((address) => ethers.utils.getAddress(address))
+  }, [userDcas])
+}
 
 export const useInvolicaDcasOrSnapshots = (dcas: boolean) => {
-  const userDcas = useInvolicaUserStatsData()
+  const userDcas = useInvolicaUserDcasData()
   const snapshots = useInvolicaSnapshotsData()
 
   return useMemo((): TimestampInsOuts[] => {
@@ -475,8 +489,8 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
     const currentValData = []
     let dayTimestamp = dataStartDay
     let dcaIndex = 0
-    const runningPortfolioIns: AddressRecord<number> = {}
-    const runningPortfolioOuts: AddressRecord<number> = {}
+    const runningPortfolioIns: AddressRecord<number> = clone({})
+    const runningPortfolioOuts: AddressRecord<number> = clone({})
 
     // Populate running portfolio with tokens to track
     userIns.forEach((inToken) => {
@@ -498,13 +512,17 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
         // Exit if dca didn't happen during this day
         if (dcaOrSnapshot.timestamp < yesterdayTimestamp || dcaOrSnapshot.timestamp >= dayTimestamp) break
 
-        runningPortfolioIns[dcaOrSnapshot.inToken] += parseFloat(dcaOrSnapshot.inAmount)
+        if (runningPortfolioIns[dcaOrSnapshot.inToken] != null) runningPortfolioIns[dcaOrSnapshot.inToken] += parseFloat(dcaOrSnapshot.inAmount)
         dcaOrSnapshot.outTokens.forEach((outToken, outTokenIndex) => {
           const amount = parseFloat(dcasOrSnapshots[i].outAmounts[outTokenIndex])
-          runningPortfolioOuts[outToken] += amount
 
-          const tradePrice = dailyPrices[yesterdayTimestamp]?.[outToken] ?? '0'
-          runningTradeUsd += parseFloat(tradePrice) * amount
+          // Only include token if its being tracked
+          if (runningPortfolioOuts[outToken] != null) {
+            runningPortfolioOuts[outToken] += amount
+
+            const tradePrice = dailyPrices[yesterdayTimestamp]?.[outToken] ?? '0'
+            runningTradeUsd += parseFloat(tradePrice) * amount
+          }
         })
 
         dcaIndex++
@@ -516,7 +534,7 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
         const currentPrice = dailyPrices[dataEndDay]?.[token] ?? '0'
         currentUsd += parseFloat(currentPrice) * amount
       })
-      currentValData.push(currentUsd * 2)
+      currentValData.push(currentUsd * (dcas ? 2 : 1))
 
       dayTimestamp += 86400
     }
@@ -526,5 +544,5 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
       tradeValData,
       currentValData,
     }
-  }, [dataStartDay, userIns, userOuts, dcasOrSnapshots, dailyPrices, dataEndDay])
+  }, [dataStartDay, userIns, userOuts, dcasOrSnapshots, dailyPrices, dcas, dataEndDay])
 }

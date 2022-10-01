@@ -1,9 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
-import { HighlightedText } from 'uikit'
+import { Column, HighlightedText } from 'uikit'
 import Page from 'components/layout/Page'
 import 'chartjs-adapter-date-fns'
 import PortfolioChart from './components/PortfolioChart'
+import { ChartOptionsRow } from './components/ChartOptionsRow'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -27,8 +28,11 @@ const Stats: React.FC = () => {
         <StyledHighlightedText className="hero" letterSpacing="16px" fontSize="34px">
           INVOLICA
         </StyledHighlightedText>
-        <PortfolioChart />
       </Hero>
+      <Column width="100%" gap="18px">
+        <ChartOptionsRow />
+        <PortfolioChart />
+      </Column>
     </Page>
   )
 }

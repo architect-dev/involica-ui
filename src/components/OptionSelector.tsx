@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import SummitButton from 'uikit/components/Button/SummitButton'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
+import { ChartDataOption } from 'views/Stats/components/chartOptionsState'
 
 const buttonHeight = 28
 
@@ -54,18 +55,20 @@ const TextButton = styled.div<{ selected: boolean }>`
   cursor: ${({ selected }) => (selected ? 'default' : 'pointer')};
 `
 
-interface Option {
-  value: string
+type OptionType = string | number | ChartDataOption
+
+interface Option<T> {
+  value: T
   label: string
 }
-interface Props {
+interface Props<T> {
   buttonWidth: number
-  options: Option[]
-  selected: string
-  select: (value: string) => void
+  options: Option<T>[]
+  selected: T
+  select: (value: T) => void
 }
 
-const OptionSelector: React.FC<Props> = ({ buttonWidth, options, selected, select }) => {
+const OptionSelector = <T extends OptionType>({ buttonWidth, options, selected, select }: Props<T>) => {
   const selectedIndex = useMemo(() => {
     return options.findIndex((option) => option.value === selected)
   }, [options, selected])
@@ -94,4 +97,4 @@ const OptionSelector: React.FC<Props> = ({ buttonWidth, options, selected, selec
   )
 }
 
-export default React.memo(OptionSelector)
+export default OptionSelector

@@ -15,6 +15,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js'
+import { ChartDataOption, useChartOptionsState } from './chartOptionsState'
 
 ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend)
 Tooltip.positioners.average = (elements) => {
@@ -31,7 +32,8 @@ Tooltip.positioners.average = (elements) => {
 }
 
 const PortfolioChart: React.FC = () => {
-  const chartData = useInvolicaDCAChartData(true, null)
+  const { dataOption, focusedToken } = useChartOptionsState()
+  const chartData = useInvolicaDCAChartData(dataOption === ChartDataOption.User, dataOption === ChartDataOption.User ? focusedToken : null)
   const { timestamps, tradeValData, currentValData } = chartData ?? {
     timestamps: [],
     tradeValData: [],
@@ -132,9 +134,7 @@ const PortfolioChart: React.FC = () => {
                   label += `:${spaces}`
                 }
                 if (parsed.y !== null) {
-                  label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-                    parsed.y,
-                  )
+                  label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parsed.y)
                 }
                 return label
               },
@@ -171,6 +171,12 @@ const PortfolioChart: React.FC = () => {
               ctx.stroke()
               ctx.restore()
             }
+          },
+        },
+        {
+          id: 'animate_axis',
+          beforeDraw: (chart) => {
+            console.log(chart)
           },
         },
       ]}

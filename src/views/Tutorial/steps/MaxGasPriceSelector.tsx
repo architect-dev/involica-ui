@@ -10,7 +10,7 @@ const MaxGasPriceSelector = () => {
   }, [setMaxGasPrice])
 
   return (
-    <OptionSelector
+    <OptionSelector<string>
       buttonWidth={100}
       options={[
         { value: '100', label: '100 gwei' },

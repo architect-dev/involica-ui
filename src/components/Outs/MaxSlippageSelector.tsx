@@ -43,7 +43,7 @@ export const MaxSlippageSelector: React.FC<{ token: string }> = ({ token }) => {
     <>
       <Column width="100%" gap="4px">
         <RowBetween>
-          <OptionSelector
+          <OptionSelector<string>
             buttonWidth={60}
             options={[
               { value: '0.5', label: '0.5%' },
