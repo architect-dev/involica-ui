@@ -7,9 +7,6 @@ import TokenIconAndSymbol from 'components/TokenIconAndSymbol'
 
 export const ChartOptionsRow: React.FC = () => {
   const { dataOption, setDataOption, focusedToken, setFocusedToken } = useChartOptionsState()
-  console.log({
-    focusedToken,
-  })
   return (
     <Row gap="16px" alignItems="flex-start">
       <OptionSelector<ChartDataOption>

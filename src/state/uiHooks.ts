@@ -5,6 +5,7 @@ import {
   DAY_TOKEN_DATA,
   involicaClient,
   InvolicaDCA,
+  InvolicaSnapshot,
   InvolicaStats,
   INVOLICA_STATS_DATA,
   SNAPSHOTS_DATA,
@@ -206,6 +207,7 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
     const timestamps = []
     const tradeValData = []
     const currentValData = []
+    const dcasCountData = []
     let dayTimestamp = dataStartDay
     let dcaIndex = 0
     const runningPortfolioOuts: AddressRecord<number> = clone({})
@@ -217,6 +219,7 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
 
     while (dayTimestamp <= Math.floor(Date.now() / 1000) + 86400) {
       const yesterdayTimestamp = dayTimestamp - 86400
+      let dcasCount = 0;
 
       // Increment portfolio values with all trades that happened on this day
       for (let i = dcaIndex; i < dcasOrSnapshots.length; i++) {
@@ -224,6 +227,11 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
 
         // Exit if dca didn't happen during this day
         if (dcaOrSnapshot.timestamp < yesterdayTimestamp || dcaOrSnapshot.timestamp >= dayTimestamp) break
+        if (dcas) {
+          dcasCount += 1
+        } else {
+          dcasCount += (dcaOrSnapshot as InvolicaSnapshot).dcasCount
+        }
 
         dcaOrSnapshot.outTokens.forEach((outToken, outTokenIndex) => {
           const amount = dcasOrSnapshots[i].outAmounts[outTokenIndex]
@@ -263,6 +271,8 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
 
       currentValData.push(currentUsd)
 
+      dcasCountData.push(dcas || dcasCount === 0 ? null : dcasCount)
+
       dayTimestamp += 86400
     }
 
@@ -270,6 +280,7 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
       timestamps: timestamps.map((timestamp) => timestamp * 1000),
       tradeValData,
       currentValData,
+      dcasCountData,
     }
-  }, [dataStartDay, userOuts, dcasOrSnapshots, dailyPrices, includeDCAs])
+  }, [dataStartDay, userOuts, dcasOrSnapshots, dailyPrices, dcas, includeDCAs])
 }

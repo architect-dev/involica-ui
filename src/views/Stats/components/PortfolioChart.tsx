@@ -38,10 +38,11 @@ const PortfolioChart: React.FC = () => {
     dataOption === ChartDataOption.User ? focusedToken : null,
     false,
   )
-  const { timestamps, tradeValData, currentValData } = chartData ?? {
+  const { timestamps, tradeValData, currentValData, dcasCountData } = chartData ?? {
     timestamps: [],
     tradeValData: [],
     currentValData: [],
+    dcasCountData: [],
   }
 
   return (
@@ -55,7 +56,7 @@ const PortfolioChart: React.FC = () => {
         scales: {
           yAxis: {
             type: 'linear',
-            grace: '50%',
+            grace: '70%',
             beginAtZero: true,
             ticks: {
               // Include a dollar sign in the ticks
@@ -122,9 +123,17 @@ const PortfolioChart: React.FC = () => {
             footerMarginTop: 6,
             footerColor: '#F7CAC9',
             callbacks: {
+              afterTitle: (context) => {
+                if (context == null || context.length < 3 || (context[2].parsed?.y ?? 0) === 0) return null
+                return `${context[2].parsed.y} DCAs`
+              },
               label: (context) => {
                 const datasets = context?.chart?.data?.datasets
                 const { dataIndex, datasetIndex, dataset, parsed } = context
+
+                // Remove DCAs count dataset
+                if (datasetIndex === 2) return null
+
                 const digits0 = `${datasets?.[0]?.data?.[dataIndex]}`.split('.')[0].length
                 const digits1 = `${datasets?.[1]?.data?.[dataIndex]}`.split('.')[0].length
                 const maxDigits = Math.max(digits0, digits1)
@@ -203,6 +212,13 @@ const PortfolioChart: React.FC = () => {
             spanGaps: true,
             borderWidth: 2,
           },
+          {
+            label: 'DCAs',
+            data: dcasCountData,
+            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+            spanGaps: true,
+          }
         ],
       }}
     />

@@ -86,10 +86,13 @@ export const transformInvolicaDCA = ({ id, timestamp, __typename, ...dca }) => {
   } as InvolicaDCA
 }
 
-export type InvolicaSnapshot = InsTokensAmountsPrices & TimestampOutsTokensAmountsPrices
+export interface InvolicaSnapshot extends InsTokensAmountsPrices, TimestampOutsTokensAmountsPrices {
+  dcasCount: number
+}
 export const transformInvolicaSnapshot = (snapshot) => {
   return {
     timestamp: parseInt(snapshot.id),
+    dcasCount: snapshot.dcasCount,
 
     outTokens: snapshot.outTokens,
     outAmounts: snapshot.outAmounts.map(parseFloat),
@@ -139,6 +142,7 @@ export const SNAPSHOTS_DATA = gql`
   query SnapshotsData {
     involicaSnapshots(first: 1000) {
       id
+      dcasCount
       inTokens
       inAmounts
       outTokens
