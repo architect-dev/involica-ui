@@ -63,13 +63,19 @@ const StyledButton = styled.button<BaseButtonProps>`
   line-height: 1;
   outline: 0;
   box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+  svg {
+    transition: stroke-width 100ms ease-in-out;
+  }
 
   ${pressableMixin}
 
   &:hover:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled):not(:active) {
     box-shadow: 2px 2px 8px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+    svg {
+      stroke-width: 3;
+    }
   }
-  
+
   &:active:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled) {
     box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
   }

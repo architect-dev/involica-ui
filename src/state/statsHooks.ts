@@ -102,10 +102,11 @@ export interface TokenTradeData extends Token {
   valueChange: ValueChangeAndStatus
 }
 export interface LifetimeStats {
+  dcasCount: number
+
   inTokens: AddressRecord<TokenTradeData>
   outTokens: AddressRecord<TokenTradeData>
 
-  totalInTrade: UsdDisplay
   totalOutFull: TradeAndCurrentAndStatus
   totalValueChange: ValueChangeAndStatus
 }
@@ -339,7 +340,6 @@ export const useUserLifetimeStats = () => {
       })
     })
 
-    const totalInTrade = getUsdDisplay(Object.values(inTokens).reduce((total, token) => total + token.trade.usd, 0))
     const totalOutTrade = getUsdDisplay(Object.values(outTokens).reduce((total, token) => total + token.trade.usd, 0))
     const totalOutCurrent = getUsdDisplay(
       Object.values(outTokens).reduce((total, token) => total + token.current.usd, 0),
@@ -347,10 +347,11 @@ export const useUserLifetimeStats = () => {
     const totalOutStatus = getValueChangeStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd)
 
     return {
+      dcasCount: dcas.length,
+
       inTokens,
       outTokens,
 
-      totalInTrade,
       totalOutFull: {
         trade: totalOutTrade,
         current: totalOutCurrent,

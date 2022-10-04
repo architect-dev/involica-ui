@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react'
 import { Text, TokenSymbolImage, Flex } from 'uikit'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { PerfIndicator } from './PerfIndicator'
 import { TokenTradeData } from 'state/statsHooks'
 import { transparentize } from 'polished'
+import { pressableMixin } from 'uikit/util/styledMixins'
 
 const StyledTable = styled.table`
   width: 100%;
@@ -27,15 +28,31 @@ const StyledTable = styled.table`
 const StyledSecondRowTh = styled.th`
   height: 52px;
 `
+const ClickableTr = styled.tr<{ clickable: boolean, highlighted: boolean }>`
+  ${({ theme, highlighted }) => highlighted && css`
+    outline: 1px solid ${theme.colors.text};
+    outline-offset: -1px;
+  `}
+  ${({ theme, clickable }) =>
+    clickable &&
+    pressableMixin({
+      theme,
+      hoverStyles: css`
+        background-color: ${transparentize(0.85, theme.colors.text)} !important;
+      `,
+    })};
+`
 
-const TokenRow: React.FC<{ data: TokenTradeData; isTokenIn?: boolean; hasOuts?: boolean, isAggregate?: boolean }> = ({
-  data,
-  isTokenIn = false,
-  hasOuts = false,
-  isAggregate = false,
-}) => {
+const TokenRow: React.FC<{
+  data: TokenTradeData
+  isTokenIn?: boolean
+  hasOuts?: boolean
+  isAggregate?: boolean
+  highlighted?: boolean
+  onClick?: () => void
+}> = ({ data, isTokenIn = false, hasOuts = false, isAggregate = false, highlighted = false, onClick }) => {
   return (
-    <tr>
+    <ClickableTr highlighted={highlighted} clickable={onClick != null} onClick={onClick}>
       <td>
         <Flex alignItems="center" gap="2px">
           <TokenSymbolImage symbol={data.symbol} width={24} height={24} />
@@ -78,7 +95,7 @@ const TokenRow: React.FC<{ data: TokenTradeData; isTokenIn?: boolean; hasOuts?: 
           <td />
         </>
       )}
-    </tr>
+    </ClickableTr>
   )
 }
 
@@ -86,7 +103,10 @@ export const TokenPerfTable: React.FC<{
   tokensIn?: TokenTradeData[]
   tokensOut?: TokenTradeData[]
   isAggregate?: boolean
-}> = ({ tokensIn, tokensOut, isAggregate }) => {
+  highlightedTokens?: string[]
+  onTokenInClick?: (token: string) => void
+  onTokenOutClick?: (token: string) => void
+}> = ({ tokensIn, tokensOut, isAggregate, highlightedTokens = [], onTokenInClick, onTokenOutClick }) => {
   const hasTokensIn = useMemo(() => tokensIn?.length > 0, [tokensIn?.length])
   return (
     <StyledTable>
@@ -108,7 +128,15 @@ export const TokenPerfTable: React.FC<{
           </thead>
           <tbody>
             {tokensIn.map((tokenIn) => (
-              <TokenRow key={tokenIn.address} data={tokenIn} isTokenIn hasOuts={tokensOut && tokensOut.length > 0} isAggregate={isAggregate} />
+              <TokenRow
+                key={tokenIn.address}
+                data={tokenIn}
+                isTokenIn
+                hasOuts={tokensOut && tokensOut.length > 0}
+                highlighted={highlightedTokens.includes(tokenIn.address)}
+                isAggregate={isAggregate}
+                onClick={onTokenInClick == null ? null :() => onTokenInClick(highlightedTokens.includes(tokenIn.address) ? null : tokenIn.address)}
+              />
             ))}
           </tbody>
         </>
@@ -149,7 +177,13 @@ export const TokenPerfTable: React.FC<{
           </thead>
           <tbody>
             {tokensOut.map((tokenOut) => (
-              <TokenRow key={tokenOut.address} data={tokenOut} isAggregate={isAggregate} />
+              <TokenRow
+                key={tokenOut.address}
+                data={tokenOut}
+                isAggregate={isAggregate}
+                highlighted={highlightedTokens.includes(tokenOut.address)}
+                onClick={onTokenOutClick == null ? null : () => onTokenOutClick(highlightedTokens.includes(tokenOut.address) ? null : tokenOut.address)}
+              />
             ))}
           </tbody>
         </>

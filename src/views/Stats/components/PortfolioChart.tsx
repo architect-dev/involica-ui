@@ -16,7 +16,6 @@ import {
   Filler,
 } from 'chart.js'
 import { ChartDataOption, useChartOptionsState } from './chartOptionsState'
-import { getSymbol } from 'config/tokens'
 
 ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend)
 Tooltip.positioners.average = (elements) => {
@@ -101,18 +100,7 @@ const PortfolioChart: React.FC = () => {
             display: false,
           },
           title: {
-            display: true,
-            text: `${dataOption === ChartDataOption.User ? 'Portfolio' : 'Involica'} Performance${dataOption === ChartDataOption.User && focusedToken != null ? ` (${getSymbol(focusedToken)})` : ''}:`,
-            align: 'start',
-            padding: {
-              bottom: 10,
-            },
-            font: {
-              family: 'Courier Prime, monospace',
-              weight: 'normal',
-              size: 12,
-              style: 'italic'
-            },
+            display: false,
           },
           tooltip: {
             xAlign: 'center',

@@ -19,6 +19,7 @@ import { useMemo } from 'react'
 import { useConfigurableIntervalDCA, useUserTxs } from './hooks'
 import { AddressRecord } from './types'
 import { useWeb3React } from '@web3-react/core'
+import { useInvolicaStore } from './store'
 
 export const suffix = (intervalDCA: number | null) => {
   if (intervalDCA == null) return '-'
@@ -67,6 +68,8 @@ export const useIntervalStrings = () => {
 
 export const useDailyTokenPrices = () => {
   const txs = useUserTxs()
+  const tokensData = useInvolicaStore((state) => state.tokens)
+
   const [inTokens, outTokens] = useMemo(() => {
     const ins: AddressRecord<boolean> = {}
     const outs: AddressRecord<boolean> = {}
@@ -88,16 +91,22 @@ export const useDailyTokenPrices = () => {
 
   const dayPrices = useMemo(() => {
     if (loading || error || data?.tokenDayDatas == null) return null
-    const prices: Record<number, AddressRecord<string>> = {}
+    const prices: Record<number | string, AddressRecord<string>> = {}
 
     data.tokenDayDatas.forEach(({ date, priceUSD, id }: { date: number; priceUSD: string; id: string }) => {
       const address = id.split('-')[0]
       if (prices[date] == null) prices[date] = {}
       prices[date][address] = priceUSD
     })
+    
+    prices.current = {}
+
+    Object.values(tokensData).forEach((token) => {
+      prices.current[token.address.toLowerCase()] = token.price.toString()
+    })
 
     return prices
-  }, [loading, error, data])
+  }, [loading, error, data?.tokenDayDatas, tokensData])
 
   return dayPrices
 }
@@ -245,9 +254,10 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
       timestamps.push(dayTimestamp)
       tradeValData.push(runningTradeUsd)
 
+      const isCurrentDay = dayTimestamp > Math.floor(Date.now() / 1000)
       let currentUsd = 0
       Object.entries(runningPortfolioOuts).forEach(([token, amount]) => {
-        const currentPrice = dailyPrices[yesterdayTimestamp]?.[token] ?? '0'
+        const currentPrice = dailyPrices[isCurrentDay ? 'current' : yesterdayTimestamp]?.[token] ?? '0'
         currentUsd += parseFloat(currentPrice) * amount
       })
 
