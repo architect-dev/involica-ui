@@ -115,7 +115,10 @@ const CloseIcon = styled(X)`
   right: 20px;
   stroke: ${({ theme }) => theme.colors.text};
   cursor: pointer;
-  stroke-width: 2.5;
+
+  &:hover {
+    stroke-width: 3;
+  }
 `
 
 export const SummitPopUp: React.FC<Props> = React.memo(({

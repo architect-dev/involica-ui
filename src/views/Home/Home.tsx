@@ -7,7 +7,7 @@ import { AllowanceCard } from './Components/AllowanceCard'
 import { PositionStatusCard } from './Components/PositionStatusCard'
 import { FundsCard } from './Components/FundsCard'
 import { UpcomingExecutionsCard } from './Components/UpcomingExecutionsCard'
-import { PastTxsCard } from './Components/PastTxsCard'
+import { PastDcasCard } from './Components/PastDcasCard'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -50,7 +50,7 @@ const Home: React.FC = () => {
           <PositionCard />
           <AllowanceCard />
           <UpcomingExecutionsCard />
-          <PastTxsCard />
+          <PastDcasCard />
         </CardsWrapper>
       </Hero>
     </Page>

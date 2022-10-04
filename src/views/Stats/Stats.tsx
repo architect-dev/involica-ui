@@ -29,9 +29,9 @@ const Stats: React.FC = () => {
           INVOLICA
         </StyledHighlightedText>
       </Hero>
-      <Column width="100%" gap="18px">
-        <ChartOptionsRow />
+      <Column width="100%" gap="24px">
         <PortfolioChart />
+        <ChartOptionsRow />
       </Column>
     </Page>
   )

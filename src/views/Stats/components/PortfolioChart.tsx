@@ -16,6 +16,7 @@ import {
   Filler,
 } from 'chart.js'
 import { ChartDataOption, useChartOptionsState } from './chartOptionsState'
+import { getSymbol } from 'config/tokens'
 
 ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend)
 Tooltip.positioners.average = (elements) => {
@@ -33,7 +34,11 @@ Tooltip.positioners.average = (elements) => {
 
 const PortfolioChart: React.FC = () => {
   const { dataOption, focusedToken } = useChartOptionsState()
-  const chartData = useInvolicaDCAChartData(dataOption === ChartDataOption.User, dataOption === ChartDataOption.User ? focusedToken : null)
+  const chartData = useInvolicaDCAChartData(
+    dataOption === ChartDataOption.User,
+    dataOption === ChartDataOption.User ? focusedToken : null,
+    false,
+  )
   const { timestamps, tradeValData, currentValData } = chartData ?? {
     timestamps: [],
     tradeValData: [],
@@ -96,7 +101,18 @@ const PortfolioChart: React.FC = () => {
             display: false,
           },
           title: {
-            display: false,
+            display: true,
+            text: `${dataOption === ChartDataOption.User ? 'Portfolio' : 'Involica'} Performance${dataOption === ChartDataOption.User && focusedToken != null ? ` (${getSymbol(focusedToken)})` : ''}:`,
+            align: 'start',
+            padding: {
+              bottom: 10,
+            },
+            font: {
+              family: 'Courier Prime, monospace',
+              weight: 'normal',
+              size: 12,
+              style: 'italic'
+            },
           },
           tooltip: {
             xAlign: 'center',
@@ -104,13 +120,13 @@ const PortfolioChart: React.FC = () => {
             caretPadding: 20,
             displayColors: false,
             bodyFont: {
-              family: 'Courier Price, monospace',
+              family: 'Courier Prime, monospace',
             },
             titleFont: {
-              family: 'Courier Price, monospace',
+              family: 'Courier Prime, monospace',
             },
             footerFont: {
-              family: 'Courier Price, monospace',
+              family: 'Courier Prime, monospace',
             },
             titleAlign: 'right',
             titleMarginBottom: 6,
@@ -125,7 +141,7 @@ const PortfolioChart: React.FC = () => {
                 const digits1 = `${datasets?.[1]?.data?.[dataIndex]}`.split('.')[0].length
                 const maxDigits = Math.max(digits0, digits1)
                 const digitsOffset = datasetIndex === 0 ? maxDigits - digits0 : maxDigits - digits1
-                const titleOffset = datasetIndex === 0 ? 4 : 2
+                const titleOffset = 2
                 const spaces = ' '.repeat(titleOffset + digitsOffset)
 
                 let label = dataset.label || ''
@@ -173,18 +189,12 @@ const PortfolioChart: React.FC = () => {
             }
           },
         },
-        {
-          id: 'animate_axis',
-          beforeDraw: (chart) => {
-            console.log(chart)
-          },
-        },
       ]}
       data={{
         labels: timestamps,
         datasets: [
           {
-            label: 'Trade',
+            label: '@ Trade',
             data: tradeValData,
             fill: false,
             borderColor: '#575757',

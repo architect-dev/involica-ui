@@ -1,13 +1,13 @@
 import { CHAIN_ID } from './networks'
 
 const bscTestnetLinks: ExternalLinks = {
-  etherscan: 'https://testnet.bscscan.com'
+  etherscan: 'https://testnet.bscscan.com',
 }
 const ftmLinks: ExternalLinks = {
   etherscan: 'https://ftmscan.com/',
 }
 const polygonLinks: ExternalLinks = {
-  etherscan: 'https://poligonscan.com/'
+  etherscan: 'https://poligonscan.com/',
 }
 
 export interface ExternalLinks {
@@ -30,6 +30,6 @@ export const getEtherscanName = (): string => {
     56: 'BscScan',
     97: 'BscTestnetScan',
     250: 'FtmScan',
-    137: 'PolygonScan'
+    137: 'PolygonScan',
   }[CHAIN_ID]
 }

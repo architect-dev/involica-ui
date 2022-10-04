@@ -1,13 +1,13 @@
 import React from 'react'
 import Link from './Link'
 import { LinkProps } from './types'
-import OpenNewIcon from '../Svg/Icons/OpenNew'
+import { ExternalLink } from 'react-feather'
 
 const LinkExternal: React.FC<LinkProps> = ({ children, ...props }) => {
   return (
     <Link external target="_blank" {...props}>
       {children}
-      <OpenNewIcon color="primary" ml="4px" />
+      <ExternalLink size='14px'/>
     </Link>
   )
 }

@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react'
 import { Flex, SummitPopUp, Text, TokenSymbolImage } from 'uikit'
 import styled, { css } from 'styled-components'
-import { UserTxWithTradeData } from 'state/uiHooks'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { transparentize } from 'polished'
 import { DCATransactionModal } from 'components/DCATransactionModal'
 import { PerfIndicator } from './DataVis/PerfIndicator'
+import { DCAStats, useUserDcasData } from 'state/statsHooks'
 
 const Table = styled.div`
   display: flex;
@@ -28,7 +28,7 @@ const Table = styled.div`
     width: 100%;
     flex-wrap: wrap;
   }
-  & .row:nth-child(even) {
+  & .row:not(.head):nth-child(odd) {
     background-color: ${({ theme }) => transparentize(0.95, theme.colors.text)};
   }
 
@@ -106,31 +106,19 @@ const OutsTokenGrid = styled.div`
   }
 `
 
-const PastTxCard: React.FC<{ tx: UserTxWithTradeData; index: number; openModal: (index: number) => void }> = ({
-  tx,
-  index,
-  openModal,
-}) => {
-  const {
-    timestampDisplay,
-    tokenInData,
-    tokenTxsData,
-    valueChangeStatus,
-    valueChangeUsdDisplay,
-    valueChangePercDisplay,
-  } = tx
-  const handleOpenModal = useCallback(() => openModal(index), [index, openModal])
+const PastDcaCard: React.FC<{ dca: DCAStats; openModal: (hash: string) => void }> = ({ dca, openModal }) => {
+  const handleOpenModal = useCallback(() => openModal(dca.txHash), [dca.txHash, openModal])
   return (
     <Row className="row" onClick={handleOpenModal}>
       <div className="item item_1">
-        <Text bold>{timestampDisplay}</Text>
+        <Text bold>{dca.timestampDisplay}</Text>
       </div>
       <div className="item item_2">
         <PerfIndicator
-          status={valueChangeStatus}
-          usdDisplay={valueChangeUsdDisplay}
-          percDisplay={valueChangePercDisplay}
-          gap='6px'
+          status={dca.totalValueChange.status}
+          usdDisplay={dca.totalValueChange.usdDisplay}
+          percDisplay={dca.totalValueChange.percDisplay}
+          gap="6px"
           mobileInline
         />
       </div>
@@ -138,17 +126,21 @@ const PastTxCard: React.FC<{ tx: UserTxWithTradeData; index: number; openModal: 
       <div className="item item_3">
         <OutsGrid>
           <Flex alignItems="center" gap="2px">
-            <Text bold small>{tokenInData.tradeAmountUsdDisplay}</Text>
-            <TokenSymbolImage symbol={tokenInData.symbol} width={24} height={24} />
+            <Text bold small>
+              {dca.inToken.trade.usdDisplay}
+            </Text>
+            <TokenSymbolImage symbol={dca.inToken.symbol} width={24} height={24} />
           </Flex>
           <Text small mx="8px">
             {'>>'}
           </Text>
           <OutsTokenGrid>
-            {tokenTxsData.map((tokenTx) => (
-              <Flex alignItems="center" gap="2px" key={tokenTx.address}>
-                <Text bold small>{tokenTx.tradeAmountUsdDisplay}</Text>
-                <TokenSymbolImage key={tokenTx.tokenOut} symbol={tokenTx.symbol} width={24} height={24} />
+            {dca.outTokens.map((outToken) => (
+              <Flex alignItems="center" gap="2px" key={outToken.address}>
+                <Text bold small>
+                  {outToken.trade.usdDisplay}
+                </Text>
+                <TokenSymbolImage symbol={outToken.symbol} width={24} height={24} />
               </Flex>
             ))}
           </OutsTokenGrid>
@@ -158,15 +150,12 @@ const PastTxCard: React.FC<{ tx: UserTxWithTradeData; index: number; openModal: 
   )
 }
 
-interface Props {
-  txs: UserTxWithTradeData[]
-}
-
-export const PastTxsTable: React.FC<Props> = ({ txs }) => {
-  const [modalTxIndex, setModalTxIndex] = React.useState<number | null>(null)
-  const hideTxModal = useCallback(() => setModalTxIndex(null), [])
-  const openUserTxModal = useCallback((i: number) => {
-    setModalTxIndex(i)
+export const PastDcasTable: React.FC = () => {
+  const dcasData = useUserDcasData()
+  const [modalDcaHash, setModalDcaHash] = React.useState<string | null>(null)
+  const hideTxModal = useCallback(() => setModalDcaHash(null), [])
+  const openUserTxModal = useCallback((hash: string) => {
+    setModalDcaHash(hash)
   }, [])
 
   return (
@@ -174,27 +163,35 @@ export const PastTxsTable: React.FC<Props> = ({ txs }) => {
       <Table>
         <div className="row head">
           <div className="item item_1">
-            <Text small italic>Date</Text>
+            <Text small italic>
+              Date
+            </Text>
           </div>
           <div className="item item_2">
-            <Text small italic>DCA Performance</Text>
+            <Text small italic>
+              DCA Performance
+            </Text>
           </div>
           <div className="item item_3">
-            <Text small italic>Trade Breakdown</Text>
+            <Text small italic>
+              Trade Breakdown
+            </Text>
           </div>
         </div>
         <div className="body">
-          {txs != null &&
-            txs.map((userTx, i) => (
-              <PastTxCard tx={userTx} key={userTx.timestamp} index={i} openModal={openUserTxModal} />
-            ))}
+          {dcasData != null &&
+            dcasData.map((dca) => <PastDcaCard dca={dca} key={dca.txHash} openModal={openUserTxModal} />)}
         </div>
       </Table>
       <SummitPopUp
-        open={modalTxIndex != null}
+        open={modalDcaHash != null}
         callOnDismiss={hideTxModal}
         popUpTitle="DCA Transaction Details"
-        popUpContent={modalTxIndex != null && <DCATransactionModal tx={txs[modalTxIndex]} onDismiss={hideTxModal} />}
+        popUpContent={
+          modalDcaHash != null && (
+            <DCATransactionModal dca={dcasData.find(({ txHash }) => txHash === modalDcaHash)} onDismiss={hideTxModal} />
+          )
+        }
       />
     </>
   )

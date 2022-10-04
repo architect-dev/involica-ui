@@ -70,6 +70,10 @@ export const getValueChangeStatus = (perc: number): ValueChangeStatus => {
   }
   return perc >= 0 ? ValueChangeStatus.Positive : ValueChangeStatus.Negative
 }
+export const getValueChangeStatusFromUsds = (currentUsd: number | null, tradeUsd: number | null): ValueChangeStatus => {
+  const perc = currentUsd == null || tradeUsd == null ? null : (currentUsd - tradeUsd) * 100 / tradeUsd
+  return getValueChangeStatus(perc)
+}
 export type ValueChangeStatusRecord<T> = Record<ValueChangeStatus, T>
 export const ValueChangeStatusColor: ValueChangeStatusRecord<string> = {
   [ValueChangeStatus.Positive]: 'success',

@@ -1,87 +1,43 @@
 import { orderBy } from 'lodash'
 import React, { useMemo } from 'react'
-import { InvValueChangeStatusColor, ValueChangeStatusColor } from 'state/status'
-import { DerivedTxsStats } from 'state/uiHooks'
+import { useUserLifetimeStats } from 'state/statsHooks'
 import { Column, Text } from 'uikit'
 import { CellCol, CellRow } from 'views/Home/Components/styles'
 import { DataRow } from './DataRow'
 import { PerfIndicator } from './DataVis/PerfIndicator'
 import { TokenPerfTable } from './DataVis/TokenPerfTable'
 
-interface Props {
-  derived: DerivedTxsStats
-}
-
-export const DerivedStatsTable: React.FC<Props> = ({ derived }) => {
-  const {
-    totalTradeInAmountUsdDisplay,
-    totalCurrentInAmountUsdDisplay,
-    totalInStatus,
-    totalTradeOutAmountUsdDisplay,
-    totalCurrentOutAmountUsdDisplay,
-    totalOutStatus,
-    totalValueChangeStatus,
-    totalValueChangeUsdDisplay,
-    totalValueChangePercDisplay,
-
-    inTokens,
-    outTokens,
-  } = derived
+export const DerivedStatsTable: React.FC = () => {
+  const lifetimeStats = useUserLifetimeStats()
 
   const sortedInTokens = useMemo(() => {
-    return orderBy(Object.values(inTokens), ['tradeAmountUsd'], ['desc'])
-  }, [inTokens])
+    return orderBy(Object.values(lifetimeStats?.inTokens ?? []), ['tradeAmountUsd'], ['desc'])
+  }, [lifetimeStats?.inTokens])
   const sortedOutTokens = useMemo(() => {
-    return orderBy(Object.values(outTokens), ['tradeAmountUsd'], ['desc'])
-  }, [outTokens])
+    return orderBy(Object.values(lifetimeStats?.outTokens ?? []), ['tradeAmountUsd'], ['desc'])
+  }, [lifetimeStats?.outTokens])
 
   return (
     <CellRow>
       <CellCol>
+        <Column width="100%">
+          <DataRow px="6px" t="Total Buy In:" v={lifetimeStats?.totalInTrade?.usdDisplay} />
+        </Column>
+        <Column width="100%">
+          <DataRow px="6px" t="Current Portfolio Value:" v={lifetimeStats?.totalOutFull?.current?.usdDisplay} />
+        </Column>
         <DataRow
           px="6px"
           t="Total PnL:"
           v={
             <PerfIndicator
-              status={totalValueChangeStatus}
-              usdDisplay={totalValueChangeUsdDisplay}
-              percDisplay={totalValueChangePercDisplay}
+              status={lifetimeStats?.totalValueChange?.status}
+              usdDisplay={lifetimeStats?.totalValueChange?.usdDisplay}
+              percDisplay={lifetimeStats?.totalValueChange?.percDisplay}
               gap='6px'
             />
           }
         />
-        <Column width="100%">
-          <DataRow px="6px" t="Combined DCAs Sell:" v={totalTradeInAmountUsdDisplay} />
-          <DataRow
-            px="6px"
-            t={
-              <Text small italic color={InvValueChangeStatusColor[totalInStatus]}>
-                Current Value:
-              </Text>
-            }
-            v={
-              <Text small color={InvValueChangeStatusColor[totalInStatus]}>
-                {totalCurrentInAmountUsdDisplay}
-              </Text>
-            }
-          />
-        </Column>
-        <Column width="100%">
-          <DataRow px="6px" t="Combined DCAs Buy:" v={totalTradeOutAmountUsdDisplay} />
-          <DataRow
-            px="6px"
-            t={
-              <Text small italic color={ValueChangeStatusColor[totalOutStatus]}>
-                Current Value:
-              </Text>
-            }
-            v={
-              <Text small color={ValueChangeStatusColor[totalOutStatus]}>
-                {totalCurrentOutAmountUsdDisplay}
-              </Text>
-            }
-          />
-        </Column>
         <Column width="100%" gap="4px">
           <Text small italic pl="6px">
             Combined DCAs Sell Token Data:

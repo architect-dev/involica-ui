@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react'
 import { Text, TokenSymbolImage, Flex } from 'uikit'
-import { TokenWithTradeData } from 'state/uiHooks'
 import styled from 'styled-components'
 import { PerfIndicator } from './PerfIndicator'
+import { TokenTradeData } from 'state/statsHooks'
+import { transparentize } from 'polished'
 
 const StyledTable = styled.table`
   width: 100%;
@@ -19,14 +20,18 @@ const StyledTable = styled.table`
     vertical-align: middle;
     padding: 6px;
   }
+  & tr:not(.head):nth-child(odd) {
+    background-color: ${({ theme }) => transparentize(0.95, theme.colors.text)};
+  }
 `
 const StyledSecondRowTh = styled.th`
   height: 52px;
 `
 
-const TokenRow: React.FC<{ data: TokenWithTradeData; isTokenIn?: boolean; isAggregate?: boolean }> = ({
+const TokenRow: React.FC<{ data: TokenTradeData; isTokenIn?: boolean; hasOuts?: boolean, isAggregate?: boolean }> = ({
   data,
   isTokenIn = false,
+  hasOuts = false,
   isAggregate = false,
 }) => {
   return (
@@ -39,41 +44,47 @@ const TokenRow: React.FC<{ data: TokenWithTradeData; isTokenIn?: boolean; isAggr
       </td>
       <td>
         <Text small textAlign="right">
-          {data.tradeAmountUsdDisplay}
-          {!isAggregate && (
-            <>
-              <br />
-              <Text fontSize="11px" italic textAlign="right">
-                (${data.tradePrice.toFixed(2)}/{data.symbol})
-              </Text>
-            </>
-          )}
-        </Text>
-      </td>
-      <td>
-        <Text small bold textAlign="right">
-          <b>{data.currentAmountUsdDisplay}</b>
+          {isTokenIn ? <b>{data.trade.usdDisplay}</b> : data.trade.usdDisplay}
           <br />
           <Text fontSize="11px" italic textAlign="right">
-            (${data.price.toFixed(2)}/{data.symbol})
+            ({isAggregate && 'avg '}${data.trade.price.toFixed(2)})
           </Text>
         </Text>
       </td>
-      <td>
-        <PerfIndicator
-          status={data.valueChangeStatus}
-          usdDisplay={data.valueChangeUsdDisplay}
-          percDisplay={data.valueChangePercDisplay}
-          invertColors={isTokenIn}
-        />
-      </td>
+      {!isTokenIn && (
+        <>
+          <td>
+            <Text small bold textAlign="right">
+              <b>{data.current.usdDisplay}</b>
+              <br />
+              <Text fontSize="11px" italic textAlign="right">
+                (${data.price.toFixed(2)})
+              </Text>
+            </Text>
+          </td>
+          <td>
+            <PerfIndicator
+              status={data.valueChange.status}
+              usdDisplay={data.valueChange.usdDisplay}
+              percDisplay={data.valueChange.percDisplay}
+              invertColors={isTokenIn}
+            />
+          </td>
+        </>
+      )}
+      {isTokenIn && hasOuts && (
+        <>
+          <td />
+          <td />
+        </>
+      )}
     </tr>
   )
 }
 
 export const TokenPerfTable: React.FC<{
-  tokensIn?: TokenWithTradeData[]
-  tokensOut?: TokenWithTradeData[]
+  tokensIn?: TokenTradeData[]
+  tokensOut?: TokenTradeData[]
   isAggregate?: boolean
 }> = ({ tokensIn, tokensOut, isAggregate }) => {
   const hasTokensIn = useMemo(() => tokensIn?.length > 0, [tokensIn?.length])
@@ -82,7 +93,7 @@ export const TokenPerfTable: React.FC<{
       {hasTokensIn && (
         <>
           <thead>
-            <tr>
+            <tr className="head">
               <th>
                 <Text italic small>
                   Token{tokensIn.length > 1 ? 's' : ''} In
@@ -93,21 +104,11 @@ export const TokenPerfTable: React.FC<{
                   $Trade
                 </Text>
               </th>
-              <th>
-                <Text italic small textAlign="right">
-                  $Current
-                </Text>
-              </th>
-              <th>
-                <Text italic small textAlign="right">
-                  Perf
-                </Text>
-              </th>
             </tr>
           </thead>
           <tbody>
             {tokensIn.map((tokenIn) => (
-              <TokenRow key={tokenIn.address} data={tokenIn} isTokenIn isAggregate={isAggregate} />
+              <TokenRow key={tokenIn.address} data={tokenIn} isTokenIn hasOuts={tokensOut && tokensOut.length > 0} isAggregate={isAggregate} />
             ))}
           </tbody>
         </>
@@ -115,7 +116,7 @@ export const TokenPerfTable: React.FC<{
       {tokensOut && tokensOut.length > 0 && (
         <>
           <thead>
-            <tr>
+            <tr className="head">
               {hasTokensIn ? (
                 <StyledSecondRowTh>
                   <Text italic small>

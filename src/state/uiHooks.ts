@@ -1,6 +1,5 @@
 /* eslint-disable no-loop-func */
 import { useQuery } from '@apollo/client'
-import BigNumber from 'bignumber.js'
 import { ethers } from 'ethers'
 import {
   DAY_TOKEN_DATA,
@@ -9,20 +8,16 @@ import {
   InvolicaStats,
   INVOLICA_STATS_DATA,
   SNAPSHOTS_DATA,
-  TimestampInsOuts,
+  TimestampOutsTokensAmountsPrices,
   transformInvolicaDCA,
   transformInvolicaSnapshot,
   transformInvolicaStats,
   USER_STATS_DATA,
 } from 'config/constants/graph'
-import { clone, cloneDeep } from 'lodash'
+import { clone } from 'lodash'
 import { useMemo } from 'react'
-import { bn, bnDecOffset, bnZero } from 'utils'
-import { timestampToDateTime } from 'utils/timestamp'
 import { useConfigurableIntervalDCA, useUserTxs } from './hooks'
-import { getValueChangeStatus, ValueChangeStatus } from './status'
-import { useInvolicaStore } from './store'
-import { AddressRecord, Token, UserTokenTx } from './types'
+import { AddressRecord } from './types'
 import { useWeb3React } from '@web3-react/core'
 
 export const suffix = (intervalDCA: number | null) => {
@@ -68,280 +63,6 @@ export const useIntervalStrings = () => {
     }),
     [anyError, intervalDCA],
   )
-}
-
-export interface TokenWithTradeData extends Token {
-  tradeAmount: BigNumber
-
-  tradePrice: number
-  tradeAmountUsd: number
-  tradeAmountUsdDisplay: string
-
-  currentPrice: number
-  currentAmountUsd: number
-  currentAmountUsdDisplay: string
-
-  valueChangeUsd: number
-  valueChangeUsdDisplay: string
-  valueChangePerc: number
-  valueChangePercDisplay: string
-  valueChangeStatus: ValueChangeStatus
-}
-export interface UserTokenTxWithTradeData extends UserTokenTx, TokenWithTradeData {}
-export interface UserTxWithTradeData {
-  timestamp: number
-  timestampDisplay: string
-  tokenInData: TokenWithTradeData
-  tokenTxsData: UserTokenTxWithTradeData[]
-
-  valueChangeUsd: number
-  valueChangeUsdDisplay: string
-  valueChangePerc: number
-  valueChangePercDisplay: string
-  valueChangeStatus: ValueChangeStatus
-}
-
-export interface DerivedTxsStats {
-  totalTradeInAmountUsd: number
-  totalTradeInAmountUsdDisplay: string
-  totalCurrentInAmountUsd: number
-  totalCurrentInAmountUsdDisplay: string
-  totalInStatus: ValueChangeStatus
-
-  totalTradeOutAmountUsd: number
-  totalTradeOutAmountUsdDisplay: string
-  totalCurrentOutAmountUsd: number
-  totalCurrentOutAmountUsdDisplay: string
-  totalOutStatus: ValueChangeStatus
-
-  totalValueChangeUsd: number
-  totalValueChangeUsdDisplay: string
-  totalValueChangePerc: number
-  totalValueChangePercDisplay: string
-  totalValueChangeStatus: ValueChangeStatus
-  inTokens: AddressRecord<TokenWithTradeData>
-  outTokens: AddressRecord<TokenWithTradeData>
-}
-export const useUserTxsWithDisplayData = () => {
-  const userTxs = useUserTxs()
-  const tokensData = useInvolicaStore((state) => state.tokens)
-
-  const txs = useMemo(() => {
-    return (userTxs ?? []).map(
-      ({ timestamp, tokenIn, tokenTxs }): UserTxWithTradeData => {
-        const tokenInDecimals = tokensData?.[tokenIn]?.decimals
-        const tokenInTradePrice = bn(tokenTxs[0].tokenInPrice).toNumber()
-        const tokenInCurrentPrice = tokensData?.[tokenIn]?.price
-        const totalTokenInTradeAmount = tokenTxs.reduce((acc, { amountIn }) => acc.plus(amountIn), bnZero)
-
-        const totalTokenInTradeAmountUsd = bnDecOffset(totalTokenInTradeAmount, tokenInDecimals)
-          .times(tokenInTradePrice)
-          .toNumber()
-        const totalTokenInCurrentAmountUsd = bnDecOffset(totalTokenInTradeAmount, tokenInDecimals)
-          .times(tokenInCurrentPrice)
-          .toNumber()
-
-        const tokenInValueChangeUsd = totalTokenInCurrentAmountUsd - totalTokenInTradeAmountUsd
-        const tokenInValueChangePerc = (tokenInValueChangeUsd * 100) / totalTokenInTradeAmountUsd
-
-        const tokenInData: TokenWithTradeData = {
-          ...tokensData[tokenIn],
-
-          tradeAmount: totalTokenInTradeAmount,
-
-          tradePrice: tokenInTradePrice,
-          tradeAmountUsd: totalTokenInTradeAmountUsd,
-          tradeAmountUsdDisplay: totalTokenInTradeAmountUsd == null ? '-' : `$${totalTokenInTradeAmountUsd.toFixed(2)}`,
-
-          currentPrice: tokenInCurrentPrice,
-          currentAmountUsd: totalTokenInCurrentAmountUsd,
-          currentAmountUsdDisplay:
-            totalTokenInCurrentAmountUsd == null ? '-' : `$${totalTokenInCurrentAmountUsd.toFixed(2)}`,
-
-          valueChangeUsd: tokenInValueChangeUsd,
-          valueChangeUsdDisplay: tokenInValueChangeUsd == null ? '-' : `$${Math.abs(tokenInValueChangeUsd).toFixed(2)}`,
-          valueChangePerc: tokenInValueChangePerc,
-          valueChangePercDisplay:
-            tokenInValueChangePerc == null ? '-' : `${Math.abs(tokenInValueChangePerc).toFixed(2)}%`,
-          valueChangeStatus: getValueChangeStatus(tokenInValueChangePerc),
-        }
-
-        const tokenTxsData = tokenTxs.map(
-          (tokenTx): UserTokenTxWithTradeData => {
-            const tradeAmount = tokenTx.amountOut
-            const outDecimals = tokensData?.[tokenTx.tokenOut]?.decimals
-            const amountOutDecOffset = bnDecOffset(tokenTx.amountOut, outDecimals)
-
-            const tradePrice =
-              tokenInData?.decimals == null || outDecimals == null
-                ? null
-                : bnDecOffset(tokenTx.amountIn, tokenInData.decimals)
-                    .div(amountOutDecOffset)
-                    .times(tokenTx.tokenInPrice)
-                    .toNumber()
-            const tradeAmountUsd =
-              tradePrice == null || outDecimals == null ? null : amountOutDecOffset.times(tradePrice).toNumber()
-
-            const currentPrice = tokensData?.[tokenTx.tokenOut]?.price
-            const currentAmountUsd =
-              currentPrice == null || outDecimals == null ? null : amountOutDecOffset.times(currentPrice).toNumber()
-
-            const valueChangeUsd = currentAmountUsd - tradeAmountUsd
-            const valueChangePerc = (valueChangeUsd * 100) / tradeAmountUsd
-
-            return {
-              ...tokenTx,
-              ...tokensData[tokenTx.tokenOut],
-
-              tradeAmount,
-
-              tradePrice,
-              tradeAmountUsd,
-              tradeAmountUsdDisplay: tradeAmountUsd == null ? '-' : `$${tradeAmountUsd.toFixed(2)}`,
-
-              currentPrice,
-              currentAmountUsd,
-              currentAmountUsdDisplay: currentAmountUsd == null ? '-' : `$${currentAmountUsd.toFixed(2)}`,
-
-              valueChangeUsd,
-              valueChangeUsdDisplay: valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`,
-              valueChangePerc,
-              valueChangePercDisplay: valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`,
-              valueChangeStatus: getValueChangeStatus(valueChangePerc),
-            }
-          },
-        )
-
-        const outValueChangeUsd = tokenTxsData.reduce((acc, tokenTx) => acc + tokenTx.valueChangeUsd, 0)
-
-        const valueChangeUsd = outValueChangeUsd - tokenInData.valueChangeUsd
-        const valueChangePerc = (valueChangeUsd * 100) / tokenInData.tradeAmountUsd
-
-        return {
-          timestamp,
-          timestampDisplay: timestampToDateTime(timestamp),
-          tokenInData,
-          tokenTxsData,
-          valueChangeUsd,
-          valueChangeUsdDisplay: valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`,
-          valueChangePerc,
-          valueChangePercDisplay: valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`,
-          valueChangeStatus: getValueChangeStatus(valueChangePerc),
-        }
-      },
-    )
-  }, [userTxs, tokensData])
-
-  const derived = useMemo((): DerivedTxsStats => {
-    let totalValueChangeUsd = 0
-    let totalTradeInAmountUsd = 0
-    let totalCurrentInAmountUsd = 0
-    let totalTradeOutAmountUsd = 0
-    let totalCurrentOutAmountUsd = 0
-    const inTokens: AddressRecord<TokenWithTradeData> = {}
-    const outTokens: AddressRecord<TokenWithTradeData> = {}
-
-    txs.forEach((tx) => {
-      totalValueChangeUsd += tx.valueChangeUsd
-      totalTradeInAmountUsd += tx.tokenInData.tradeAmountUsd
-      totalCurrentInAmountUsd += tx.tokenInData.currentAmountUsd
-
-      if (inTokens[tx.tokenInData.address] == null) {
-        inTokens[tx.tokenInData.address] = cloneDeep(tx.tokenInData)
-      } else {
-        inTokens[tx.tokenInData.address].tradeAmountUsd += tx.tokenInData.tradeAmountUsd
-        inTokens[tx.tokenInData.address].currentAmountUsd += tx.tokenInData.currentAmountUsd
-      }
-
-      tx.tokenTxsData.forEach((tokenTx) => {
-        totalTradeOutAmountUsd += tokenTx.tradeAmountUsd
-        totalCurrentOutAmountUsd += tokenTx.currentAmountUsd
-
-        if (outTokens[tokenTx.address] == null) {
-          outTokens[tokenTx.address] = cloneDeep(tokenTx)
-        } else {
-          outTokens[tokenTx.address].tradeAmountUsd += tokenTx.tradeAmountUsd
-          outTokens[tokenTx.address].currentAmountUsd += tokenTx.currentAmountUsd
-        }
-      })
-    })
-
-    const totalValueChangeUsdDisplay =
-      totalValueChangeUsd == null ? '-' : `$${Math.abs(totalValueChangeUsd).toFixed(2)}`
-    const totalValueChangePerc = (totalValueChangeUsd * 100) / totalTradeInAmountUsd
-    const totalValueChangePercDisplay =
-      totalValueChangePerc == null ? '-' : `${Math.abs(totalValueChangePerc).toFixed(2)}%`
-    const totalValueChangeStatus = getValueChangeStatus(totalValueChangePerc)
-
-    Object.values(inTokens).forEach((inToken) => {
-      inTokens[inToken.address].tradeAmountUsdDisplay =
-        inToken.tradeAmountUsd == null ? '-' : `$${Math.abs(inToken.tradeAmountUsd).toFixed(2)}`
-      inTokens[inToken.address].currentAmountUsdDisplay =
-        inToken.currentAmountUsd == null ? '-' : `$${Math.abs(inToken.currentAmountUsd).toFixed(2)}`
-
-      const valueChangeUsd = inToken.currentAmountUsd - inToken.tradeAmountUsd
-      const valueChangePerc = (inToken.valueChangeUsd * 100) / inToken.tradeAmountUsd
-      inTokens[inToken.address].valueChangeUsd = valueChangeUsd
-      inTokens[inToken.address].valueChangeUsdDisplay =
-        valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`
-      inTokens[inToken.address].valueChangePerc = valueChangePerc
-      inTokens[inToken.address].valueChangePercDisplay =
-        valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`
-      inTokens[inToken.address].valueChangeStatus = getValueChangeStatus(inToken.valueChangePerc)
-    })
-    Object.values(outTokens).forEach((outToken) => {
-      outTokens[outToken.address].tradeAmountUsdDisplay =
-        outToken.tradeAmountUsd == null ? '-' : `$${Math.abs(outToken.tradeAmountUsd).toFixed(2)}`
-      outTokens[outToken.address].currentAmountUsdDisplay =
-        outToken.currentAmountUsd == null ? '-' : `$${Math.abs(outToken.currentAmountUsd).toFixed(2)}`
-
-      const valueChangeUsd = outToken.currentAmountUsd - outToken.tradeAmountUsd
-      const valueChangePerc = (outToken.valueChangeUsd * 100) / outToken.tradeAmountUsd
-      outTokens[outToken.address].valueChangeUsd = valueChangeUsd
-      outTokens[outToken.address].valueChangeUsdDisplay =
-        valueChangeUsd == null ? '-' : `$${Math.abs(valueChangeUsd).toFixed(2)}`
-      outTokens[outToken.address].valueChangePerc = valueChangePerc
-      outTokens[outToken.address].valueChangePercDisplay =
-        valueChangePerc == null ? '-' : `${Math.abs(valueChangePerc).toFixed(2)}%`
-      outTokens[outToken.address].valueChangeStatus = getValueChangeStatus(outToken.valueChangePerc)
-    })
-
-    return {
-      totalTradeInAmountUsd,
-      totalTradeInAmountUsdDisplay:
-        totalTradeInAmountUsd == null ? '-' : `$${Math.abs(totalTradeInAmountUsd).toFixed(2)}`,
-      totalCurrentInAmountUsd,
-      totalCurrentInAmountUsdDisplay:
-        totalCurrentInAmountUsd == null ? '-' : `$${Math.abs(totalCurrentInAmountUsd).toFixed(2)}`,
-      totalInStatus: getValueChangeStatus(
-        ((totalCurrentInAmountUsd - totalTradeInAmountUsd) * 100) / totalTradeInAmountUsd,
-      ),
-
-      totalTradeOutAmountUsd,
-      totalTradeOutAmountUsdDisplay:
-        totalTradeOutAmountUsd == null ? '-' : `$${Math.abs(totalTradeOutAmountUsd).toFixed(2)}`,
-      totalCurrentOutAmountUsd,
-      totalCurrentOutAmountUsdDisplay:
-        totalCurrentOutAmountUsd == null ? '-' : `$${Math.abs(totalCurrentOutAmountUsd).toFixed(2)}`,
-      totalOutStatus: getValueChangeStatus(
-        ((totalCurrentOutAmountUsd - totalCurrentInAmountUsd) * 100) / totalTradeOutAmountUsd,
-      ),
-
-      totalValueChangeUsd,
-      totalValueChangeUsdDisplay,
-      totalValueChangePerc,
-      totalValueChangePercDisplay,
-      totalValueChangeStatus,
-
-      inTokens,
-      outTokens,
-    }
-  }, [txs])
-
-  return {
-    txs,
-    derived,
-  }
 }
 
 export const useDailyTokenPrices = () => {
@@ -434,43 +155,32 @@ export const useInvolicaDcasOrSnapshots = (dcas: boolean) => {
   const userDcas = useInvolicaUserDcasData()
   const snapshots = useInvolicaSnapshotsData()
 
-  return useMemo((): TimestampInsOuts[] => {
+  return useMemo((): TimestampOutsTokensAmountsPrices[] => {
     return dcas ? userDcas : snapshots
   }, [dcas, userDcas, snapshots])
 }
 
-export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | null) => {
+export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | null, includeDCAs: boolean) => {
   const dcasOrSnapshots = useInvolicaDcasOrSnapshots(dcas)
   const dailyPrices = useDailyTokenPrices()
 
-  const { userIns, userOuts } = useMemo(() => {
-    if (dcasOrSnapshots == null) return { userIns: null, userOuts: null }
-    const ins: AddressRecord<boolean> = {}
+  const userOuts = useMemo(() => {
+    if (dcasOrSnapshots == null) return null
     const outs: AddressRecord<boolean> = {}
     dcasOrSnapshots.forEach((dcaOrSnapshot) => {
-      ins[dcaOrSnapshot.inToken] = true
       dcaOrSnapshot.outTokens.forEach((outToken) => {
         outs[outToken] = true
       })
     })
     if (selectedToken != null)
-      return {
-        userIns: ins[selectedToken.toLowerCase()] ? [selectedToken.toLowerCase()] : [],
-        userOuts: outs[selectedToken.toLowerCase()] ? [selectedToken.toLowerCase()] : [],
-      }
-    return {
-      userIns: Object.keys(ins),
-      userOuts: Object.keys(outs),
-    }
+      return outs[selectedToken.toLowerCase()] ? [selectedToken.toLowerCase()] : []
+    return Object.keys(outs)
   }, [dcasOrSnapshots, selectedToken])
 
   const dataStartDay = useMemo(() => {
     if (dcasOrSnapshots == null || dcasOrSnapshots.length === 0) return null
     return Math.floor(dcasOrSnapshots[0].timestamp / 86400) * 86400
   }, [dcasOrSnapshots])
-  const dataEndDay = useMemo(() => {
-    return Math.floor(Math.floor(Date.now() / 1000) / 86400) * 86400
-  }, [])
 
   /*
     Zip between days to create a portfolio snapshot of everything that happened during that day
@@ -480,7 +190,7 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
       Add outs change and subtract in change to get total change
   */
   return useMemo(() => {
-    if (dataStartDay == null || userIns == null || userOuts == null || dcasOrSnapshots == null || dailyPrices == null)
+    if (dataStartDay == null || userOuts == null || dcasOrSnapshots == null || dailyPrices == null)
       return null
 
     let runningTradeUsd = 0
@@ -489,52 +199,59 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
     const currentValData = []
     let dayTimestamp = dataStartDay
     let dcaIndex = 0
-    const runningPortfolioIns: AddressRecord<number> = clone({})
     const runningPortfolioOuts: AddressRecord<number> = clone({})
 
     // Populate running portfolio with tokens to track
-    userIns.forEach((inToken) => {
-      runningPortfolioIns[inToken] = 0
-    })
     userOuts.forEach((outToken) => {
       runningPortfolioOuts[outToken] = 0
     })
 
     while (dayTimestamp <= Math.floor(Date.now() / 1000) + 86400) {
-      timestamps.push(dayTimestamp)
       const yesterdayTimestamp = dayTimestamp - 86400
 
       // Increment portfolio values with all trades that happened on this day
-      const dcasCountRemaining = dcasOrSnapshots.length - dcaIndex
-      for (let i = dcaIndex; i <= dcasCountRemaining; i++) {
+      for (let i = dcaIndex; i < dcasOrSnapshots.length; i++) {
         const dcaOrSnapshot = dcasOrSnapshots[i]
 
         // Exit if dca didn't happen during this day
         if (dcaOrSnapshot.timestamp < yesterdayTimestamp || dcaOrSnapshot.timestamp >= dayTimestamp) break
 
-        if (runningPortfolioIns[dcaOrSnapshot.inToken] != null) runningPortfolioIns[dcaOrSnapshot.inToken] += parseFloat(dcaOrSnapshot.inAmount)
         dcaOrSnapshot.outTokens.forEach((outToken, outTokenIndex) => {
-          const amount = parseFloat(dcasOrSnapshots[i].outAmounts[outTokenIndex])
-
+          const amount = dcasOrSnapshots[i].outAmounts[outTokenIndex]
+          
           // Only include token if its being tracked
           if (runningPortfolioOuts[outToken] != null) {
             runningPortfolioOuts[outToken] += amount
-
+            
             const tradePrice = dailyPrices[yesterdayTimestamp]?.[outToken] ?? '0'
             runningTradeUsd += parseFloat(tradePrice) * amount
           }
         })
 
+        if (includeDCAs) {
+          timestamps.push(dcaOrSnapshot.timestamp)
+          tradeValData.push(runningTradeUsd)
+          let currentUsd = 0
+          Object.entries(runningPortfolioOuts).forEach(([token, amount]) => {
+            const currentPrice = dailyPrices[yesterdayTimestamp]?.[token] ?? '0'
+            currentUsd += parseFloat(currentPrice) * amount
+          })
+          currentValData.push(currentUsd)
+        }
+
         dcaIndex++
       }
+      
+      timestamps.push(dayTimestamp)
       tradeValData.push(runningTradeUsd)
 
       let currentUsd = 0
       Object.entries(runningPortfolioOuts).forEach(([token, amount]) => {
-        const currentPrice = dailyPrices[dataEndDay]?.[token] ?? '0'
+        const currentPrice = dailyPrices[yesterdayTimestamp]?.[token] ?? '0'
         currentUsd += parseFloat(currentPrice) * amount
       })
-      currentValData.push(currentUsd * (dcas ? 2 : 1))
+
+      currentValData.push(currentUsd)
 
       dayTimestamp += 86400
     }
@@ -544,5 +261,5 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
       tradeValData,
       currentValData,
     }
-  }, [dataStartDay, userIns, userOuts, dcasOrSnapshots, dailyPrices, dcas, dataEndDay])
+  }, [dataStartDay, userOuts, dcasOrSnapshots, dailyPrices, includeDCAs])
 }

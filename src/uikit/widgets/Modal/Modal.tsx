@@ -5,6 +5,7 @@ import Flex from '../../components/Box/Flex'
 import { ArrowBackIcon, CloseIcon } from '../../components/Svg'
 import { IconButton } from '../../components/Button'
 import { InjectedProps } from './types'
+import { X } from 'react-feather'
 
 interface Props extends InjectedProps {
   title: string
@@ -91,7 +92,7 @@ const Modal: React.FC<Props> = ({
           </ModalTitle>
           {!hideCloseButton && (
             <IconButton variant="text" onClick={onDismiss} aria-label="Close the dialog">
-              <StyledCloseIcon color="primary" />
+              <X size='14px'/>
             </IconButton>
           )}
         </ModalHeader>

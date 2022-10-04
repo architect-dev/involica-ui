@@ -12,7 +12,7 @@ export const involicaClient = new ApolloClient({
 export interface InvolicaStats {
   totalDcasCount: number
   totalManualDcasCount: number
-  totalInvolicaTxFee: string[]
+  totalInvolicaTxFeeUsd: string[]
   totalTradeAmountUsd: string
 
   inTokens: string[]
@@ -26,46 +26,74 @@ export const transformInvolicaStats = ({ id, __typename, ...involicaStats }) => 
   return involicaStats as InvolicaStats
 }
 
-export interface TimestampInsOuts {
+export interface InsTokensAmountsPrices {
+  outTokens: string[]
+  outAmounts: number[]
+  outPrices: number[]
+}
+export interface TimestampOutsTokensAmountsPrices {
   timestamp: number
 
-  inToken: string
-  inAmount: string
-
   outTokens: string[]
-  outAmounts: string[]
+  outAmounts: number[]
+  outPrices: number[]
 }
-export interface InvolicaDCA extends TimestampInsOuts {
+export interface PortfolioTokensPrices {
+  portfolioInTokens: string[]
+  portfolioInAmounts: number[]
+  portfolioOutTokens: string[]
+  portfolioOutAmounts: number[]
+}
+export interface InvolicaDCA extends TimestampOutsTokensAmountsPrices {
   txHash: string
 
   user: string
   recipient: string
-  involicaTxFee: string
+  involicaTxFeeUsd: number
   manualExecution: boolean
+
+  inToken: string
+  inAmount: number
+  inPrice: number
 
   dcasCount: number
   manualDcasCount: number
-  totalInvolicaTxFee: string
+  totalInvolicaTxFeeUsd: number
 
   portfolioInTokens: string[]
-  portfolioInAmounts: string[]
+  portfolioInAmounts: number[]
   portfolioOutTokens: string[]
-  portfolioOutAmounts: string[]
+  portfolioOutAmounts: number[]
 }
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 export const transformInvolicaDCA = ({ id, timestamp, __typename, ...dca }) => {
   return {
+    ...dca,
+
     txHash: id,
     timestamp: parseInt(timestamp),
-    ...dca,
+    involicaTxFeeUsd: parseFloat(dca.involicaTxFeeUsd),
+    totalInvolicaTxFeeUsd: parseFloat(dca.totalInvolicaTxFeeUsd),
+
+    inAmount: parseFloat(dca.inAmount),
+    inPrice: parseFloat(dca.inPrice),
+
+    outAmounts: dca.outAmounts.map(parseFloat),
+    outPrices: dca.outPrices.map(parseFloat),
+
+    portfolioInAmounts: dca.portfolioInAmounts.map(parseFloat),
+    portfolioOutAmounts: dca.portfolioOutAmounts.map(parseFloat),
   } as InvolicaDCA
 }
 
-export type InvolicaSnapshot = TimestampInsOuts
-export const transformInvolicaSnapshot = ({ id, __typename, ...snapshot }) => {
+export type InvolicaSnapshot = InsTokensAmountsPrices & TimestampOutsTokensAmountsPrices
+export const transformInvolicaSnapshot = (snapshot) => {
   return {
-    timestamp: parseInt(id),
-    ...snapshot,
+    timestamp: parseInt(snapshot.id),
+
+    outTokens: snapshot.outTokens,
+    outAmounts: snapshot.outAmounts.map(parseFloat),
+    outPrices: [],
   } as InvolicaSnapshot
 }
 
@@ -126,11 +154,13 @@ export const USER_STATS_DATA = gql`
       user
       inAmount
       inToken
+      inPrice
       involicaTxFeeUsd
       manualDcasCount
       manualExecution
       outAmounts
       outTokens
+      outPrices
       portfolioInAmounts
       portfolioInTokens
       portfolioOutAmounts

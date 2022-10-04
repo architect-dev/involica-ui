@@ -1,35 +1,29 @@
 import React from 'react'
-import { SummitButton, RowCenter } from 'uikit'
+import { SummitButton, RowCenter, LinkExternal } from 'uikit'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
-import { UserTxWithTradeData } from 'state/uiHooks'
 import { DataRow } from './DataRow'
 import { PerfIndicator } from './DataVis/PerfIndicator'
 import { TokenPerfTable } from './DataVis/TokenPerfTable'
+import { DCAStats } from 'state/statsHooks'
+import { getLinks } from 'config/constants'
 
 export const DCATransactionModal: React.FC<{
-  tx: UserTxWithTradeData
+  dca: DCAStats
   onDismiss?: () => void
-}> = ({ tx, onDismiss }) => {
-  const {
-    tokenInData,
-    tokenTxsData,
-    timestampDisplay,
-    valueChangeStatus,
-    valueChangeUsdDisplay,
-    valueChangePercDisplay,
-  } = tx
+}> = ({ dca, onDismiss }) => {
+  const txHashEllipsis = dca.txHash ? `${dca.txHash.substring(0, 4)}...${dca.txHash.substring(dca.txHash.length - 4)}` : null
 
   return (
     <ModalContentContainer alignItems="flex-start" minWidth="300px" maxWidth="450px" gap="18px">
-      <DataRow px="6px" t="Executed:" v={timestampDisplay} />
-
-      {/* TODO: Add Tx Hash
-      <DataRow px='6px' t='Tx Hash:' v={tx.hash} />
-      */}
+      {/* TODO: Make button */}
+      <DataRow px='6px' t='Tx Hash:' v={
+        <LinkExternal href={`${getLinks().etherscan}/tx/${dca.txHash}`}>{txHashEllipsis}</LinkExternal>
+      } />
+      <DataRow px="6px" t="Executed:" v={dca.timestampDisplay} />
       
       <TokenPerfTable
-        tokensIn={[tokenInData]}
-        tokensOut={tokenTxsData}
+        tokensIn={[dca.inToken]}
+        tokensOut={dca.outTokens}
       />
 
       <DataRow
@@ -37,9 +31,7 @@ export const DCATransactionModal: React.FC<{
         t="Total DCA Performance:"
         v={
           <PerfIndicator
-            status={valueChangeStatus}
-            usdDisplay={valueChangeUsdDisplay}
-            percDisplay={valueChangePercDisplay}
+            {...dca.totalValueChange}
           />
         }
       />

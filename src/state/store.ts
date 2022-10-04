@@ -129,7 +129,8 @@ export const useInvolicaStore = create<State>()(
         let amountDCAInvalidReason = null
         if (amountDCA === '') amountDCAInvalidReason = 'DCA Amount required'
         else if (isNaN(parseFloat(amountDCA))) amountDCAInvalidReason = 'Not a number'
-        else if (!checkPrecisionValid(amountDCA, token.decimals)) amountDCAInvalidReason = `${token.symbol} only supports ${token.decimals} decimals`
+        else if (!checkPrecisionValid(amountDCA, token.decimals))
+          amountDCAInvalidReason = `${token.symbol} only supports ${token.decimals} decimals`
         else if (parseFloat(amountDCA) <= 0) amountDCAInvalidReason = 'Must be greater than 0'
         else if (parseFloat(amountDCA ?? '0') > parseFloat(fullBalance ?? '0'))
           amountDCAInvalidReason = 'Insufficient wallet balance to cover 1 DCA'
