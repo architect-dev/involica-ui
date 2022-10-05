@@ -23,7 +23,7 @@ Tooltip.positioners.average = (elements) => {
     return false
   }
 
-  const minY = Math.min(elements[0].element.y, elements[1].element.y)
+  const minY = elements.reduce((min, { element }) => Math.min(min, element.y), elements[0].element.y)
 
   return {
     x: elements[0].element.x,
@@ -32,7 +32,7 @@ Tooltip.positioners.average = (elements) => {
 }
 
 const PortfolioChart: React.FC = () => {
-  const { dataOption, focusedToken } = useChartOptionsState()
+  const { dataOption, focusedToken, dcasCountChart } = useChartOptionsState()
   const chartData = useInvolicaDCAChartData(
     dataOption === ChartDataOption.User,
     dataOption === ChartDataOption.User ? focusedToken : null,
@@ -61,6 +61,7 @@ const PortfolioChart: React.FC = () => {
             ticks: {
               // Include a dollar sign in the ticks
               callback: (value): string => {
+                if (dcasCountChart) return value.toString()
                 return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
                   parseFloat(`${value}`),
                 )
@@ -108,6 +109,7 @@ const PortfolioChart: React.FC = () => {
             yAlign: 'bottom',
             caretPadding: 20,
             displayColors: false,
+            position: 'average',
             bodyFont: {
               family: 'Courier Prime, monospace',
             },
@@ -124,14 +126,26 @@ const PortfolioChart: React.FC = () => {
             footerColor: '#F7CAC9',
             callbacks: {
               afterTitle: (context) => {
-                if (context == null || context.length < 3 || (context[2].parsed?.y ?? 0) === 0) return null
-                return `${context[2].parsed.y} DCAs`
+                if (dcasCountChart || context == null || context.length === 0) return null
+                const { chart, dataIndex } = context[0]
+                const { datasets } = chart.data
+                const dcas =
+                  (datasets[2].data[dataIndex] as number) -
+                  (dataIndex === 0 ? 0 : (datasets[2].data[dataIndex - 1] as number))
+                if (dcas === 0) return null
+                return `${dcas} DCAs`
               },
               label: (context) => {
                 const datasets = context?.chart?.data?.datasets
                 const { dataIndex, datasetIndex, dataset, parsed } = context
 
                 // Remove DCAs count dataset
+                if (dcasCountChart) {
+                  if (datasetIndex === 2) {
+                    return `Total DCAs: ${parsed.y}`
+                  }
+                  return null
+                }
                 if (datasetIndex === 2) return null
 
                 const digits0 = `${datasets?.[0]?.data?.[dataIndex]}`.split('.')[0].length
@@ -152,8 +166,17 @@ const PortfolioChart: React.FC = () => {
                 return label
               },
               footer: (tooltipItems) => {
-                const current = tooltipItems[1].raw as number
-                const trade = tooltipItems[0].raw as number
+                const { dataIndex } = tooltipItems[0]
+                const { datasets } = tooltipItems[0].chart.data
+                if (dcasCountChart) {
+                  const dcas =
+                    (datasets[2].data[dataIndex] as number) -
+                    (dataIndex === 0 ? 0 : (datasets[2].data[dataIndex - 1] as number))
+                  return `${dcas} DCAs`
+                }
+
+                const current = datasets[1].data[dataIndex] as number
+                const trade = datasets[0].data[dataIndex] as number
                 const delta = current - trade
                 return `${delta === 0 ? '' : delta > 0 ? '▲' : '▼'} ${new Intl.NumberFormat('en-US', {
                   style: 'currency',
@@ -161,7 +184,7 @@ const PortfolioChart: React.FC = () => {
                 }).format(delta)}`
               },
               labelTextColor: (context) => {
-                return context.datasetIndex < 0.1 ? '#ffffff' : '#F7CAC9'
+                return context.datasetIndex === 1 ? '#F7CAC9' : '#ffffff'
               },
             },
           },
@@ -194,31 +217,38 @@ const PortfolioChart: React.FC = () => {
             label: '@ Trade',
             data: tradeValData,
             fill: false,
-            borderColor: '#575757',
+            borderColor: dcasCountChart ? 'transparent' : '#575757',
+            backgroundColor: dcasCountChart ? 'transparent' : undefined,
             tension: 0.1,
             spanGaps: true,
             borderWidth: 2,
+            hidden: dcasCountChart,
           },
           {
             label: 'Current',
             data: currentValData,
-            fill: {
-              target: '-1',
-              above: '#f7cac96d', // Area will be red above the origin
-              below: 'transparent', // And blue below the origin
-            },
-            borderColor: '#F7CAC9',
+            fill: dcasCountChart
+              ? undefined
+              : {
+                  target: '-1',
+                  above: '#f7cac96d', // Area will be red above the origin
+                  below: 'transparent', // And blue below the origin
+                },
+            borderColor: dcasCountChart ? 'transparent' : '#F7CAC9',
+            backgroundColor: dcasCountChart ? 'transparent' : '#F7CAC9',
             tension: 0.1,
             spanGaps: true,
             borderWidth: 2,
+            hidden: dcasCountChart,
           },
           {
             label: 'DCAs',
             data: dcasCountData,
-            borderColor: 'transparent',
+            borderColor: dcasCountChart ? '#575757' : 'transparent',
             backgroundColor: 'transparent',
             spanGaps: true,
-          }
+            hidden: !dcasCountChart,
+          },
         ],
       }}
     />

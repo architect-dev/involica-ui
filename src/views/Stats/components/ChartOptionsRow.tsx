@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import OptionSelector from 'components/OptionSelector'
 import { Row, RowBetween, RowStart, SummitButton, Text } from 'uikit'
 import { ChartDataOption, useChartOptionsState } from './chartOptionsState'
@@ -6,7 +6,20 @@ import { X } from 'react-feather'
 import TokenIconAndSymbol from 'components/TokenIconAndSymbol'
 
 export const ChartOptionsRow: React.FC = () => {
-  const { dataOption, setDataOption, focusedToken, setFocusedToken } = useChartOptionsState()
+  const {
+    dataOption,
+    setDataOption,
+    focusedToken,
+    setFocusedToken,
+    dcasCountChart,
+    setDcasCountChart,
+  } = useChartOptionsState()
+  const handleClearDcasCountChart = useCallback(() => {
+    setDcasCountChart(dataOption, false)
+  }, [dataOption, setDcasCountChart])
+  const handleClearFocusedToken = useCallback(() => {
+    setFocusedToken(null)
+  }, [setFocusedToken])
   return (
     <Row gap="16px" alignItems="flex-start">
       <OptionSelector<ChartDataOption>
@@ -18,9 +31,8 @@ export const ChartOptionsRow: React.FC = () => {
         selected={dataOption}
         select={setDataOption}
       />
-      <Text>Performance</Text>
       {dataOption === ChartDataOption.User && focusedToken != null && (
-        <SummitButton onClick={() => setFocusedToken(null)} padding="0 8px 0 2px" width="100px">
+        <SummitButton onClick={handleClearFocusedToken} padding="0 8px 0 2px" width="100px">
           <RowBetween>
             <RowStart gap="4px">
               <TokenIconAndSymbol token={focusedToken} />
@@ -28,6 +40,16 @@ export const ChartOptionsRow: React.FC = () => {
             <X size="16px" />
           </RowBetween>
         </SummitButton>
+      )}
+      {dcasCountChart ? (
+        <SummitButton onClick={handleClearDcasCountChart} padding="0 8px 0 12px" width="100px">
+          <RowBetween>
+            DCAs
+            <X size="16px" />
+          </RowBetween>
+        </SummitButton>
+      ) : (
+        <Text>Performance</Text>
       )}
     </Row>
   )
