@@ -10,20 +10,33 @@ export const involicaClient = new ApolloClient({
 })
 
 export interface InvolicaStats {
+  totalUserCount: number
   totalDcasCount: number
   totalManualDcasCount: number
-  totalInvolicaTxFeeUsd: string[]
-  totalTradeAmountUsd: string
+  totalInvolicaTxFeeUsd: number
+  totalTradeAmountUsd: number
 
   inTokens: string[]
-  inAmounts: string[]
+  inAmounts: number[]
 
   outTokens: string[]
-  outAmounts: string[]
+  outAmounts: number[]
 }
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-export const transformInvolicaStats = ({ id, __typename, ...involicaStats }) => {
-  return involicaStats as InvolicaStats
+export const transformInvolicaStats = (involicaStats): InvolicaStats => {
+  return {
+    totalUserCount: involicaStats.totalUserCount,
+    totalDcasCount: involicaStats.totalDcasCount,
+    totalManualDcasCount: involicaStats.totalManualDcasCount,
+    totalInvolicaTxFeeUsd: parseFloat(involicaStats.totalInvolicaTxFeeUsd),
+    totalTradeAmountUsd: parseFloat(involicaStats.totalTradeAmountUsd),
+
+    inTokens: involicaStats.inTokens,
+    inAmounts: involicaStats.inAmounts.map(parseFloat),
+
+    outTokens: involicaStats.outTokens,
+    outAmounts: involicaStats.outAmounts.map(parseFloat),
+  }
 }
 
 export interface InsTokensAmountsPrices {
@@ -130,6 +143,7 @@ export const INVOLICA_STATS_DATA = gql`
       outAmounts
       inTokens
       outTokens
+      totalUserCount
       totalDcasCount
       totalInvolicaTxFeeUsd
       totalManualDcasCount

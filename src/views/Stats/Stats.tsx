@@ -6,8 +6,8 @@ import 'chartjs-adapter-date-fns'
 import PortfolioChart from './components/PortfolioChart'
 import { ChartOptionsRow } from './components/ChartOptionsRow'
 import { DerivedStatsTable } from 'components/DerivedStatsTable'
-import { Card } from 'components/Card'
 import { PastDcasTable } from 'components/PastDcasTable'
+import { InvolicaStatsTable } from 'components/InvolicaStatsTable'
 
 const Hero = styled.div`
   align-items: flex-start;
@@ -35,12 +35,9 @@ const Stats: React.FC = () => {
       <Column width="100%" gap="24px">
         <ChartOptionsRow />
         <PortfolioChart />
-        <Card title="Portfolio Stats" padding="24px">
-          <DerivedStatsTable />
-        </Card>
-        <Card title="Executed DCAs" padding="24px">
-          <PastDcasTable />
-        </Card>
+        <InvolicaStatsTable />
+        <DerivedStatsTable />
+        <PastDcasTable />
       </Column>
     </Page>
   )

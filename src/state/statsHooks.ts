@@ -312,6 +312,47 @@ const getValueChangeAndStatusFromUsds = (currentUsd: number | null, tradeUsd: nu
   }
 }
 
+export const useInvolicaLifetimeStats = () => {
+  const involicaStats = useInvolicaStatsData()
+  const tokensData = useInvolicaStore((state) => state.tokens)
+
+  return useMemo(() => {
+    if (involicaStats == null || tokensData == null) return null
+
+    const outTokens: AddressRecord<TokenTradeData> = {}
+
+    involicaStats.outTokens.forEach((outToken, outIndex) => {
+      outTokens[outToken] = getFreshOrUpdatedTokenTradeData(
+        tokensData[ethers.utils.getAddress(outToken)],
+        involicaStats.outAmounts[outIndex],
+        tokensData[ethers.utils.getAddress(outToken)].price,
+        null,
+      )
+    })
+
+    const totalOutTrade = getUsdDisplay(involicaStats.totalTradeAmountUsd)
+    const totalOutCurrent = getUsdDisplay(
+      Object.values(outTokens).reduce((total, token) => total + token.current.usd, 0),
+    )
+    const totalOutStatus = getValueChangeStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd)
+
+    
+    return {
+      dcasCount: involicaStats?.totalDcasCount,
+      userCount: involicaStats?.totalUserCount,
+
+      totalOutFull: {
+        trade: totalOutTrade,
+        current: totalOutCurrent,
+        status: totalOutStatus,
+      },
+
+      totalValueChange: getValueChangeAndStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd),
+    }
+  }, [involicaStats, tokensData])
+
+}
+
 export const useUserLifetimeStats = () => {
   const dcas = useInvolicaUserDcasData()
   const tokensData = useInvolicaStore((state) => state.tokens)

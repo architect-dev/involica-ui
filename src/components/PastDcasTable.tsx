@@ -6,6 +6,7 @@ import { transparentize } from 'polished'
 import { DCATransactionModal } from 'components/DCATransactionModal'
 import { PerfIndicator } from './DataVis/PerfIndicator'
 import { DCAStats, useUserDcasData } from 'state/statsHooks'
+import { Card } from './Card'
 
 const Table = styled.div`
   display: flex;
@@ -159,7 +160,7 @@ export const PastDcasTable: React.FC = () => {
   }, [])
 
   return (
-    <>
+    <Card title="Executed DCAs" padding="24px">
       <Table>
         <div className="row head">
           <div className="item item_1">
@@ -193,6 +194,6 @@ export const PastDcasTable: React.FC = () => {
           )
         }
       />
-    </>
+    </Card>
   )
 }
