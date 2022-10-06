@@ -22,6 +22,7 @@ import { getValueChangeStatusFromUsds, ValueChangeStatus } from './status'
 import { useInvolicaStore } from './store'
 import { AddressRecord, Token, UserTokenTx } from './types'
 import { useWeb3React } from '@web3-react/core'
+import { orderBy } from 'lodash'
 
 export interface TokenWithTradeData extends Token {
   tradeAmount: BigNumber
@@ -411,7 +412,7 @@ export const useUserDcasData = () => {
   return useMemo((): DCAStats[] | null => {
     if (dcas == null || tokensData == null) return null
 
-    return dcas.map(
+    return orderBy(dcas, ['timestamp'], ['desc']).map(
       (dca): DCAStats => {
         const outTokens = dca.outTokens.map((outToken, outIndex) =>
           getFreshOrUpdatedTokenTradeData(

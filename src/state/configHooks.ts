@@ -16,7 +16,7 @@ export const usePositionConfig = (): PositionConfig =>
     executeImmediately: state.config.executeImmediately,
   }))
 export const useSubmissionReadyPositionConfig = (createPosition = false): any[] => {
-  const { tokenIn, outs, amountDCA, intervalDCA, maxGasPrice, executeImmediately } = usePositionConfig()
+  const { tokenIn, outs, amountDCA, intervalDCA, maxGasPrice /* , executeImmediately */ } = usePositionConfig()
   const { data: tokenInData } = useTokenPublicData(tokenIn)
 
   return useMemo(
@@ -31,10 +31,10 @@ export const useSubmissionReadyPositionConfig = (createPosition = false): any[] 
       eN(amountDCA, tokenInData?.decimals),
       intervalDCA,
       getChainGwei(maxGasPrice),
-      executeImmediately,
+      true, // executeImmediately,
       createPosition ? null : false,
     ].filter((x) => x != null),
-    [amountDCA, createPosition, executeImmediately, intervalDCA, maxGasPrice, outs, tokenIn, tokenInData?.decimals],
+    [amountDCA, createPosition, intervalDCA, maxGasPrice, outs, tokenIn, tokenInData?.decimals],
   )
 }
 

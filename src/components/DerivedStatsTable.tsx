@@ -42,10 +42,10 @@ export const DerivedStatsTable: React.FC = () => {
   const { dataOption, setDataOption, focusedToken, setFocusedToken, dcasCountChart, setDcasCountChart } = useChartOptionsState()
 
   const sortedInTokens = useMemo(() => {
-    return orderBy(Object.values(lifetimeStats?.inTokens ?? []), ['tradeAmountUsd'], ['desc'])
+    return orderBy(Object.values(lifetimeStats?.inTokens ?? []), ['trade.usd'], ['desc'])
   }, [lifetimeStats?.inTokens])
   const sortedOutTokens = useMemo(() => {
-    return orderBy(Object.values(lifetimeStats?.outTokens ?? []), ['tradeAmountUsd'], ['desc'])
+    return orderBy(Object.values(lifetimeStats?.outTokens ?? []), ['trade.usd'], ['desc'])
   }, [lifetimeStats?.outTokens])
 
   const userTotalPerformanceSelected = useMemo(() => {

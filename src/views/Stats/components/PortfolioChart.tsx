@@ -17,17 +17,24 @@ import {
 } from 'chart.js'
 import { ChartDataOption, useChartOptionsState } from './chartOptionsState'
 
+let chartHalfHeight = 0
+
 ChartJS.register(CategoryScale, TimeScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend)
-Tooltip.positioners.average = (elements) => {
+Tooltip.positioners.average = (elements, position) => {
   if (!elements.length) {
     return false
   }
 
+  const height = (position as any).chart?.chartArea?.height
+  if (height != null) {
+    chartHalfHeight = height / 2
+  }
   const minY = elements.reduce((min, { element }) => Math.min(min, element.y), elements[0].element.y)
 
   return {
     x: elements[0].element.x,
     y: minY,
+    yAlign: minY > chartHalfHeight ? 'bottom' : 'top',
   }
 }
 
@@ -106,7 +113,6 @@ const PortfolioChart: React.FC = () => {
           },
           tooltip: {
             xAlign: 'center',
-            yAlign: 'bottom',
             caretPadding: 20,
             displayColors: false,
             position: 'average',
@@ -178,10 +184,11 @@ const PortfolioChart: React.FC = () => {
                 const current = datasets[1].data[dataIndex] as number
                 const trade = datasets[0].data[dataIndex] as number
                 const delta = current - trade
-                return `${delta === 0 ? '' : delta > 0 ? '▲' : '▼'} ${new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                }).format(delta)}`
+                const perc = trade === 0 ? 0 : ((current - trade) * 100) / trade
+                return [
+                  `${delta === 0 ? '' : delta >= 0 ? '+' : '-'}$${Math.abs(delta).toFixed(2)}`,
+                  `${delta === 0 ? '' : delta >= 0 ? '+' : '-'}${Math.abs(perc).toFixed(2)}%`,
+                ]
               },
               labelTextColor: (context) => {
                 return context.datasetIndex === 1 ? '#F7CAC9' : '#ffffff'

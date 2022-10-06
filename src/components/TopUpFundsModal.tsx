@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDcaTxPriceRange, useNativeTokenFullData, useUserTreasury } from 'state/hooks'
 import { SummitButton, Text, RowCenter, SummitPopUp } from 'uikit'
-import { bnDisplay, useShowHideModal } from 'utils'
+import { bn, bnDisplay, useShowHideModal } from 'utils'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
@@ -27,7 +27,14 @@ export const TopUpFundsModal: React.FC<{
     if (minTxPrice == null || minTxPrice === '' || minTxPrice === '0') return '-'
     return bnDisplay(minTxPrice, 18, 4)
   }, [minTxPrice])
-
+  const maxTxPriceDisplayUsd = useMemo(() => {
+    if (maxTxPrice == null || maxTxPrice === '' || maxTxPrice === '0' || nativeTokenData?.price == null) return '-'
+    return `$${bnDisplay(bn(maxTxPrice).times(nativeTokenData.price), 18, 2)}`
+  }, [maxTxPrice, nativeTokenData?.price])
+  const minTxPriceDisplayUsd = useMemo(() => {
+    if (minTxPrice == null || minTxPrice === '' || minTxPrice === '0' || nativeTokenData?.price == null) return '-'
+    return `$${bnDisplay(bn(minTxPrice).times(nativeTokenData.price), 18, 2)}`
+  }, [minTxPrice, nativeTokenData?.price])
 
   const { onDepositTreasury, pending } = useDepositTreasury()
 
@@ -50,12 +57,43 @@ export const TopUpFundsModal: React.FC<{
     onDepositTreasury(fundingAmount, nativeTokenData?.decimals)
   }, [fundingAmount, nativeTokenData?.decimals, onDepositTreasury])
 
+  const topUpCoveredDcasCount = useMemo(() => {
+    if (fundingAmount == null || fundingAmount === '' || fundingAmount === '0' || isNaN(parseFloat(fundingAmount)))
+      return '-'
+    if (maxTxPrice == null || maxTxPrice === '' || maxTxPrice === '0') return '-'
+    return Math.floor(parseFloat(fundingAmount) / parseFloat(bnDisplay(maxTxPrice, 18)))
+  }, [fundingAmount, maxTxPrice])
+
   return (
     <ModalContentContainer alignItems="flex-start" minWidth="300px" maxWidth="400px" gap="12px">
       <DataRow t="Current Funding:" v={`${userTreasuryDisplay} ${getNativeTokenSymbol()}`} />
-      <br/>
-      <DataRow t={`DCA gas @ ${minGasPrice} gwei (min):`} v={`${minTxPriceDisplay} ${getNativeTokenSymbol()}`} />
-      <DataRow t={`DCA gas @ ${maxGasPrice} gwei (max):`} v={`${maxTxPriceDisplay} ${getNativeTokenSymbol()}`} />
+      <br />
+      <DataRow
+        t={`DCA gas @ ${minGasPrice} gwei${maxGasPrice !== minGasPrice ? ' (min)' : ''}:`}
+        v={
+          <Text textAlign="right">
+            <b>
+              {minTxPriceDisplay} {getNativeTokenSymbol()}
+            </b>
+            <br />
+            <i>{minTxPriceDisplayUsd}</i>
+          </Text>
+        }
+      />
+      {maxGasPrice !== minGasPrice && (
+        <DataRow
+          t={`DCA gas @ ${maxGasPrice} gwei (max):`}
+          v={
+            <Text textAlign="right">
+              <b>
+                {maxTxPriceDisplay} {getNativeTokenSymbol()}
+              </b>
+              <br />
+              <i>{maxTxPriceDisplayUsd}</i>
+            </Text>
+          }
+        />
+      )}
 
       <br />
       <Text small italic>
@@ -70,8 +108,12 @@ export const TopUpFundsModal: React.FC<{
         isNativeDeposit
       />
 
+      {fundingAmount != null && fundingAmount !== '0' && (
+        <DataRow t="DCAs covered by Top Up:" v={topUpCoveredDcasCount} />
+      )}
+
       <br />
-      <RowCenter gap='18px'>
+      <RowCenter gap="18px">
         <SummitButton onClick={onDismiss} activeText="Close" />
         <SummitButton
           isLoading={pending}
