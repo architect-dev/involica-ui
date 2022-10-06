@@ -1,5 +1,14 @@
-import { chunk } from "lodash"
+import { chunk, clone } from "lodash"
 import { bnZero } from "./bigNum"
+import web3 from 'web3'
+
+export const tryGetAddress = (value: any): string | false => {
+  try {
+    return web3.utils.toChecksumAddress(clone(value))
+  } catch {
+    return false
+  }
+}
 
 export const chunkArray = <T>(chunkSize: number, array: T[]): T[][] => {
   const groups: T[][] = []

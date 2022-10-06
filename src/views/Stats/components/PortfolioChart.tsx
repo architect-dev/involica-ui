@@ -63,7 +63,6 @@ const PortfolioChart: React.FC = () => {
         scales: {
           yAxis: {
             type: 'linear',
-            grace: '70%',
             beginAtZero: true,
             ticks: {
               // Include a dollar sign in the ticks
