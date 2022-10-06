@@ -190,10 +190,16 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
   const handleSelect20Native = useCallback(() => {
     setValue('20', fullBalance, tokenData)
   }, [setValue, fullBalance, tokenData])
-  const handleSelect10 = useCallback(() => {
+  const handleSelect1Perc = useCallback(() => {
+    setValue(toFixedMaxPrecision(bn(fullBalance).div(100).toString(), tokenData?.decimals), fullBalance, tokenData)
+  }, [setValue, fullBalance, tokenData])
+  const handleSelect5Perc = useCallback(() => {
+    setValue(toFixedMaxPrecision(bn(fullBalance).div(20).toString(), tokenData?.decimals), fullBalance, tokenData)
+  }, [setValue, fullBalance, tokenData])
+  const handleSelect10Perc = useCallback(() => {
     setValue(toFixedMaxPrecision(bn(fullBalance).div(10).toString(), tokenData?.decimals), fullBalance, tokenData)
   }, [setValue, fullBalance, tokenData])
-  const handleSelect50 = useCallback(() => {
+  const handleSelect50Perc = useCallback(() => {
     setValue(toFixedMaxPrecision(bn(fullBalance).div(5).toString(), tokenData?.decimals), fullBalance, tokenData)
   }, [setValue, fullBalance, tokenData])
   const handleSelectMax = useCallback(() => {
@@ -216,8 +222,10 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
             </>
           ) : (
             <>
-              <TextButton onClick={handleSelect10}>10%</TextButton>
-              <TextButton onClick={handleSelect50}>50%</TextButton>
+              <TextButton onClick={handleSelect1Perc}>1%</TextButton>
+              <TextButton onClick={handleSelect5Perc}>5%</TextButton>
+              <TextButton onClick={handleSelect10Perc}>10%</TextButton>
+              <TextButton onClick={handleSelect50Perc}>50%</TextButton>
               <TextButton onClick={handleSelectMax}>MAX</TextButton>
             </>
           )}

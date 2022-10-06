@@ -7,6 +7,12 @@ import { MaxSlippageSelector } from './MaxSlippageSelector'
 import TokenIconAndSymbol from 'components/TokenIconAndSymbol'
 import styled from 'styled-components'
 import { DataRow } from 'components/DataRow'
+import { Minus } from 'react-feather'
+
+const StyledMinus = styled(Minus)`
+  color: #ffffff;
+  stroke-weight: 2.5;
+`
 
 export const ManageOutTokenModal: React.FC<{
   token: string
@@ -24,7 +30,11 @@ export const ManageOutTokenModal: React.FC<{
       <br />
       <DataRow
         t="Remove Token from Position:"
-        v={<SummitButton onClick={handleRemove} variant="danger" activeText="-" padding="0" width="28px" />}
+        v={
+          <SummitButton onClick={handleRemove} variant="danger" padding="0" width="28px">
+            <StyledMinus size="14px" />
+          </SummitButton>
+        }
       />
       <br />
       <RowCenter>
