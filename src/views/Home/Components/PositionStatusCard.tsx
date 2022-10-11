@@ -9,7 +9,7 @@ import { TopUpFundsButton } from 'components/TopUpFundsModal'
 import { TimeUntilNextDca } from 'components/TimeUntilNextDca'
 import { ManagePositionButton } from 'components/ManagePositionModal'
 import { ManuallyExecuteDCAButton } from 'components/ManuallyExecuteDCAButton'
-import { DCAsRemaining } from 'components/DCAsRemaining'
+import { DCAsRemaining, DCAsRemainingLabel } from 'components/DCAsRemaining'
 import { PositionStatusRecord, PositionStatus, StatusColor, StatusType, StatusString } from 'state/status'
 import { DataRow } from 'components/DataRow'
 
@@ -17,7 +17,7 @@ const StatusAction: PositionStatusRecord<React.ReactNode> = {
   [PositionStatus.Active]: (
     <>
       <DataRow t="Next DCA In:" v={<TimeUntilNextDca />} />
-      <DataRow t="DCAs Remaining:" v={<DCAsRemaining />} />
+      <DataRow t={<DCAsRemainingLabel />} v={<DCAsRemaining />} />
     </>
   ),
   [PositionStatus.ActiveManualOnly]: <ManuallyExecuteDCAButton />,
@@ -63,7 +63,7 @@ export const PositionStatusCard: React.FC = () => {
         <DataRow
           t="Position Status:"
           v={
-            <Text bold color={StatusColor[StatusType[status]]} italic textAlign="right">
+            <Text bold color={StatusColor[StatusType[status]]} textAlign="right">
               {StatusString[status]}
             </Text>
           }

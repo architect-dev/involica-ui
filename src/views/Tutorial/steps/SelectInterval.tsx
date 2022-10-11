@@ -1,9 +1,10 @@
 import React from 'react'
 import { Text } from 'uikit'
 import { IntervalSelector } from 'components/IntervalSelector'
+import { useIntervalStrings } from 'state/uiHooks'
 
 export const SelectInterval: React.FC = () => {
-
+  const { intervalStringly } = useIntervalStrings()
   return (
     <>
       <Text small>
@@ -14,7 +15,8 @@ export const SelectInterval: React.FC = () => {
         but costs more gas (still only pennies per transaction).
         <br />
       </Text>
-      <IntervalSelector/>
+      <IntervalSelector intro/>
+      <Text italic>Interval: <b>{intervalStringly}</b></Text>
     </>
   )
 }

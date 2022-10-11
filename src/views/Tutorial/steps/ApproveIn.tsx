@@ -81,7 +81,7 @@ export const ApproveIn: React.FC = () => {
         <SummitButton activeText="Inf DCAs" width="120px" padding="0" onClick={handleSetInf} />
       </RowStart>
       {dcasCountInvalidReason != null && (
-        <Text red italic mt="-12px">
+        <Text red italic mt="-12px" small>
           {dcasCountInvalidReason}
         </Text>
       )}

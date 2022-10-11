@@ -30,6 +30,7 @@ const SelectorWrapper = styled(SelectorWrapperBase)<SelectorWrapperProps>`
 `
 
 const SelectedSummitButton = styled(SummitButton)<{ selectedIndex: number }>`
+  transition: left 100ms ease-in-out;
   pointer-events: none;
   position: absolute;
   top: 0px;
@@ -44,7 +45,6 @@ const SelectedSummitButton = styled(SummitButton)<{ selectedIndex: number }>`
 const TextButton = styled.div<{ selected: boolean }>`
   cursor: pointer;
   color: ${({ theme, selected }) => (selected ? 'transparent' : theme.colors.text)};
-  font-family: Courier Prime, monospace;
   font-size: 14px;
   height: ${buttonHeight}px;
   line-height: ${buttonHeight}px;

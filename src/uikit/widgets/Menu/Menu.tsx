@@ -6,7 +6,6 @@ import UserBlock from './components/UserBlock'
 import { NavProps } from './types'
 import { MENU_HEIGHT } from './config'
 import NavLinks from './components/NavLinks'
-import DebugMenu from './components/DebugMenu'
 
 const Wrapper = styled.div`
   position: relative;
@@ -25,12 +24,11 @@ const StyledNav = styled.nav<{ showMenu: boolean }>`
   padding-left: 16px;
   padding-right: 16px;
   width: 100vw;
-  max-width: 100vw;
   height: ${MENU_HEIGHT}px;
   z-index: 20;
   transform: translate3d(0, 0, 0);
   flex-direction: row;
-  max-width: 800px;
+  max-width: min(100vw, 800px);
   margin: auto;
 `
 
@@ -73,8 +71,7 @@ const Menu: React.FC<NavProps> = ({
           justifyContent="center"
           gap="24px"
         >
-          <NavLinks links={links} mobileNav={false} />
-          <DebugMenu account={account}/>
+          <NavLinks links={links} account={account} mobileNav={false} />
         </Flex>
         <Flex alignItems="center" justifyContent="center" gap="10px">
           <UserBlock

@@ -1,3 +1,4 @@
+import React from 'react'
 import { MenuEntry } from 'uikit'
 
 export const getMenuItems = (): MenuEntry[] => [
@@ -18,6 +19,12 @@ export const getMenuItems = (): MenuEntry[] => [
     href: '/stats',
     external: false,
     keyPaths: ['stats']
+  },
+  {
+    label: <>INVOLI<s>CA</s></>,
+    href: '/involi',
+    external: false,
+    keyPaths: ['involi']
   },
   {
     label: 'DOCS',

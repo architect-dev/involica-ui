@@ -13634,6 +13634,11 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
+open-props@^1.4.16:
+  version "1.4.16"
+  resolved "https://registry.yarnpkg.com/open-props/-/open-props-1.4.16.tgz#dfab38fbbcd7b4a979dffb76bfb618b635554d49"
+  integrity sha512-kPIgGYjan1aKl3Vp1pG9V5TgH7CTaDWm3ndllTgr5gBQ3tu+F11dZKpZiP1+o/aCSCx8WMo15ARsFYxCAJXxHg==
+
 open@^6.3.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/open/-/open-6.4.0.tgz#5c13e96d0dc894686164f18965ecfe889ecfc8a9"

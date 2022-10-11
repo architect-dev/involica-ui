@@ -66,14 +66,14 @@ export const OutsSelectionAndWeights: React.FC<{ intro?: boolean }> = ({ intro =
           ))}
       </OutsRow>
       {outs.length === 0 && (
-          <Text red italic>
+          <Text red italic small>
             Must have at least one DCA out
           </Text>
         )}
       {intro && (
-        <Text small italic>
+        <Text italic>
           <br />
-          Use the slider to set your portfolio ratios.
+          Use the slider to set your portfolio ratios:
         </Text>
       )}
       <WeightsSlider intro={intro} />

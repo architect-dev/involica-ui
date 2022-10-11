@@ -52,7 +52,7 @@ const PanelFooter: React.FC<Props> = ({ pushNav, additionals, isMobile }) => {
 
           return (
             <MenuEntryComponent
-              key={entry.label}
+              key='hi'
               isPushed={false}
               textItem={false}
               isActive={entry.href === window.location.pathname}

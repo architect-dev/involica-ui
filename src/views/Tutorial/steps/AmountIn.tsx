@@ -3,10 +3,10 @@ import { Text } from 'uikit'
 import { useConfigurableAmountDCA, usePositionOuts, usePositionTokenInWithData } from 'state/hooks'
 import TokenAndAmountSelector from 'components/TokenAndAmountSelector'
 import { getSymbol } from 'config/tokens'
-import { bn } from 'utils'
+import { bn, eN } from 'utils'
 
 export const AmountIn: React.FC = () => {
-  const { tokenIn, tokenInData } = usePositionTokenInWithData()
+  const { tokenIn, tokenInData, tokenInUserData } = usePositionTokenInWithData()
   const { outs } = usePositionOuts()
   const { amountDCA, amountDCAInvalidReason, setAmountDCA } = useConfigurableAmountDCA()
 
@@ -20,6 +20,11 @@ export const AmountIn: React.FC = () => {
     return bn(parseFloat(amountDCA)).times(tokenInData.price).toNumber()
   }, [tokenInData?.price, amountDCAInvalidReason, amountDCA])
 
+  const balanceDCAs = useMemo(() => {
+    if (amountDCA === '' || isNaN(parseFloat(amountDCA)) || parseFloat(amountDCA) === 0) return null
+    return Math.floor(bn(tokenInUserData?.balance).div(eN(amountDCA, tokenInData?.decimals)).toNumber())
+  }, [amountDCA, tokenInData?.decimals, tokenInUserData?.balance])
+
   return (
     <>
       <Text small italic>
@@ -27,7 +32,7 @@ export const AmountIn: React.FC = () => {
       </Text>
       <TokenAndAmountSelector token={tokenIn} value={amountDCA} setValue={setAmountDCA} tokenSelectDisabled />
       {amountDCAInvalidReason != null && (
-        <Text red italic mt="-12px">
+        <Text red italic mt="-12px" small>
           {amountDCAInvalidReason}
         </Text>
       )}
@@ -43,8 +48,10 @@ export const AmountIn: React.FC = () => {
           Increase portfolio % {getSymbol(minOut.token)} or increase DCA amount.
         </Text>
       )}
-      <br />
-      <Text italic>DCA amount USD: ${amountDcaUsd === 0 ? '-' : amountDcaUsd}</Text>
+      <br/>
+      <Text italic>
+        DCAs covered by Balance: <b>{balanceDCAs != null && !isNaN(balanceDCAs) ? `${balanceDCAs} DCAs` : '-'}</b>
+      </Text>
     </>
   )
 }

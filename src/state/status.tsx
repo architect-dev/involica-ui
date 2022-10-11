@@ -1,6 +1,12 @@
 import React from 'react'
 import { Minus, TrendingDown, TrendingUp } from 'react-feather'
 
+export enum PositionLimitingFactor {
+  None = 'None',
+  Funding = 'Funding',
+  Allowance = 'Allowance',
+  Balance = 'Balance',
+}
 export enum PositionStatus {
   NoPosition = 'NoPosition',
   Active = 'Active',

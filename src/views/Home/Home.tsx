@@ -44,6 +44,12 @@ const Home: React.FC = () => {
         <StyledHighlightedText className="sticky" fontSize="34px" letterSpacing="16px">
           INVOLICA
         </StyledHighlightedText>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
         <CardsWrapper>
           <PositionStatusCard />
           <FundsCard />

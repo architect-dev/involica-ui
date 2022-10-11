@@ -7,6 +7,7 @@ import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useDepositTreasury } from 'hooks/useExecute'
 import { DataRow } from './DataRow'
+import { validateFundingAmount } from 'state/utils'
 
 export const TopUpFundsModal: React.FC<{
   onDismiss?: () => void
@@ -43,15 +44,8 @@ export const TopUpFundsModal: React.FC<{
 
   const handleSetFundingAmount = useCallback((val: string, max: string) => {
     setFundingAmount(val)
-
-    // Test validity
-    let invalidReason = null
-    if (val === '' || val == null) invalidReason = null
-    else if (isNaN(parseFloat(val))) invalidReason = 'Not a number'
-    else if (parseFloat(val) <= 0) invalidReason = 'Must be greater than 0'
-    else if (parseFloat(val) > parseFloat(max)) invalidReason = 'Insufficient balance'
-    setFundingInvalidReason(invalidReason)
-  }, [])
+    setFundingInvalidReason(validateFundingAmount(val, max, nativeTokenData))
+  }, [nativeTokenData])
 
   const handleDepositTreasury = useCallback(() => {
     onDepositTreasury(fundingAmount, nativeTokenData?.decimals)
@@ -114,7 +108,7 @@ export const TopUpFundsModal: React.FC<{
 
       <br />
       <RowCenter gap="18px">
-        <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
         <SummitButton
           isLoading={pending}
           onClick={handleDepositTreasury}

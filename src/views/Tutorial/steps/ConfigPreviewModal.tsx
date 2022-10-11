@@ -19,7 +19,7 @@ export const ConfigPreviewModal: React.FC<{ onDismiss?: () => void }> = ({ onDis
         Number of DCAs that are expected to execute based on the amount to DCA and DCA interval:
       </Text>
       <PositionExpectedAndDurationOverview />
-      <SummitButton onClick={onDismiss} activeText="Close" />
+      <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
     </ModalContentContainer>
   )
 }

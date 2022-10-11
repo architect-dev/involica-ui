@@ -15,7 +15,6 @@ export const DCATransactionModal: React.FC<{
 
   return (
     <ModalContentContainer alignItems="flex-start" minWidth="300px" maxWidth="450px" gap="18px">
-      {/* TODO: Make button */}
       <DataRow px='6px' t='Tx Hash:' v={
         <LinkExternal href={`${getLinks().etherscan}/tx/${dca.txHash}`}>{txHashEllipsis}</LinkExternal>
       } />
@@ -39,7 +38,7 @@ export const DCATransactionModal: React.FC<{
       <br />
 
       <RowCenter gap="18px">
-        <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
       </RowCenter>
     </ModalContentContainer>
   )

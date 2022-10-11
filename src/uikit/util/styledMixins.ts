@@ -23,7 +23,7 @@ export const pressableMixin = ({
   return css`
     cursor: pointer;
     opacity: 1;
-    transition: opacity 100ms ease-in-out, box-shadow 100ms ease-in-out;
+    transition: opacity 100ms ease-in-out, box-shadow 100ms ease-in-out, transform 100ms ease-in-out;
 
     ${theme.mediaQueries.nav} {
       &:hover {

@@ -9,6 +9,7 @@ import {
   usePositionIntervalDCA,
   usePositionMaxGasPrice,
   usePositionOuts,
+  usePositionTokenInWithData,
   useRevertIntervalAndMaxGasPrice,
   useRevertOuts,
   useRevertTokenAndAmount,
@@ -24,6 +25,7 @@ import { ManagePositionButton } from 'components/ManagePositionModal'
 import { useSetPosition } from 'hooks/useExecute'
 import { useInvolicaStore } from 'state/store'
 import { DataRow } from 'components/DataRow'
+import { bn, eN } from 'utils'
 
 const CellRow = styled.div`
   display: flex;
@@ -51,8 +53,15 @@ const RevertChangesButton: React.FC<{ onClick }> = ({ onClick }) => {
   )
 }
 
+const StyledDataRow = styled(DataRow)`
+  margin-top: -18px;
+  max-width: 320px;
+  padding: 0 12px 0 16px;
+`
+
 const TokenInCell: React.FC = () => {
   const { dirty: tokenInDirty, tokenIn, setTokenIn } = useConfigurableTokenIn()
+  const { tokenInData, tokenInUserData } = usePositionTokenInWithData()
   const { outs } = usePositionOuts()
   const { dirty: amountDCADirty, amountDCA, setAmountDCA, amountDCAInvalidReason } = useConfigurableAmountDCA()
   const revertTokenAndAmount = useRevertTokenAndAmount()
@@ -65,6 +74,11 @@ const TokenInCell: React.FC = () => {
     })
     return reasons
   }, [outs, tokenIn])
+
+  const balanceDCAs = useMemo(() => {
+    if (amountDCA === '' || isNaN(parseFloat(amountDCA)) || parseFloat(amountDCA) === 0) return null
+    return Math.floor(bn(tokenInUserData?.balance).div(eN(amountDCA, tokenInData?.decimals)).toNumber())
+  }, [amountDCA, tokenInData?.decimals, tokenInUserData?.balance])
 
   return (
     <CellWithChanged changed={tokenInDirty || amountDCADirty} error={amountDCAInvalidReason != null}>
@@ -81,6 +95,7 @@ const TokenInCell: React.FC = () => {
         amountChanged={amountDCADirty}
         invalidReason={amountDCAInvalidReason}
       />
+      <StyledDataRow t="DCAs covered by Balance" v={balanceDCAs != null && !isNaN(balanceDCAs) ? `${balanceDCAs} DCAs` : '-'} />
 
       {(tokenInDirty || amountDCADirty) && <RevertChangesButton onClick={revertTokenAndAmount} />}
     </CellWithChanged>

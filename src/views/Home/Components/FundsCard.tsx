@@ -27,6 +27,7 @@ export const FundsCard: React.FC = () => {
   }, [minTxPrice, userTreasury])
   const dcasAtMaxGas = useMemo(() => {
     if (maxTxPrice == null || userTreasury == null) return '-'
+    if (bn(userTreasury).eq(0)) return 0
     return Math.floor(bn(userTreasury).div(maxTxPrice).toNumber())
   }, [maxTxPrice, userTreasury])
 
@@ -43,6 +44,7 @@ export const FundsCard: React.FC = () => {
         <ColumnStart gap="inherit" width="100%">
           <DataRow
             t="Current Funding:"
+            i="Test test test test"
             v={
               <Text color={errorColor} textAlign='right'>
                 <b>{userTreasuryDisplay} {getNativeTokenSymbol()}</b>

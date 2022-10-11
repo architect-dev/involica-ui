@@ -2,6 +2,7 @@ import NumericInput from 'components/Input/NumericInput'
 import OptionSelector from 'components/OptionSelector'
 import React, { useCallback, useState } from 'react'
 import { usePositionOutConfigurableMaxSlippage } from 'state/hooks'
+import { validateSlippage } from 'state/utils'
 import { Column, RowBetween, RowCenter, RowEnd, Text } from 'uikit'
 
 export const MaxSlippageSelector: React.FC<{ token: string }> = ({ token }) => {
@@ -14,15 +15,8 @@ export const MaxSlippageSelector: React.FC<{ token: string }> = ({ token }) => {
     (valRaw: React.FormEvent<HTMLInputElement>) => {
       const val = valRaw.currentTarget.value
       setValue(val)
-
-      let reason: string | null = null
-      if (val === '') reason = 'Slippage required'
-      else if (isNaN(parseFloat(val))) reason = 'Not a number'
-      else if (parseFloat(val) < 0.5) reason = 'Must be greater than 0.5%'
-      else if (parseFloat(val) > 50) reason = 'Must be less than 50%'
-
+      const reason = validateSlippage(val)
       setInvalidReason(reason)
-
       if (reason == null) {
         updateMaxSlippage(val)
       }

@@ -6,6 +6,7 @@ import {
   DAY_TOKEN_DATA,
   involicaClient,
   InvolicaDCA,
+  InvolicaSnapshot,
   InvolicaStats,
   INVOLICA_STATS_DATA,
   SNAPSHOTS_DATA,
@@ -22,7 +23,7 @@ import { getValueChangeStatusFromUsds, ValueChangeStatus } from './status'
 import { useInvolicaStore } from './store'
 import { AddressRecord, Token, UserTokenTx } from './types'
 import { useWeb3React } from '@web3-react/core'
-import { orderBy } from 'lodash'
+import { clone, orderBy } from 'lodash'
 
 export interface TokenWithTradeData extends Token {
   tradeAmount: BigNumber
@@ -123,46 +124,10 @@ export interface DCAStats {
   totalValueChange: ValueChangeAndStatus
 }
 
-export const useDailyTokenPrices = () => {
-  const txs = useUserTxs()
-  const [inTokens, outTokens] = useMemo(() => {
-    const ins: AddressRecord<boolean> = {}
-    const outs: AddressRecord<boolean> = {}
-    txs.forEach((tx) => {
-      ins[tx.tokenIn] = true
-      tx.tokenTxs.forEach((tokenTx) => {
-        outs[tokenTx.tokenOut] = true
-      })
-    })
-    return [
-      Object.keys(ins).map((address) => address.toLowerCase()),
-      Object.keys(outs).map((address) => address.toLowerCase()),
-    ]
-  }, [txs])
-
-  const { loading, error, data } = useQuery(DAY_TOKEN_DATA, {
-    variables: { tokens: inTokens.concat(outTokens), timestamp: 1663242332 },
-  })
-
-  const dayPrices = useMemo(() => {
-    if (loading || error || data?.tokenDayDatas == null) return null
-    const prices: Record<number, AddressRecord<string>> = {}
-
-    data.tokenDayDatas.forEach(({ date, priceUSD, id }: { date: number; priceUSD: string; id: string }) => {
-      const address = id.split('-')[0]
-      if (prices[date] == null) prices[date] = {}
-      prices[date][address] = priceUSD
-    })
-
-    return prices
-  }, [loading, error, data])
-
-  return dayPrices
-}
-
 export const useInvolicaStatsData = () => {
   const { loading, data } = useQuery(INVOLICA_STATS_DATA, {
     client: involicaClient,
+    pollInterval: 1000,
   })
 
   return useMemo((): InvolicaStats | null => {
@@ -174,6 +139,7 @@ export const useInvolicaStatsData = () => {
 export const useInvolicaSnapshotsData = () => {
   const { loading, data } = useQuery(SNAPSHOTS_DATA, {
     client: involicaClient,
+    pollInterval: 1000,
   })
 
   return useMemo((): InvolicaDCA[] | null => {
@@ -187,6 +153,7 @@ export const useInvolicaUserDcasData = () => {
   const { loading, data } = useQuery(USER_STATS_DATA, {
     variables: { user: account },
     client: involicaClient,
+    pollInterval: 1000,
   })
 
   return useMemo((): InvolicaDCA[] | null => {
@@ -444,4 +411,173 @@ export const useUserDcasData = () => {
       },
     )
   }, [dcas, tokensData])
+}
+
+export const useDailyTokenPrices = () => {
+  const txs = useUserTxs()
+  const tokensData = useInvolicaStore((state) => state.tokens)
+
+  const [inTokens, outTokens] = useMemo(() => {
+    const ins: AddressRecord<boolean> = {}
+    const outs: AddressRecord<boolean> = {}
+    txs.forEach((tx) => {
+      ins[tx.tokenIn] = true
+      tx.tokenTxs.forEach((tokenTx) => {
+        outs[tokenTx.tokenOut] = true
+      })
+    })
+    return [
+      Object.keys(ins).map((address) => address.toLowerCase()),
+      Object.keys(outs).map((address) => address.toLowerCase()),
+    ]
+  }, [txs])
+
+  const { loading, error, data } = useQuery(DAY_TOKEN_DATA, {
+    variables: { tokens: inTokens.concat(outTokens), timestamp: 1663242332 },
+    pollInterval: 1000,
+  })
+
+  const dayPrices = useMemo(() => {
+    if (loading || error || data?.tokenDayDatas == null) return null
+    const prices: Record<number | string, AddressRecord<string>> = {}
+
+    data.tokenDayDatas.forEach(({ date, priceUSD, id }: { date: number; priceUSD: string; id: string }) => {
+      const address = id.split('-')[0]
+      if (prices[date] == null) prices[date] = {}
+      prices[date][address] = priceUSD
+    })
+
+    prices.current = {}
+
+    Object.values(tokensData).forEach((token) => {
+      prices.current[token.address.toLowerCase()] = token.price.toString()
+    })
+
+    return prices
+  }, [loading, error, data?.tokenDayDatas, tokensData])
+
+  return dayPrices
+}
+
+export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | null, includeDCAs: boolean) => {
+  const dcasOrSnapshots = useInvolicaDcasOrSnapshots(dcas)
+  const dailyPrices = useDailyTokenPrices()
+
+  const userOuts = useMemo(() => {
+    if (dcasOrSnapshots == null) return null
+    const outs: AddressRecord<boolean> = {}
+    dcasOrSnapshots.forEach((dcaOrSnapshot) => {
+      dcaOrSnapshot.outTokens.forEach((outToken) => {
+        outs[outToken] = true
+      })
+    })
+    if (selectedToken != null) return outs[selectedToken.toLowerCase()] ? [selectedToken.toLowerCase()] : []
+    return Object.keys(outs)
+  }, [dcasOrSnapshots, selectedToken])
+
+  const dataStartDay = useMemo(() => {
+    if (dcasOrSnapshots == null || dcasOrSnapshots.length === 0) return null
+    return Math.floor(dcasOrSnapshots[0].timestamp / 86400) * 86400
+  }, [dcasOrSnapshots])
+
+  /*
+    Zip between days to create a portfolio snapshot of everything that happened during that day
+    For each day snapshot:
+      Calculate trade dollar value
+      Use current price to determine value change of ins and outs
+      Add outs change and subtract in change to get total change
+  */
+  return useMemo(() => {
+    if (dataStartDay == null || userOuts == null || dcasOrSnapshots == null || dailyPrices == null) return null
+
+    let maxUsdValue = 0
+
+    let runningTradeUsd = 0
+    const timestamps = []
+    const tradeValData = []
+    const currentValData = []
+    const dcasCountData = []
+    let dayTimestamp = dataStartDay
+    let dcaIndex = 0
+    let dcasCount = 0
+    const runningPortfolioOuts: AddressRecord<number> = clone({})
+
+    // Populate running portfolio with tokens to track
+    userOuts.forEach((outToken) => {
+      runningPortfolioOuts[outToken] = 0
+    })
+
+    while (dayTimestamp <= Math.floor(Date.now() / 1000) + 86400) {
+      const yesterdayTimestamp = dayTimestamp - 86400
+
+      // Increment portfolio values with all trades that happened on this day
+      for (let i = dcaIndex; i < dcasOrSnapshots.length; i++) {
+        const dcaOrSnapshot = dcasOrSnapshots[i]
+
+        // Exit if dca didn't happen during this day
+        if (dcaOrSnapshot.timestamp < yesterdayTimestamp || dcaOrSnapshot.timestamp >= dayTimestamp) break
+        if (dcas) {
+          dcasCount += 1
+        } else {
+          dcasCount += (dcaOrSnapshot as InvolicaSnapshot).dcasCount
+        }
+
+        dcaOrSnapshot.outTokens
+        .forEach((outToken, outTokenIndex) => {
+            // Only include token if its being tracked
+            if (runningPortfolioOuts[outToken] == null) return
+
+            const amount = dcasOrSnapshots[i].outAmounts[outTokenIndex]
+            const price = dcas
+              ? dcasOrSnapshots[i].outPrices[outTokenIndex]
+              : parseFloat(dailyPrices[yesterdayTimestamp]?.[outToken] ?? '0')
+            runningPortfolioOuts[outToken] += amount
+            runningTradeUsd += amount * price
+          })
+
+        if (includeDCAs) {
+          timestamps.push(dcaOrSnapshot.timestamp)
+          tradeValData.push(runningTradeUsd)
+          if (runningTradeUsd > maxUsdValue) maxUsdValue = runningTradeUsd
+          let currentUsd = 0
+          Object.entries(runningPortfolioOuts).forEach(([token, amount]) => {
+            const currentPrice = dailyPrices[yesterdayTimestamp]?.[token] ?? '0'
+            currentUsd += parseFloat(currentPrice) * amount
+          })
+          currentValData.push(currentUsd)
+          if (currentUsd > maxUsdValue) maxUsdValue = currentUsd
+        }
+
+        dcaIndex++
+      }
+
+      timestamps.push(dayTimestamp)
+      const isCurrentDay = dayTimestamp > Math.floor(Date.now() / 1000)
+
+      tradeValData.push(runningTradeUsd)
+      if (runningTradeUsd > maxUsdValue) maxUsdValue = runningTradeUsd
+
+      let currentUsd = 0
+      Object.entries(runningPortfolioOuts).forEach(([token, amount]) => {
+        const currentPrice = dailyPrices[isCurrentDay ? 'current' : yesterdayTimestamp]?.[token] ?? '0'
+        currentUsd += parseFloat(currentPrice) * amount
+      })
+
+      currentValData.push(currentUsd)
+      if (currentUsd > maxUsdValue) maxUsdValue = currentUsd
+
+      dcasCountData.push(dcasCount)
+
+      dayTimestamp += 86400
+    }
+
+    return {
+      timestamps: timestamps.map((timestamp) => timestamp * 1000),
+      tradeValData,
+      currentValData,
+      dcasCountData,
+      maxUsdValue,
+      maxDcasValue: dcasCountData[dcasCountData.length - 1],
+    }
+  }, [dataStartDay, userOuts, dcasOrSnapshots, dailyPrices, dcas, includeDCAs])
 }

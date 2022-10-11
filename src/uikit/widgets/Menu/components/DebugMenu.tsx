@@ -13,7 +13,7 @@ const ItemFlex = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
-  height: 100%;
+  height: 32px;
   ${({ theme }) =>
     pressableMixin({
       theme,
@@ -44,7 +44,7 @@ export const DebugModal: React.FC<{
         </ItemFlex>
       ))}
       <br />
-      <SummitButton onClick={onDismiss} activeText="Close" />
+      <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
     </ModalContentContainer>
   )
 }

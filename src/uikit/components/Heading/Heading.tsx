@@ -25,7 +25,6 @@ const Heading = styled(Text).attrs({ bold: true })<HeadingProps>`
   font-size: ${({ size }) => style[size || sizes.MD].fontSize};
   font-weight: 300;
   line-height: 1.1;
-  font-family: Courier Prime, monospace;
 
   ${({ theme }) => theme.mediaQueries.lg} {
     font-size: ${({ size }) => style[size || sizes.MD].fontSizeLg};

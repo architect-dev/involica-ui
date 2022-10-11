@@ -2,7 +2,7 @@ import React from 'react'
 import { Line } from 'react-chartjs-2'
 import 'chartjs-adapter-date-fns'
 import { enUS } from 'date-fns/locale'
-import { useInvolicaDCAChartData } from 'state/uiHooks'
+import { useInvolicaDCAChartData } from 'state/statsHooks'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -73,7 +73,7 @@ const PortfolioChart: React.FC = () => {
                 )
               },
               font: {
-                family: 'Courier Prime, monospace',
+                family: 'Andale Mono, monospace',
               },
             },
           },
@@ -98,7 +98,7 @@ const PortfolioChart: React.FC = () => {
             },
             ticks: {
               font: {
-                family: 'Courier Prime, monospace',
+                family: 'Andale Mono, monospace',
               },
             },
           },
@@ -116,13 +116,13 @@ const PortfolioChart: React.FC = () => {
             displayColors: false,
             position: 'average',
             bodyFont: {
-              family: 'Courier Prime, monospace',
+              family: 'Andale Mono, monospace',
             },
             titleFont: {
-              family: 'Courier Prime, monospace',
+              family: 'Andale Mono, monospace',
             },
             footerFont: {
-              family: 'Courier Prime, monospace',
+              family: 'Andale Mono, monospace',
             },
             titleAlign: 'right',
             titleMarginBottom: 6,
@@ -130,16 +130,16 @@ const PortfolioChart: React.FC = () => {
             footerMarginTop: 6,
             footerColor: '#F7CAC9',
             callbacks: {
-              afterTitle: (context) => {
-                if (dcasCountChart || context == null || context.length === 0) return null
-                const { chart, dataIndex } = context[0]
-                const { datasets } = chart.data
-                const dcas =
-                  (datasets[2].data[dataIndex] as number) -
-                  (dataIndex === 0 ? 0 : (datasets[2].data[dataIndex - 1] as number))
-                if (dcas === 0) return null
-                return `${dcas} DCAs`
-              },
+              // afterTitle: (context) => {
+              //   if (dcasCountChart || context == null || context.length === 0) return null
+              //   const { chart, dataIndex } = context[0]
+              //   const { datasets } = chart.data
+              //   const dcas =
+              //     (datasets[2].data[dataIndex] as number) -
+              //     (dataIndex === 0 ? 0 : (datasets[2].data[dataIndex - 1] as number))
+              //   if (dcas === 0) return null
+              //   return `${dcas} DCAs`
+              // },
               label: (context) => {
                 const datasets = context?.chart?.data?.datasets
                 const { dataIndex, datasetIndex, dataset, parsed } = context

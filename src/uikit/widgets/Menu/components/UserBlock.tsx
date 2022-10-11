@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { Text } from 'uikit/components/Text'
 import { Login } from '../../WalletModal/types'
-import { linearGradient } from 'polished'
+import { linearGradient, transparentize } from 'polished'
 import { SummitPopUp } from 'uikit/widgets/Popup'
 import ConnectPopUp from 'uikit/widgets/WalletModal/ConnectPopUp'
 import AccountPopUp from 'uikit/widgets/WalletModal/AccountPopUp'
@@ -17,6 +17,20 @@ const UserBlockFlex = styled.div`
   align-items: center;
   justify-content: center;
   ${pressableMixin}
+
+  transform: null;
+  transition: transform 100ms ease-in-out;
+
+  :hover:not(:active) {
+    transform: translate(-1px, -1px);
+    .account-dot {
+      box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+    }
+    .label {
+      text-decoration: underline;
+      font-weight: bold;
+    }
+  }
 `
 
 const AccountDot = styled.div<{ connected: boolean }>`
@@ -36,7 +50,8 @@ const AccountDot = styled.div<{ connected: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-
+  box-shadow: 0px 0px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+  transition: box-shadow 100ms ease-in-out;
 
   ${({ theme }) => theme.mediaQueries.nav} {
     width: 32px;
@@ -86,10 +101,10 @@ const UserBlock: React.FC<Props> = ({ account, isDark, toggleTheme, login, logou
       position='bottom right'
       button={
         <UserBlockFlex>
-          <AccountDot connected={account != null}>
+          <AccountDot className='account-dot' connected={account != null}>
             { account != null && <StyledChainIcon white chain={chain}/> }
           </AccountDot>
-          <Text bold monospace>{account ? accountEllipsis : 'CONNECT'}</Text>
+          <Text className='label' monospace>{account ? accountEllipsis : 'CONNECT'}</Text>
         </UserBlockFlex>
       }
       popUpContent={

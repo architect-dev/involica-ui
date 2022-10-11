@@ -1,3 +1,4 @@
+import { transparentize } from 'polished'
 import React, { ReactNode } from 'react'
 import styled from 'styled-components'
 import { Text } from 'uikit'
@@ -8,6 +9,7 @@ const StyledFieldset = styled.fieldset<{
   mobilePadding?: string
   padding?: string
 }>`
+  background-color: #fff6eb80;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -16,7 +18,7 @@ const StyledFieldset = styled.fieldset<{
   border-radius: 4px;
   padding: ${({ mobilePadding, expanded }) => mobilePadding ?? (expanded ? '16px' : '2px 20px')};
   margin-bottom: ${({ expanded }) => (expanded ? '0px' : 'auto')};
-  transition: padding 200ms;
+  transition: padding 200ms, box-shadow 200ms ease-in-out, transform 200ms ease-in-out, background-color 200ms ease-in-out;
   border: dashed ${({ theme }) => theme.colors.text};
   border-width: 1px;
   min-width: 100%;
@@ -26,6 +28,14 @@ const StyledFieldset = styled.fieldset<{
     min-width: ${({ halfWidth }) => (halfWidth ? 'calc(50% - 12px)' : '100%')};
     width: ${({ halfWidth }) => (halfWidth ? 'calc(50% - 12px)' : '100%')};
     padding: ${({ padding, expanded }) => padding ?? (expanded ? '32px' : '2px 36px')};
+  }
+
+  box-shadow: 0px 0px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+  transform: none;
+  :hover {
+    box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+    transform: translate(-1px, -1px);
+    background-color: #fff6eb;
   }
 
   .legend {

@@ -76,7 +76,6 @@ const InputWrapper = styled.div<{ changed?: boolean }>`
         color: ${theme.colors.warning};
         font-size: 14px;
         font-weight: bold;
-        font-family: Courier Prime, monospace;
         position: absolute;
         top: -4px;
         right: -8px;
@@ -200,7 +199,7 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
     setValue(toFixedMaxPrecision(bn(fullBalance).div(10).toString(), tokenData?.decimals), fullBalance, tokenData)
   }, [setValue, fullBalance, tokenData])
   const handleSelect50Perc = useCallback(() => {
-    setValue(toFixedMaxPrecision(bn(fullBalance).div(5).toString(), tokenData?.decimals), fullBalance, tokenData)
+    setValue(toFixedMaxPrecision(bn(fullBalance).div(2).toString(), tokenData?.decimals), fullBalance, tokenData)
   }, [setValue, fullBalance, tokenData])
   const handleSelectMax = useCallback(() => {
     setValue(fullBalance, fullBalance, tokenData)
@@ -265,7 +264,7 @@ const TokenAndAmountSelector: React.FC<TokenInputProps> = ({
       </StyledInputWrapper>
 
       {invalidReason != null && (
-        <Text red italic>
+        <Text red italic small>
           {invalidReason}
         </Text>
       )}

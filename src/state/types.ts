@@ -100,7 +100,7 @@ interface UserDataState {
   userData?: UserData
 }
 interface UserDataMutators {
-  fetchUserData: (account) => Promise<void>
+  fetchUserData: (account: string, hydrateConfig: boolean) => Promise<void>
 }
 
 interface Loaded {

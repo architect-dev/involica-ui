@@ -9,6 +9,20 @@ import { Login, Config } from './types'
 const StyledButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.selectorBackground};
   width: 100%;
+
+  .icon {
+    width: 32px;
+    filter: drop-shadow(0px 0px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)});
+    transform: none;
+    transition: filter 100ms ease-in-out, transform 100ms ease-in-out;
+  }
+
+  :hover:not(:active) {
+    .icon {
+      filter: drop-shadow(2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)});
+      transform: translate(-1px, -1px);
+    }
+  }
 `
 
 interface Props {
@@ -37,7 +51,7 @@ const WalletCard: React.FC<Props> = ({ login, walletConfig, onDismiss, mb }) => 
       </Text>
       <Icon
         width="32px"
-        style={{ width: '32px', filter: `drop-shadow(2px 2px 2px ${transparentize(0.5, '#000000')})` }}
+        className='icon'
       />
     </StyledButton>
   )

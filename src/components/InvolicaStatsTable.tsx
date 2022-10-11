@@ -57,6 +57,8 @@ export const InvolicaStatsTable: React.FC = () => {
     }
   }, [setDcasCountChart, involicaDcasCountChartSelected])
 
+  if (dataOption !== ChartDataOption.Involica) return null
+
   return (
     <Card title="Involica Stats" padding="24px">
       <CellRow>

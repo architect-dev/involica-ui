@@ -1,3 +1,4 @@
+import React from 'react'
 import { Login } from '../WalletModal/types'
 
 export interface LangType {
@@ -25,7 +26,7 @@ export interface NavTheme {
 
 export interface MenuEntry {
   gap?: boolean
-  label?: string
+  label?: React.ReactNode
   palette?: string
   icon?: string
   href: string

@@ -18,10 +18,10 @@ interface Props {
 }
 
 const StyledPopup = styled(Popup)`
-  &-content {
+  /* &-content {
     margin: 95px auto auto auto !important;
     max-height: calc(100vh - 48px) !important;
-  }
+  } */
 `
 
 export const ModalContentContainer = styled.div<{
@@ -121,65 +121,57 @@ const CloseIcon = styled(X)`
   }
 `
 
-export const SummitPopUp: React.FC<Props> = React.memo(({
-  button,
-  position,
-  contentPadding,
-  popUpContent,
-  popUpTitle,
-  open,
-  callOnDismiss,
-  modal,
-  className,
-}) => {
-  const ref = useRef()
-  const onDismiss = useCallback(() => {
-    callOnDismiss()
-    if (ref.current != null) {
-      // eslint-disable-next-line @typescript-eslint/no-extra-semi
-      ;((ref.current as unknown) as any).close()
+export const SummitPopUp: React.FC<Props> = React.memo(
+  ({ button, position, contentPadding, popUpContent, popUpTitle, open, callOnDismiss, modal, className }) => {
+    const ref = useRef()
+    const onDismiss = useCallback(() => {
+      callOnDismiss()
+      if (ref.current != null) {
+        // eslint-disable-next-line @typescript-eslint/no-extra-semi
+        ;((ref.current as unknown) as any).close()
+      }
+    }, [ref, callOnDismiss])
+    let WrappedButton = null
+    if (typeof button === 'object' && typeof button.type === 'function') {
+      WrappedButton =
+        button &&
+        React.forwardRef((props, buttonRef: React.ForwardedRef<HTMLDivElement>) => (
+          <span {...props} ref={buttonRef}>
+            {button}
+          </span>
+        ))
     }
-  }, [ref, callOnDismiss])
-  let WrappedButton = null
-  if (typeof button === 'object' && typeof button.type === 'function') {
-    WrappedButton =
-      button &&
-      React.forwardRef((props, buttonRef: React.ForwardedRef<HTMLDivElement>) => (
-        <span {...props} ref={buttonRef}>
-          {button}
-        </span>
-      ))
-  }
 
-  return (
-    <StyledPopup
-      trigger={WrappedButton ? <WrappedButton /> : button}
-      position={position}
-      closeOnDocumentClick
-      closeOnEscape
-      ref={ref}
-      modal={modal}
-      offsetX={0}
-      offsetY={0}
-      open={open}
-      arrow={false}
-      onClose={onDismiss}
-      className={className}
-    >
-      <PopUpCard padding={contentPadding}>
-        {popUpTitle != null && (
-          <PopUpHeader>
-            <Text bold>{popUpTitle}</Text>
-            <CloseIcon onClick={onDismiss} size={16} />
-          </PopUpHeader>
-        )}
-        <Scrollable padding={contentPadding}>
-          {React.cloneElement(popUpContent, {
-            onDismiss,
-          })}
-        </Scrollable>
-        {popUpTitle != null && <PopUpFooterGradient />}
-      </PopUpCard>
-    </StyledPopup>
-  )
-})
+    return (
+      <StyledPopup
+        trigger={WrappedButton ? <WrappedButton /> : button}
+        position={position}
+        closeOnDocumentClick
+        closeOnEscape
+        ref={ref}
+        modal={modal}
+        offsetX={0}
+        offsetY={10}
+        open={open}
+        arrow
+        onClose={onDismiss}
+        className={className}
+      >
+        <PopUpCard padding={contentPadding}>
+          {popUpTitle != null && (
+            <PopUpHeader>
+              <Text bold>{popUpTitle}</Text>
+              <CloseIcon onClick={onDismiss} size={16} />
+            </PopUpHeader>
+          )}
+          <Scrollable padding={contentPadding}>
+            {React.cloneElement(popUpContent, {
+              onDismiss,
+            })}
+          </Scrollable>
+          {popUpTitle != null && <PopUpFooterGradient />}
+        </PopUpCard>
+      </StyledPopup>
+    )
+  },
+)

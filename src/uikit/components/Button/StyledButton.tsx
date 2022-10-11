@@ -55,14 +55,14 @@ const StyledButton = styled.button<BaseButtonProps>`
   border: 0;
   border-radius: 6px;
   display: inline-flex;
-  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   justify-content: center;
   letter-spacing: 0.03em;
   line-height: 1;
   outline: 0;
-  box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+  box-shadow: 0px 0px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+  transform: none;
   svg {
     transition: stroke-width 100ms ease-in-out;
   }
@@ -70,14 +70,15 @@ const StyledButton = styled.button<BaseButtonProps>`
   ${pressableMixin}
 
   &:hover:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled):not(:active) {
-    box-shadow: 2px 2px 8px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
     svg {
       stroke-width: 3;
     }
   }
 
   &:active:not(:disabled):not(.summit-button--disabled):not(.summit-button--disabled) {
-    box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+    box-shadow: 0px 0px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
   }
 
   ${getDisabledStyles}

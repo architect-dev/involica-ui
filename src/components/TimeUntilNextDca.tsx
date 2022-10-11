@@ -7,7 +7,7 @@ import { getTimeRemainingText } from 'utils/timestamp'
 export const TimeUntilNextDca: React.FC = () => {
   const timeUntilNextDca = useTimeUntilNextDCA()
   return (
-    <Text bold italic textAlign='right'>
+    <Text bold textAlign='right'>
       { timeUntilNextDca === 0 ? <Dots>Executing</Dots> : timeUntilNextDca != null ? getTimeRemainingText(timeUntilNextDca) : '-'}
     </Text>
   )

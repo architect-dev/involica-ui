@@ -5,9 +5,9 @@ import { useInterval } from 'hooks/useInterval'
 import useRefresh from 'hooks/useRefresh'
 import { pick } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { bnDisplay, eN } from 'utils'
+import { bn, bnDecOffset, bnDisplay, eN } from 'utils'
 import { timestampToDateTime } from 'utils/timestamp'
-import { PositionStatus } from './status'
+import { PositionLimitingFactor, PositionStatus } from './status'
 import { useInvolicaStore } from './store'
 import {
   AddressRecord,
@@ -41,7 +41,7 @@ export const useFetchUserData = () => {
   useEffect(() => {
     if (!account) return
     setActiveAccount(account)
-    fetchUserData(account)
+    fetchUserData(account, true)
   }, [account, fetchUserData, setActiveAccount, slowRefresh])
 }
 
@@ -303,15 +303,16 @@ export const useTimeUntilNextDCA = () => {
 export const useUpcomingDCAs = () => {
   const lastDCA = useInvolicaStore((state) => state.userData?.position?.lastDCA)
   const intervalDCA = useInvolicaStore((state) => state.userData?.position?.intervalDCA)
+  const dcasRemaining = useDcasRemaining()
 
   return useMemo(() => {
     if (lastDCA == null || lastDCA === 0 || intervalDCA == null || intervalDCA === 0) return null
     const upcomingDCAs = []
-    ;[1, 2, 3, 4, 5].forEach((i) => {
+    ;[1, 2, 3, 4, 5, 6].forEach((i) => {
       upcomingDCAs.push(timestampToDateTime(lastDCA + intervalDCA * (i + 1)))
     })
-    return upcomingDCAs
-  }, [intervalDCA, lastDCA])
+    return upcomingDCAs.slice(0, Math.min(dcasRemaining, 6))
+  }, [dcasRemaining, intervalDCA, lastDCA])
 }
 
 export const baseGasPrice = 450000
@@ -373,6 +374,44 @@ export const usePositionStatus = () => {
     tokenInUserData?.allowance,
     tokenInUserData?.balance,
     maxTxPrice,
+  ])
+}
+export const usePositionLimitingFactor = () => {
+  const { tokenInData, tokenInUserData } = usePositionTokenInWithData(true)
+  const userHasPosition = useUserHasPosition()
+  const userTreasury = useUserTreasury()
+  const { amountDCA } = usePositionAmountDCA(true)
+  const { minTxPrice } = useDcaTxPriceRange(true)
+  const positionPaused = useIsPositionPaused()
+  const positionManualOnly = false
+
+  return useMemo(() => {
+    if (!userHasPosition) return PositionLimitingFactor.None
+    if (positionManualOnly) return PositionLimitingFactor.None
+    if (positionPaused) return PositionLimitingFactor.None
+
+    const fundingDcas = Math.floor(bn(userTreasury).div(minTxPrice).toNumber())
+    const allowanceDcas = Math.floor(
+      bnDecOffset(tokenInUserData?.allowance, tokenInData?.decimals).div(amountDCA).toNumber(),
+    )
+    const balanceDcas = Math.floor(
+      bnDecOffset(tokenInUserData?.balance, tokenInData?.decimals).div(amountDCA).toNumber(),
+    )
+    const minDcas = Math.min(fundingDcas, allowanceDcas, balanceDcas)
+
+    if (fundingDcas === minDcas) return PositionLimitingFactor.Funding
+    if (allowanceDcas === minDcas) return PositionLimitingFactor.Allowance
+    return PositionLimitingFactor.Balance
+  }, [
+    userHasPosition,
+    positionManualOnly,
+    positionPaused,
+    userTreasury,
+    minTxPrice,
+    tokenInUserData?.allowance,
+    tokenInUserData?.balance,
+    tokenInData?.decimals,
+    amountDCA,
   ])
 }
 

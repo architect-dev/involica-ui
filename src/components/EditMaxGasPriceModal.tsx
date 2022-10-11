@@ -72,7 +72,7 @@ export const EditMaxGasPriceModal: React.FC<{
       <br />
 
       <RowCenter>
-        <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
       </RowCenter>
     </ModalContentContainer>
   )
@@ -87,7 +87,7 @@ export const EditMaxGasPriceButton: React.FC = () => {
       callOnDismiss={hide}
       modal
       button={
-        <TextButton onClick={show} bold italic changed={dirty} asterisk asteriskPosition="-6px 0px">
+        <TextButton onClick={show} changed={dirty} asterisk asteriskPosition="-6px 0px">
           {maxGasPrice} gwei
           <Edit3 size="14px" />
         </TextButton>

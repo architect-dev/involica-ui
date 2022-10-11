@@ -17,7 +17,6 @@ const IndicatorWrapper = styled.div`
   border: 1px solid ${({ theme }) => transparentize(0.75, theme.colors.text)};
 
   text-align: center;
-  font-family: Courier Prime, monospace;
   color: ${({ theme }) => theme.colors.text};
   font-weight: 600;
   font-size: 14px;

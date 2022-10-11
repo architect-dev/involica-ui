@@ -1,3 +1,4 @@
+import { transparentize } from "polished";
 import styled, { css, DefaultTheme } from "styled-components";
 
 export const selectorWrapperMixin = ({
@@ -13,7 +14,17 @@ export const selectorWrapperMixin = ({
 }) => {
     return css`
         background-color: ${theme.colors.selectorBackground};
-        box-shadow: ${(disabled || isLocked) ? 'none' : `inset 1px 1px 1px ${invalid ? theme.colors.failure : theme.colors.textShadow}`};
+        transition: box-shadow 100ms ease-in-out, transform 100ms ease-in-out;
+        box-shadow: ${(disabled || isLocked) ? 'none' : `inset 0px 0px 0px ${transparentize(0.4, theme.colors.text)}`};
+        transform: none;
+        ${ invalid && css`
+            box-shadow: ${(disabled || isLocked) ? 'none' : `inset 2px 2px 0px ${transparentize(0.4, theme.colors.failure)}`};
+            transform: translate(1px, 1px);
+        `}
+        :hover, :focus-within {
+            box-shadow: ${(disabled || isLocked) ? 'none' : `inset 2px 2px 0px ${transparentize(0.4, invalid ? theme.colors.failure : theme.colors.text)}`};
+            transform: translate(1px, 1px);
+        }
     `
 }
 

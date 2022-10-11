@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { useConfigurableIntervalDCA } from 'state/hooks'
-import { useIntervalStrings } from 'state/uiHooks'
 import { Column, ColumnStart, RowStart, Text } from 'uikit'
 import NumericInput from './Input/NumericInput'
 
@@ -18,7 +17,6 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
     setDays,
     setHours,
   } = useConfigurableIntervalDCA()
-  const { intervalString } = useIntervalStrings()
 
   const handleSetWeeks = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -54,7 +52,7 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
           placeholder="0"
           invalid={weeksInvalidReason != null}
           rightBlend
-          changed={dirty && weeks !== ''}
+          changed={!intro && dirty && weeks !== ''}
         />
         <NumericInput
           value={days}
@@ -64,7 +62,7 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
           invalid={daysInvalidReason != null}
           leftBlend
           rightBlend
-          changed={dirty && days !== ''}
+          changed={!intro && dirty && days !== ''}
         />
         <NumericInput
           value={hours}
@@ -73,37 +71,31 @@ export const IntervalSelector: React.FC<{ intro?: boolean }> = ({ intro = false 
           placeholder="0"
           invalid={hoursInvalidReason != null}
           leftBlend
-          changed={dirty && hours !== ''}
+          changed={!intro && dirty && hours !== ''}
         />
       </RowStart>
       <Column mt={intro ? '-12px' : '0'}>
         {weeksInvalidReason != null && (
-          <Text red italic>
+          <Text red italic small>
             Weeks: {weeksInvalidReason}
           </Text>
         )}
         {daysInvalidReason != null && (
-          <Text red italic>
+          <Text red italic small>
             Days: {daysInvalidReason}
           </Text>
         )}
         {hoursInvalidReason != null && (
-          <Text red italic>
+          <Text red italic small>
             Hours: {hoursInvalidReason}
           </Text>
         )}
         {intervalDCA === 0 && (
-          <Text red italic>
+          <Text red italic small>
             DCA interval cannot be 0
           </Text>
         )}
       </Column>
-      {intro && (
-        <Text italic small bold={intro}>
-          <br/>
-          {intervalDCA === 0 ? '-' : intervalString}
-        </Text>
-      )}
     </ColumnStart>
   )
 }

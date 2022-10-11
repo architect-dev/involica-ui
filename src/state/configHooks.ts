@@ -52,8 +52,6 @@ export const useIntroActiveStep = () => {
     'fundingInvalidReason',
   ])
 
-  return IntroStep.Finalize
-
   if (!startIntro) return IntroStep.NotStarted
 
   if (tokenIn == null || tokenIn === ethers.constants.AddressZero) return IntroStep.TokenIn

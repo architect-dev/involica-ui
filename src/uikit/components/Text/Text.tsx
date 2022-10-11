@@ -29,7 +29,6 @@ export const Text = styled.div<TextProps>`
   text-decoration: ${({ underline }) => (underline ? 'underline' : 'default')};
   line-height: 1.5;
   text-align: left;
-  font-family: monospace;
   ${({ textTransform }) => textTransform && `text-transform: ${textTransform};`}
   ${space};
   ${typography};
@@ -47,7 +46,6 @@ export const TextWithChanged = styled(Text)<{ changed?: boolean; asterisk?: bool
             color: ${theme.colors.warning};
             font-size: 14px;
             font-weight: bold;
-            font-family: Courier Prime, monospace;
             position: absolute;
             top: ${asteriskPosition ? asteriskPosition.split(' ')[0] : '-6px'};
             right: ${asteriskPosition ? asteriskPosition.split(' ')[1] : '-8px'};

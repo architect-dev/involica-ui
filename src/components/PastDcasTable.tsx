@@ -29,6 +29,11 @@ const Table = styled.div`
     width: 100%;
     flex-wrap: wrap;
   }
+  .empty-row {
+    height: 56px;
+    align-items: center;
+    justify-content: center;
+  }
   & .row:not(.head):nth-child(odd) {
     background-color: ${({ theme }) => transparentize(0.95, theme.colors.text)};
   }
@@ -180,8 +185,15 @@ export const PastDcasTable: React.FC = () => {
           </div>
         </div>
         <div className="body">
-          {dcasData != null &&
-            dcasData.map((dca) => <PastDcaCard dca={dca} key={dca.txHash} openModal={openUserTxModal} />)}
+          {dcasData != null && dcasData.length > 0 ? (
+            <>
+              {dcasData.map((dca) => (
+                <PastDcaCard dca={dca} key={dca.txHash} openModal={openUserTxModal} />
+              ))}
+            </>
+          ) : (
+            <Text className='row empty-row'>No Executed DCAs found</Text>
+          )}
         </div>
       </Table>
       <SummitPopUp

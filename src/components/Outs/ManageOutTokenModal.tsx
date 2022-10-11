@@ -38,7 +38,7 @@ export const ManageOutTokenModal: React.FC<{
       />
       <br />
       <RowCenter>
-        <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
       </RowCenter>
     </ModalContentContainer>
   )

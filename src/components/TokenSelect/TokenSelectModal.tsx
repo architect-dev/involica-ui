@@ -102,7 +102,6 @@ export const TokenSearchInput = styled.input`
   width: 100%;
   border: none;
   outline: none;
-  font-family: Courier Prime, monospace;
   color: ${({ theme }) => theme.colors.text};
   font-size: 12px;
   
@@ -235,7 +234,7 @@ const TokenSelectModal: React.FC<{
         )}
       </Scrollable>
       <br />
-      <SummitButton onClick={onDismiss} activeText="Close" />
+      <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
     </ModalContentContainer>
   )
 }

@@ -24,7 +24,6 @@ interface ExecuteParams {
 const useExecuteTx = () => {
   const fetchUserData = useInvolicaStore((state) => state.fetchUserData)
   const fetchPublicData = useInvolicaStore((state) => state.fetchPublicData)
-  const onHydrateConfig = useInvolicaStore((state) => state.hydrateConfig)
   const [pending, setPending] = useState(false)
   const { toastSuccess, toastError } = useToast()
   const { account } = useWeb3React()
@@ -44,17 +43,16 @@ const useExecuteTx = () => {
         setPending(true)
         await callWithEstimateGas(contract, method, args, overrides)
         toastSuccess(successMsg)
-        if (hydrateConfig) onHydrateConfig()
       } catch (error) {
         toastError(errorMsg, (error as Error).message)
       } finally {
         setPending(false)
-        fetchUserData(account)
+        fetchUserData(account, hydrateConfig)
         fetchPublicData()
         if (callback != null) callback()
       }
     },
-    [toastSuccess, toastError, fetchUserData, account, fetchPublicData, onHydrateConfig],
+    [toastSuccess, toastError, fetchUserData, account, fetchPublicData],
   )
 
   return { handleExecute, pending }

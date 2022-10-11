@@ -20,7 +20,6 @@ const StyleButton = styled(Link)`
   font-size: 13px;
   font-weight: bold;
   gap: 8px;
-  font-family: Courier Prime, monospace;
   text-align: right;
   white-space: nowrap;
   height: 14px;

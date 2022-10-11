@@ -23,12 +23,12 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
     isLoading,
     isLocked,
     disabled,
-    secondary = false,
     children,
     onClick,
     activeText,
     loadingText,
     changed,
+    variant,
     ...rest
   } = props
   const internalProps = external ? getExternalLinkProps() : {}
@@ -53,8 +53,8 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
       $isLoading={isLoading}
       $isLocked={isLocked}
       className={classNames.join(' ')}
-      $secondary={secondary}
       disabled={isDisabled || isLocked}
+      variant={variant}
       onClick={handleClick}
       changed={changed}
       {...internalProps}
@@ -77,12 +77,11 @@ SummitButton.defaultProps = {
   isLoading: false,
   isLocked: false,
   external: false,
-  variant: variants.PRIMARY,
   scale: scales.MD,
+  variant: variants.PRIMARY,
   disabled: false,
   elevation: null,
   href: null,
-  secondary: false,
 }
 
 export default SummitButton

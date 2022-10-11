@@ -59,7 +59,7 @@ export const ManagePositionModal: React.FC<{
       <br />
 
       <RowCenter gap="18px">
-        <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
         {unpauseOnly && (
           <SummitButton
             isLoading={pausePending}

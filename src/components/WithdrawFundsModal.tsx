@@ -7,6 +7,7 @@ import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useWithdrawTreasury } from 'hooks/useExecute'
 import { DataRow } from './DataRow'
+import { validateFundingWithdrawal } from 'state/utils'
 
 export const WithdrawFundsModal: React.FC<{
   onDismiss?: () => void
@@ -27,15 +28,8 @@ export const WithdrawFundsModal: React.FC<{
 
   const handleSetFundingAmount = useCallback((val: string, max: string) => {
     setWithdrawAmount(val)
-
-    // Test validity
-    let invalidReason = null
-    if (val === '' || val == null) invalidReason = null
-    else if (isNaN(parseFloat(val))) invalidReason = 'Not a number'
-    else if (parseFloat(val) <= 0) invalidReason = 'Must be greater than 0'
-    else if (parseFloat(val) > parseFloat(max)) invalidReason = 'Insufficient funding'
-    setWithdrawInvalidReason(invalidReason)
-  }, [])
+    setWithdrawInvalidReason(validateFundingWithdrawal(val, max, nativeTokenData))
+  }, [nativeTokenData])
 
   const handleWithdrawTreasury = useCallback(() => {
     onWithdrawTreasury(withdrawAmount, nativeTokenData?.decimals)
@@ -70,7 +64,7 @@ export const WithdrawFundsModal: React.FC<{
 
       <br />
       <RowCenter gap="18px">
-        <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
         <SummitButton
           isLoading={pending}
           onClick={handleWithdrawTreasury}

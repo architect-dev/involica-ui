@@ -8,6 +8,7 @@ import NumericInput from './Input/NumericInput'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { DataRow } from './DataRow'
+import { validateDcasCount } from 'state/utils'
 
 export const SetAllowanceModal: React.FC<{
   onDismiss?: () => void
@@ -36,16 +37,7 @@ export const SetAllowanceModal: React.FC<{
     (e: React.FormEvent<HTMLInputElement>) => {
       const val = e.currentTarget.value
       setRawDcasCount(val)
-
-      console.log('set dcas count')
-
-      // Test validity
-      let invalidReason = null
-      if (val === '' || val == null) invalidReason = null
-      else if (isNaN(parseFloat(val))) invalidReason = 'Not a number'
-      else if (parseFloat(val) <= 0) invalidReason = 'Must be greater than 0'
-      if (invalidReason == null && amountDCAInvalid) invalidReason = 'Your current DCA amount is 0'
-      setDcasCountInvalidReason(invalidReason)
+      setDcasCountInvalidReason(validateDcasCount(val) ?? (amountDCAInvalid ? 'Your current DCA amount is 0' : null))
 
       setRawApprovalAmount('')
       setApprovalAmountInvalidReason(null)
@@ -147,7 +139,7 @@ export const SetAllowanceModal: React.FC<{
         invalid={dcasCountInvalidReason != null}
       />
       {dcasCountInvalidReason != null && (
-        <Text red italic>
+        <Text red italic small>
           {dcasCountInvalidReason}
         </Text>
       )}
@@ -208,7 +200,7 @@ export const SetAllowanceModal: React.FC<{
       <br />
       <br />
       <RowCenter>
-        <SummitButton onClick={onDismiss} activeText="Close" />
+        <SummitButton onClick={onDismiss} activeText="Close" variant="secondary" />
       </RowCenter>
     </ModalContentContainer>
   )

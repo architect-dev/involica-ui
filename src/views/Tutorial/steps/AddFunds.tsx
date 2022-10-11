@@ -27,10 +27,25 @@ export const AddFunds: React.FC = () => {
     return bnDisplay(minTxPrice, 18, 4)
   }, [minTxPrice])
 
+  const fundsDCAs = useMemo(() => {
+    if (
+      fundingAmount == null ||
+      fundingAmount === '' ||
+      fundingAmount === '0' ||
+      isNaN(parseFloat(fundingAmount)) ||
+      minTxPrice == null ||
+      minTxPrice === '' ||
+      minTxPrice === '0'
+    )
+      return null
+    return Math.floor(parseFloat(fundingAmount) / parseFloat(bnDisplay(minTxPrice, 18)))
+  }, [fundingAmount, minTxPrice])
+
   return (
     <>
       <IntroText small>
-        Funds are only used to pay for the gas of each DCA transaction, and can be removed at any time.
+        In order for Involica to execute your DCAs automatically, you need to <b>Fund</b> your account to pay for the
+        DCAs' gas costs. These funds can be withdrawn at any time.
         <br />
         <br />
         <i>
@@ -47,7 +62,11 @@ export const AddFunds: React.FC = () => {
         tokenSelectDisabled
         isNativeDeposit
       />
-      <br />
+      <Text italic>
+        DCAs covered by Funds: <b>{fundsDCAs != null && !isNaN(fundsDCAs) ? `${fundsDCAs} DCAs` : '-'}</b>
+        <br/>
+        <br/>
+      </Text>
       <Column alignItems="flex-start">
         <Text small italic mb="4px">
           Minimum Gas Price is hard coded by Gelato to be 100 gwei

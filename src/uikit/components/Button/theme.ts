@@ -25,11 +25,7 @@ export const styleVariants = {
     backgroundColor: 'transparent',
     border: '1px solid',
     borderColor: 'text',
-    boxShadow: 'none',
     color: 'text',
-    ':disabled': {
-      backgroundColor: 'transparent',
-    },
   },
   [variants.TERTIARY]: {
     backgroundColor: 'tertiary',

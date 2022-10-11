@@ -75,7 +75,6 @@ export const StyledTextInput = styled.input<{ multiline: boolean }>`
   width: 100%;
   background: none;
   border: 0;
-  font-family: Courier Prime, monospace;
   font-size: 12px;
   font-weight: bold;
   flex-wrap: wrap;
