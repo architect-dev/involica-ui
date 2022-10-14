@@ -76,23 +76,23 @@ export const DerivedStatsTable: React.FC = () => {
     <Card title="Portfolio Stats" padding="24px">
       <CellRow>
         <CellCol>
-          <ClickableCol highlighted={userDcasCountChartSelected} onClick={handleToggleUserDcasChart}>
-            <DataRow className="row" px="6px" t="Number of DCAs:" v={lifetimeStats?.dcasCount} />
-          </ClickableCol>
           <ClickableCol highlighted={userTotalPerformanceSelected} onClick={handleShowUserTotalPerformance}>
-            <DataRow className="row" px="6px" t="Total Buy In:" v={lifetimeStats?.totalOutFull?.trade?.usdDisplay} />
             <DataRow
               className="row"
               px="6px"
               t="Current Portfolio Value:"
               v={lifetimeStats?.totalOutFull?.current?.usdDisplay}
             />
+            <DataRow className="row" px="6px" t="Total Buy In:" v={lifetimeStats?.totalOutFull?.trade?.usdDisplay} />
             <DataRow
               className="row"
               px="6px"
               t="Total PnL:"
               v={<PerfIndicator {...lifetimeStats?.totalValueChange} gap="6px" />}
             />
+          </ClickableCol>
+          <ClickableCol highlighted={userDcasCountChartSelected} onClick={handleToggleUserDcasChart}>
+            <DataRow className="row" px="6px" t="Number of DCAs:" v={lifetimeStats?.dcasCount} />
           </ClickableCol>
           <Column width="100%" gap="4px">
             <Text small italic pl="6px">

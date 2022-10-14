@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import SummitButton from 'uikit/components/Button/SummitButton'
-import { pressableMixin } from 'uikit/util/styledMixins'
+import { grainyGradientMixin, pressableMixin } from 'uikit/util/styledMixins'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 import { ChartDataOption } from 'views/Stats/components/chartOptionsState'
 
@@ -27,6 +27,8 @@ const SelectorWrapper = styled(SelectorWrapperBase)<SelectorWrapperProps>`
   .textButton {
     width: ${({ buttonWidth }) => buttonWidth}px;
   }
+
+  ${({ theme }) => grainyGradientMixin(theme.isDark)}
 `
 
 const SelectedSummitButton = styled(SummitButton)<{ selectedIndex: number }>`
@@ -49,6 +51,7 @@ const TextButton = styled.div<{ selected: boolean }>`
   height: ${buttonHeight}px;
   line-height: ${buttonHeight}px;
   text-align: center;
+  z-index: 2;
 
   ${pressableMixin};
 

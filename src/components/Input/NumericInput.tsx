@@ -1,6 +1,8 @@
+import { transparentize } from 'polished'
 import React from 'react'
 import styled, { css } from 'styled-components'
 import { TextWithChanged } from 'uikit'
+import { grainyGradientMixin } from 'uikit/util/styledMixins'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 
 interface NumericInputProps {
@@ -47,7 +49,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
           />
         </InputWrapper>
         {endText != null && (
-          <TextWithChanged small italic red={invalid} changed={changed} asterisk>
+          <TextWithChanged small italic red={invalid} changed={changed} asterisk buttonText>
             {endText}
           </TextWithChanged>
         )}
@@ -83,6 +85,8 @@ const StyledInputWrapper = styled(SelectorWrapperBase)<{ leftBlend: boolean; rig
       filter: grayscale(1);
       opacity: 0.5;
     `}
+
+  ${({ theme }) => grainyGradientMixin(!theme.isDark)}
 `
 
 const InputWrapper = styled.div`
@@ -91,6 +95,7 @@ const InputWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+  z-index: 2;
 `
 
 export const StyledInput = styled.input<{ invalid?: boolean }>`
@@ -105,7 +110,11 @@ export const StyledInput = styled.input<{ invalid?: boolean }>`
   margin: 0;
   padding: 0;
   outline: none;
-  color: ${({ theme, invalid }) => (invalid ? theme.colors.failure : theme.colors.text)};
+  color: ${({ theme, invalid }) => (invalid ? theme.colors.failure : theme.colors.buttonText)};
+  
+  ::placeholder {
+    color: ${({ theme, invalid }) => transparentize(0.5, invalid ? theme.colors.failure : theme.colors.buttonText)};
+  }
 `
 
 export default NumericInput

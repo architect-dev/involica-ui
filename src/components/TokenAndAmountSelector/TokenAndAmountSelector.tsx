@@ -6,7 +6,7 @@ import { AddressRecord, Token } from 'state/types'
 import { useTokenOrNativeFullData } from 'state/hooks'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 import { bn, bnDisplay, toFixedMaxPrecision } from 'utils'
-import { pressableMixin } from 'uikit/util/styledMixins'
+import { grainyGradientMixin, pressableMixin } from 'uikit/util/styledMixins'
 import { transparentize } from 'polished'
 import { TokenIndicator } from 'components/TokenSelect/TokenIndicator'
 import { getNativeTokenSymbol } from 'config/constants'
@@ -16,6 +16,8 @@ const StyledInputWrapper = styled(SelectorWrapperBase)`
   align-items: center;
 
   border-radius: 16px;
+  /* outline: 1.5px solid ${({ theme }) => transparentize(0.65, theme.colors.text)}; */
+  outline-offset: -1.5px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -35,6 +37,8 @@ const StyledInputWrapper = styled(SelectorWrapperBase)`
       filter: grayscale(1);
       opacity: 0.5;
     `}
+
+  ${({ theme }) => grainyGradientMixin(theme.isDark)}
 `
 
 const ThinRow = styled.div`
@@ -46,6 +50,7 @@ const ThinRow = styled.div`
   width: 100%;
   padding: 0 16px;
   gap: 16px;
+  z-index: 2;
 `
 const BalanceRow = styled(ThinRow)`
   justify-content: space-between;
@@ -98,16 +103,19 @@ export const StyledInput = styled.input<{ invalid?: boolean }>`
   text-align: right;
   letter-spacing: 1px;
   color: ${({ theme, invalid }) => (invalid ? theme.colors.failure : theme.colors.text)};
+  ::placeholder {
+    color: ${({ theme, invalid }) => transparentize(0.5, invalid ? theme.colors.failure : theme.colors.text)};
+  }
 `
 
-const TextButton = styled.div`
+const TextButton = styled.div<{ buttonText?: boolean }>`
   cursor: pointer;
   font-size: 14px;
   line-height: 24px;
   cursor: pointer;
   padding: 0px 8px;
   margin: 0px -8px;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme, buttonText }) => buttonText ? theme.colors.buttonText : theme.colors.text};
 
   ${pressableMixin};
 

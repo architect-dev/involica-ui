@@ -73,7 +73,7 @@ const AccountPopUp: React.FC<Props> = ({ account, isDark, toggleTheme, logout, o
             onDismiss()
           }}
         >
-          <Text monospace small>DISCONNECT</Text>
+          <Text monospace small buttonText>DISCONNECT</Text>
         </SummitButton>
       </Flex>
 

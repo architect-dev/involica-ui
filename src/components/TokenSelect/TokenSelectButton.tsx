@@ -16,7 +16,8 @@ export const TokenSelectButton: React.FC<{
   intro?: boolean
   className?: string
   changed?: boolean
-}> = ({ token, setToken, noTokenString, selectedTokens, disabledTokens, modalVariant, intro, className, changed }) => {
+  invertColor?: boolean
+}> = ({ token, setToken, noTokenString, selectedTokens, disabledTokens, modalVariant, intro, className, changed, invertColor }) => {
   const tokenData = useInvolicaStore((state) => state.tokens?.[token])
   const userTokenData = useInvolicaStore(
     (state) => state.userData?.userTokensData?.[token],
@@ -48,6 +49,7 @@ export const TokenSelectButton: React.FC<{
             onClick={show}
             noTokenString={noTokenString}
             changed={changed}
+            invertColor={invertColor}
           />
         }
         popUpTitle='Select Token:'

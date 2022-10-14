@@ -16,6 +16,8 @@ import {
   Filler,
 } from 'chart.js'
 import { ChartDataOption, useChartOptionsState } from './chartOptionsState'
+import { useTheme } from 'styled-components'
+import { transparentize } from 'polished'
 
 let chartHalfHeight = 0
 
@@ -39,6 +41,7 @@ Tooltip.positioners.average = (elements, position) => {
 }
 
 const PortfolioChart: React.FC = () => {
+  const theme = useTheme()
   const { dataOption, focusedToken, dcasCountChart } = useChartOptionsState()
   const chartData = useInvolicaDCAChartData(
     dataOption === ChartDataOption.User,
@@ -55,6 +58,8 @@ const PortfolioChart: React.FC = () => {
   return (
     <Line
       options={{
+        color: theme.colors.text,
+        borderColor: theme.colors.text,
         responsive: true,
         interaction: {
           mode: 'index',
@@ -75,7 +80,12 @@ const PortfolioChart: React.FC = () => {
               font: {
                 family: 'Andale Mono, monospace',
               },
+              color: theme.colors.text,
             },
+            grid: {
+              color: transparentize(0.8, theme.colors.text),
+              borderColor: transparentize(0.8, theme.colors.text),
+            }
           },
           xAxis: {
             adapters: {
@@ -95,11 +105,14 @@ const PortfolioChart: React.FC = () => {
             grid: {
               display: true,
               drawOnChartArea: false,
+              color: transparentize(0.8, theme.colors.text),
+              borderColor: transparentize(0.8, theme.colors.text),
             },
             ticks: {
               font: {
                 family: 'Andale Mono, monospace',
               },
+              color: theme.colors.text,
             },
           },
         },
@@ -209,7 +222,7 @@ const PortfolioChart: React.FC = () => {
               ctx.moveTo(caretX, yAxis.top)
               ctx.lineTo(caretX, yAxis.bottom)
               ctx.lineWidth = 1
-              ctx.strokeStyle = ChartJS.defaults.borderColor.toString()
+              ctx.strokeStyle = transparentize(0.8, theme.colors.text)
               ctx.stroke()
               ctx.restore()
             }
@@ -223,11 +236,11 @@ const PortfolioChart: React.FC = () => {
             label: '@ Trade',
             data: tradeValData,
             fill: false,
-            borderColor: dcasCountChart ? 'transparent' : '#575757',
+            borderColor: dcasCountChart ? 'transparent' : theme.colors.text,
             backgroundColor: dcasCountChart ? 'transparent' : undefined,
             tension: 0.1,
             spanGaps: true,
-            borderWidth: 2,
+            borderWidth: 1.5,
             hidden: dcasCountChart,
           },
           {
@@ -237,11 +250,11 @@ const PortfolioChart: React.FC = () => {
               ? undefined
               : {
                   target: '-1',
-                  above: '#f7cac96d', // Area will be red above the origin
-                  below: 'transparent', // And blue below the origin
+                  above: '#f7cac96d',
+                  below: 'transparent',
                 },
-            borderColor: dcasCountChart ? 'transparent' : '#F7CAC9',
-            backgroundColor: dcasCountChart ? 'transparent' : '#F7CAC9',
+            borderColor: dcasCountChart ? 'transparent' : theme.colors.quartz,
+            backgroundColor: dcasCountChart ? 'transparent' : theme.colors.quartz,
             tension: 0.1,
             spanGaps: true,
             borderWidth: 2,
@@ -250,7 +263,7 @@ const PortfolioChart: React.FC = () => {
           {
             label: 'DCAs',
             data: dcasCountData,
-            borderColor: dcasCountChart ? '#575757' : 'transparent',
+            borderColor: dcasCountChart ? theme.colors.text : 'transparent',
             backgroundColor: 'transparent',
             spanGaps: true,
             hidden: !dcasCountChart,

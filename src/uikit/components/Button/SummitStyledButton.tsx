@@ -1,6 +1,8 @@
 import styled, { css } from 'styled-components'
+import { grainyGradientMixin } from 'uikit/util/styledMixins'
 import { SpinnerKeyframes } from '../Svg/Icons/Spinner'
 import StyledButton from './StyledButton'
+import { variants } from './types'
 
 const SummitStyledButton = styled(StyledButton)<{
   height?: number
@@ -20,10 +22,10 @@ const SummitStyledButton = styled(StyledButton)<{
   
   padding: ${({ padding }) => padding || '0px 38px'};
   opacity: ${({ disabled, $isLocked }) => (disabled || $isLocked ? 0.5 : 1)};
-  
+
   > * {
     text-align: center;
-    color: ${({ theme }) => theme.colors.text};
+    /* color: ${({ theme }) => theme.colors.buttonText}; */
   }
 
   .spinner {
@@ -42,6 +44,8 @@ const SummitStyledButton = styled(StyledButton)<{
       right: -8px;
     }
   `}
+
+  ${({ theme, variant }) => variant !== variants.SECONDARY && grainyGradientMixin(variant === variants.INVERTED ? theme.isDark : !theme.isDark)}
 `
 
 export default SummitStyledButton

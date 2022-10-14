@@ -8,7 +8,8 @@ export const TokenButton: React.FC<{
   noTokenString: string
   disabled?: boolean
   changed?: boolean
-}> = ({ onClick, token, noTokenString, changed, disabled }) => {
+  invertColor?: boolean
+}> = ({ onClick, token, noTokenString, changed, disabled, invertColor = false }) => {
   return (
     <SummitButton
       onClick={onClick}
@@ -16,6 +17,7 @@ export const TokenButton: React.FC<{
       padding={token == null ? '0px 12px' : '0 12px 0 2px'}
       width="100px"
       changed={changed}
+      variant={invertColor ? 'inverted' : 'primary'}
     >
       {token != null ? (
         <RowBetween>

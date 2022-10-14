@@ -9,7 +9,8 @@ const StyledFieldset = styled.fieldset<{
   mobilePadding?: string
   padding?: string
 }>`
-  background-color: #fff6eb80;
+  position: relative;
+  background-color: ${({ theme }) => transparentize(0.8, theme.colors.background)};
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -23,6 +24,7 @@ const StyledFieldset = styled.fieldset<{
   border-width: 1px;
   min-width: 100%;
   width: 100%;
+  margin-top: 22px;
   flex-wrap: wrap;
   ${({ theme }) => theme.mediaQueries.nav} {
     min-width: ${({ halfWidth }) => (halfWidth ? 'calc(50% - 12px)' : '100%')};
@@ -33,14 +35,17 @@ const StyledFieldset = styled.fieldset<{
   box-shadow: 0px 0px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
   transform: none;
   :hover {
-    box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+    box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.8, theme.colors.text)};
     transform: translate(-1px, -1px);
-    background-color: #fff6eb;
+    background-color: ${({ theme }) => theme.colors.background};
   }
+`
 
-  .legend {
-    margin-right: auto;
-  }
+const PseudoTitle = styled(Text)`
+  font-weight: bold;
+  position: absolute;
+  top: -22px;
+  left: 12px;
 `
 
 interface Props {
@@ -62,11 +67,9 @@ export const Card: React.FC<Props> = ({
 }) => {
   return (
     <StyledFieldset halfWidth={halfWidth} expanded={expanded} mobilePadding={mobilePadding} padding={padding}>
-      <legend className="legend">
-        <Text bold px="12px">
-          {title}
-        </Text>
-      </legend>
+      <PseudoTitle>
+        {title}
+      </PseudoTitle>
       {children}
     </StyledFieldset>
   )

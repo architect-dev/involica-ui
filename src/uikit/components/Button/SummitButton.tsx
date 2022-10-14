@@ -48,6 +48,10 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
     onClick()
   }, [isLoading, isLocked, isDisabled, onClick])
 
+  console.log({
+    variant
+  })
+
   return (
     <SummitStyledButton
       $isLoading={isLoading}
@@ -60,7 +64,7 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
       {...internalProps}
       {...rest}
     >
-      <>
+      <Children>
         {isValidElement(startIcon) && cloneElement(startIcon)}
         {children != null && children}
         {activeText != null && !isLoading && activeText}
@@ -68,10 +72,19 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
         {isLoading && <Dots />}
         {isValidElement(endIcon) && cloneElement(endIcon)}
         {isLocked && <StyledLock width="28px" />}
-      </>
+      </Children>
     </SummitStyledButton>
   )
 }
+
+const Children = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  filter: brightness(1);
+`
 
 SummitButton.defaultProps = {
   isLoading: false,

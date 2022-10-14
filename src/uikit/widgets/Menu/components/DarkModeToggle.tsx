@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import SummitButton from 'uikit/components/Button/SummitButton'
-import { pressableMixin } from 'uikit/util/styledMixins'
+import { grainyGradientMixin, pressableMixin } from 'uikit/util/styledMixins'
 import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 import { SunIcon, MoonIcon } from '../icons'
 
@@ -17,6 +17,8 @@ const ToggleWrapper = styled(SelectorWrapperBase)`
   border-radius: 20px;
 
   ${pressableMixin}
+
+  ${({ theme }) => grainyGradientMixin(theme.isDark)}
 `
 
 const BGSunIcon = styled(SunIcon)`
@@ -25,7 +27,7 @@ const BGSunIcon = styled(SunIcon)`
   height: 20px;
   top: 6px;
   right: 6px;
-  color: ${({ theme }) => theme.colors.text};
+  fill: ${({ theme }) => theme.colors.text};
 `
 const BGMoonIcon = styled(MoonIcon)`
   position: absolute;
@@ -33,7 +35,7 @@ const BGMoonIcon = styled(MoonIcon)`
   height: 20px;
   top: 6px;
   left: 6px;
-  color: ${({ theme }) => theme.colors.text};
+  fill: ${({ theme }) => theme.colors.text};
 `
 
 const StyledSummitButton = styled(SummitButton)<{ visible: boolean }>`
@@ -58,7 +60,7 @@ const StyledSunIcon = styled(SunIcon)<{ visible: boolean }>`
   right: 0px;
   margin: auto;
   opacity: ${({ visible }) => (visible ? 1 : 0)};
-  color: ${({ theme }) => theme.colors.text};
+  fill: ${({ theme }) => theme.colors.buttonText};
 `
 const StyledMoonIcon = styled(MoonIcon)<{ visible: boolean }>`
   position: absolute;
@@ -70,7 +72,7 @@ const StyledMoonIcon = styled(MoonIcon)<{ visible: boolean }>`
   right: 0px;
   margin: auto;
   opacity: ${({ visible }) => (visible ? 1 : 0)};
-  color: ${({ theme }) => theme.colors.text};
+  fill: ${({ theme }) => theme.colors.buttonText};
 `
 
 const DarkModeToggle: React.FC<Props> = ({ isDark, toggleTheme }) => {

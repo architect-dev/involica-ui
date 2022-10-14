@@ -8,8 +8,9 @@ export interface ThemedProps extends TextProps {
   theme: DefaultTheme
 }
 
-const getColor = ({ color, red, theme }: ThemedProps) => {
+const getColor = ({ color, red, buttonText, theme }: ThemedProps) => {
   if (red) return theme.colors.failure
+  if (buttonText) return theme.colors.buttonText
   return theme.colors[color] || theme.colors.text
 }
 

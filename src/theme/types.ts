@@ -48,8 +48,10 @@ export type Colors = {
   textShadow: string
   textDisabled: string
   textSubtle: string
+  buttonText: string
   borderColor: string
   card: string
+  shadow: string
   selectorBackground: string
   button: string
 

@@ -10,5 +10,6 @@ export interface TextProps extends SpaceProps, TypographyProps {
   monospace?: boolean
   gold?: boolean
   red?: boolean
+  buttonText?: boolean
   textTransform?: 'uppercase' | 'lowercase' | 'capitalize'
 }

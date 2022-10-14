@@ -19,6 +19,10 @@ export const scaleVariants = {
 export const styleVariants = {
   [variants.PRIMARY]: {
     backgroundColor: 'primary',
+    color: 'buttonText',
+  },
+  [variants.INVERTED]: {
+    backgroundColor: 'primary',
     color: 'text',
   },
   [variants.SECONDARY]: {
