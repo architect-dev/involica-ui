@@ -1,14 +1,16 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useNativeTokenFullData, useUserTreasury } from 'state/hooks'
-import { SummitButton, Text, RowCenter, SummitPopUp } from 'uikit'
 import { bn, bnDisplay } from 'utils'
 import TokenAndAmountSelector from '../TokenAndAmountSelector'
-import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
+import { ModalContentContainer, SummitPopUp } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useWithdrawTreasury } from 'hooks/useExecute'
-import { DataRow } from '../DataRow'
+import { DataRow } from '../../uikit/components/DataRow'
+import { Text } from '../../uikit/components/Text'
 import { validateFundingWithdrawal } from 'state/utils'
 import { useFundsManagementState } from './state'
+import SummitButton from 'uikit/components/Button/SummitButton'
+import { RowCenter } from 'uikit/components/Box'
 
 export const WithdrawFundsButton: React.FC<{ buttonText?: string; onDismissParent?: () => void }> = ({
   buttonText = 'Withdraw Funds',

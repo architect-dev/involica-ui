@@ -6,7 +6,7 @@ import { useShowHideModal } from 'utils'
 import { MaxSlippageSelector } from './MaxSlippageSelector'
 import TokenIconAndSymbol from 'components/TokenIconAndSymbol'
 import styled from 'styled-components'
-import { DataRow } from 'components/DataRow'
+import { DataRow } from 'uikit/components/DataRow'
 import { Minus } from 'react-feather'
 
 const StyledMinus = styled(Minus)`

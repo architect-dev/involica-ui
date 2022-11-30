@@ -1,7 +1,7 @@
 import React from 'react'
 import { SummitButton, RowCenter, LinkExternal } from 'uikit'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
-import { DataRow } from './DataRow'
+import { DataRow } from '../uikit/components/DataRow'
 import { PerfIndicator } from './DataVis/PerfIndicator'
 import { TokenPerfTable } from './DataVis/TokenPerfTable'
 import { DCAStats } from 'state/statsHooks'

@@ -6,7 +6,7 @@ import { useExitPosition, usePausePosition } from 'hooks/useExecute'
 import { Edit3 } from 'react-feather'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useIsPositionPaused, useUserTreasury } from 'state/hooks'
-import { DataRow } from './DataRow'
+import { DataRow } from '../uikit/components/DataRow'
 
 export const ManagePositionModal: React.FC<{
   unpauseOnly: boolean

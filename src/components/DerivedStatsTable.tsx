@@ -8,7 +8,7 @@ import { pressableMixin } from 'uikit/util/styledMixins'
 import { CellCol, CellRow } from 'views/Home/Components/styles'
 import { ChartDataOption, useChartOptionsState } from 'views/Stats/components/chartOptionsState'
 import { Card } from './Card'
-import { DataRow } from './DataRow'
+import { DataRow } from '../uikit/components/DataRow'
 import { PerfIndicator } from './DataVis/PerfIndicator'
 import { TokenPerfTable } from './DataVis/TokenPerfTable'
 

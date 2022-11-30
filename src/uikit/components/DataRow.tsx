@@ -1,7 +1,8 @@
 import React from 'react'
 import { FlexProps } from 'styled-system'
-import { BoxProps, RowBetween, RowStart, Text } from 'uikit'
 import { SummitTooltip } from 'uikit/widgets/Popup/SummitTooltip'
+import { BoxProps, RowBetween, RowStart } from './Box'
+import { Text } from './Text'
 
 interface Props extends BoxProps, FlexProps {
   className?: string

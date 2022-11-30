@@ -1,4 +1,4 @@
-import { Toast } from 'uikit'
+import { Toast } from "uikit/widgets/Toast"
 
 type ToastSignature = (title: Toast['title'], description?: Toast['description']) => void
 

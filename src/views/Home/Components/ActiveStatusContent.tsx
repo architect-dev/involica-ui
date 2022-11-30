@@ -1,4 +1,4 @@
-import { DataRow } from 'components/DataRow'
+import { DataRow } from 'uikit/components/DataRow'
 import { DCAsRemainingLabel, DCAsRemaining } from 'components/DCAsRemaining'
 import { ManualExecutionModalButton } from 'components/ManualExecutionModal'
 import { TimeUntilNextDca } from 'components/TimeUntilNextDca'

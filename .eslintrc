@@ -26,6 +26,8 @@
     "import/prefer-default-export": 0,
     "import/export": 0,
     "react/no-unescaped-entities": 0,
+    "react/no-unused-prop-types": "warn",
+    "react/require-default-props": 0,
     "import/order": 0,
     "no-await-in-loop": 0,
     "no-restricted-globals": 0,

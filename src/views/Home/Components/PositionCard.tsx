@@ -24,7 +24,7 @@ import { getSymbol } from 'config/tokens'
 import { ManagePositionButton } from 'components/ManagePositionModal'
 import { useSetPosition } from 'hooks/useExecute'
 import { useInvolicaStore } from 'state/store'
-import { DataRow } from 'components/DataRow'
+import { DataRow } from 'uikit/components/DataRow'
 import { bn, eN } from 'utils'
 
 const CellRow = styled.div`

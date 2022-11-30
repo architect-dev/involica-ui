@@ -7,7 +7,7 @@ import { getNativeTokenSymbol } from 'config/constants'
 import { bn, bnDisplay } from 'utils'
 import { TopUpFundsButton } from 'components/FundsManagement/TopUpFundsModal'
 import { WithdrawFundsButton } from 'components/FundsManagement/WithdrawFundsModal'
-import { DataRow } from 'components/DataRow'
+import { DataRow } from 'uikit/components/DataRow'
 
 export const FundsCard: React.FC = () => {
   const { nativeTokenData } = useNativeTokenPublicData()

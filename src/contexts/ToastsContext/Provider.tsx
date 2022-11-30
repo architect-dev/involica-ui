@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useState } from 'react'
 import { kebabCase } from 'lodash'
-import { Toast, toastTypes } from 'uikit'
 import { ToastContextApi } from './types'
+import { Toast, toastTypes } from 'uikit/widgets/Toast'
 
 export const ToastsContext = createContext<ToastContextApi>(undefined)
 

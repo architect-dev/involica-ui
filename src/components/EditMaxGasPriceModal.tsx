@@ -6,7 +6,7 @@ import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { Edit3 } from 'react-feather'
 import MaxGasPriceSelector from 'views/Tutorial/steps/MaxGasPriceSelector'
 import { MaxGasPriceOptions } from 'state/types'
-import { DataRow } from './DataRow'
+import { DataRow } from '../uikit/components/DataRow'
 import { getNativeTokenSymbol } from 'config/constants'
 
 export const EditMaxGasPriceModal: React.FC<{

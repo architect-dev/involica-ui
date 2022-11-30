@@ -1,4 +1,4 @@
-import { ComponentProps, ElementType, ReactElement, ReactNode } from 'react'
+import React, { ComponentProps, ElementType, ReactElement, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { LayoutProps, SpaceProps } from 'styled-system'
 
@@ -46,8 +46,8 @@ export interface BaseButtonProps extends LayoutProps, SpaceProps {
   insetColor?: string
   variant?: Variant
   disabled?: boolean
-  startIcon?: ReactNode
-  endIcon?: ReactNode
+  startIcon?: React.ReactElement<{ mr: string }>
+  endIcon?: React.ReactElement<{ ml: string }>
   secondary?: boolean
   InsetComponent?: ReactNode
   activeText?: string

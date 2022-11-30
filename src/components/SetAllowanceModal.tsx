@@ -7,7 +7,7 @@ import { bn, bnDisplay, eN, useShowHideModal } from 'utils'
 import NumericInput from './Input/NumericInput'
 import TokenAndAmountSelector from './TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
-import { DataRow } from './DataRow'
+import { DataRow } from '../uikit/components/DataRow'
 import { validateDcasCount } from 'state/utils'
 
 export const SetAllowanceModal: React.FC<{

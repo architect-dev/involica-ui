@@ -9,7 +9,7 @@ import { TopUpFundsButton } from 'components/FundsManagement/TopUpFundsModal'
 import { ManagePositionButton } from 'components/ManagePositionModal'
 import { ManuallyExecuteDCAButton } from 'components/ManuallyExecuteDCAButton'
 import { PositionStatusRecord, PositionStatus, StatusColor, StatusType, StatusString } from 'state/status'
-import { DataRow } from 'components/DataRow'
+import { DataRow } from 'uikit/components/DataRow'
 import { ActiveStatusContent } from './ActiveStatusContent'
 
 const StatusAction: PositionStatusRecord<React.ReactNode> = {

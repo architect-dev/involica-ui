@@ -7,7 +7,7 @@ import { CellCol } from './styles'
 import { bn, bnDisplay, eN } from 'utils'
 import { SetAllowanceButton } from 'components/SetAllowanceModal'
 import { useRevokeApproval } from 'hooks/useExecute'
-import { DataRow } from 'components/DataRow'
+import { DataRow } from 'uikit/components/DataRow'
 
 export const AllowanceCard: React.FC = () => {
   const { onRevokeApproval, pending } = useRevokeApproval()
