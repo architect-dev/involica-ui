@@ -5,8 +5,8 @@ import { CellCol } from './styles'
 import { useDcaTxPriceRange, useNativeTokenPublicData, useUserTreasury } from 'state/hooks'
 import { getNativeTokenSymbol } from 'config/constants'
 import { bn, bnDisplay } from 'utils'
-import { TopUpFundsButton } from 'components/TopUpFundsModal'
-import { WithdrawFundsButton } from 'components/WithdrawFundsModal'
+import { TopUpFundsButton } from 'components/FundsManagement/TopUpFundsModal'
+import { WithdrawFundsButton } from 'components/FundsManagement/WithdrawFundsModal'
 import { DataRow } from 'components/DataRow'
 
 export const FundsCard: React.FC = () => {

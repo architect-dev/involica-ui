@@ -10,7 +10,7 @@ const StyledFieldset = styled.fieldset<{
   padding?: string
 }>`
   position: relative;
-  background-color: ${({ theme }) => transparentize(0.8, theme.colors.background)};
+  /* background-color: ${({ theme }) => transparentize(0.8, theme.colors.background)}; */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -32,13 +32,13 @@ const StyledFieldset = styled.fieldset<{
     padding: ${({ padding, expanded }) => padding ?? (expanded ? '32px' : '2px 36px')};
   }
 
-  box-shadow: 0px 0px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
-  transform: none;
-  :hover {
+  /* box-shadow: 0px 0px 0px ${({ theme }) => transparentize(0.4, theme.colors.text)};
+  transform: none; */
+  /* :hover {
     box-shadow: 2px 2px 0px ${({ theme }) => transparentize(0.8, theme.colors.text)};
     transform: translate(-1px, -1px);
     background-color: ${({ theme }) => theme.colors.background};
-  }
+  } */
 `
 
 const PseudoTitle = styled(Text)`

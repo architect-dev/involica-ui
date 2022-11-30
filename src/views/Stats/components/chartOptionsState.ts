@@ -13,9 +13,12 @@ interface ChartOptions {
 
   focusedToken: string | null
   setFocusedToken: (focusedToken: string | null) => void
+
+  censored: boolean,
+  toggleCensored: () => void
 }
 
-export const useChartOptionsState = create<ChartOptions>()((set) => ({
+export const useChartOptionsState = create<ChartOptions>()((set, get) => ({
   dataOption: ChartDataOption.User,
   setDataOption: (dataOption: ChartDataOption) => set({ dataOption, focusedToken: null }),
 
@@ -25,4 +28,7 @@ export const useChartOptionsState = create<ChartOptions>()((set) => ({
 
   focusedToken: null,
   setFocusedToken: (focusedToken: string | null) => set({ focusedToken, dcasCountChart: false }),
+
+  censored: false,
+  toggleCensored: () => set({ censored: !get().censored }),
 }))

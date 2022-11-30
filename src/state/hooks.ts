@@ -343,7 +343,7 @@ export const useDcaTxPriceRange = (positionOnly?: boolean) => {
 }
 
 export const usePositionStatus = () => {
-  const { tokenInUserData } = usePositionTokenInWithData(true)
+  const { tokenInData, tokenInUserData } = usePositionTokenInWithData(true)
   const userHasPosition = useUserHasPosition()
   const userTreasury = useUserTreasury()
   const { amountDCA } = usePositionAmountDCA(true)
@@ -352,6 +352,7 @@ export const usePositionStatus = () => {
   const positionManualOnly = false
 
   return useMemo(() => {
+
     if (!userHasPosition) return PositionStatus.NoPosition
 
     if (positionManualOnly) return PositionStatus.ActiveManualOnly
@@ -359,8 +360,8 @@ export const usePositionStatus = () => {
 
     if (new BigNumber(userTreasury).lt(minTxPrice)) return PositionStatus.ErrorGasFunds
     if (amountDCA == null || amountDCA === '' || amountDCA === '0') return PositionStatus.ErrorNoDcaAmount
-    if (new BigNumber(tokenInUserData?.allowance).lt(amountDCA)) return PositionStatus.ErrorInsufficientAllowance
-    if (new BigNumber(tokenInUserData?.balance).lt(amountDCA)) return PositionStatus.ErrorInsufficientBalance
+    if (bnDecOffset(tokenInUserData?.allowance, tokenInData?.decimals).lt(amountDCA)) return PositionStatus.ErrorInsufficientAllowance
+    if (bnDecOffset(tokenInUserData?.balance, tokenInData?.decimals).lt(amountDCA)) return PositionStatus.ErrorInsufficientBalance
     if (new BigNumber(userTreasury).lt(maxTxPrice)) return PositionStatus.WarnGasFunds
 
     return PositionStatus.Active
@@ -371,6 +372,7 @@ export const usePositionStatus = () => {
     userTreasury,
     minTxPrice,
     amountDCA,
+    tokenInData?.decimals,
     tokenInUserData?.allowance,
     tokenInUserData?.balance,
     maxTxPrice,

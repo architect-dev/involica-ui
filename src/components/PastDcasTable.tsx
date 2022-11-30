@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { Flex, SummitPopUp, Text, TokenSymbolImage } from 'uikit'
+import { Flex, RowCenter, SummitButton, SummitPopUp, Text, TokenSymbolImage } from 'uikit'
 import styled, { css } from 'styled-components'
 import { pressableMixin } from 'uikit/util/styledMixins'
 import { transparentize } from 'polished'
@@ -7,6 +7,8 @@ import { DCATransactionModal } from 'components/DCATransactionModal'
 import { PerfIndicator } from './DataVis/PerfIndicator'
 import { DCAStats, useUserDcasData } from 'state/statsHooks'
 import { Card } from './Card'
+import { Link } from 'react-router-dom'
+import { useChartOptionsState } from 'views/Stats/components/chartOptionsState'
 
 const Table = styled.div`
   display: flex;
@@ -112,7 +114,11 @@ const OutsTokenGrid = styled.div`
   }
 `
 
-const PastDcaCard: React.FC<{ dca: DCAStats; openModal: (hash: string) => void }> = ({ dca, openModal }) => {
+const PastDcaRow: React.FC<{ dca: DCAStats; openModal: (hash: string) => void; censorable: boolean }> = ({
+  dca,
+  openModal,
+  censorable,
+}) => {
   const handleOpenModal = useCallback(() => openModal(dca.txHash), [dca.txHash, openModal])
   return (
     <Row className="row" onClick={handleOpenModal}>
@@ -120,20 +126,14 @@ const PastDcaCard: React.FC<{ dca: DCAStats; openModal: (hash: string) => void }
         <Text bold>{dca.timestampDisplay}</Text>
       </div>
       <div className="item item_2">
-        <PerfIndicator
-          status={dca.totalValueChange.status}
-          usdDisplay={dca.totalValueChange.usdDisplay}
-          percDisplay={dca.totalValueChange.percDisplay}
-          gap="6px"
-          mobileInline
-        />
+        <PerfIndicator {...dca.totalValueChange} censorable={censorable} gap="6px" mobileInline />
       </div>
 
       <div className="item item_3">
         <OutsGrid>
           <Flex alignItems="center" gap="2px">
             <Text bold small>
-              {dca.inToken.trade.usdDisplay}
+              {censorable ? dca.inToken.trade.censorableUsdDisplay : dca.inToken.trade.usdDisplay}
             </Text>
             <TokenSymbolImage symbol={dca.inToken.symbol} width={24} height={24} />
           </Flex>
@@ -144,7 +144,7 @@ const PastDcaCard: React.FC<{ dca: DCAStats; openModal: (hash: string) => void }
             {dca.outTokens.map((outToken) => (
               <Flex alignItems="center" gap="2px" key={outToken.address}>
                 <Text bold small>
-                  {outToken.trade.usdDisplay}
+                  {censorable ? outToken.trade.censorableUsdDisplay : outToken.trade.usdDisplay}
                 </Text>
                 <TokenSymbolImage symbol={outToken.symbol} width={24} height={24} />
               </Flex>
@@ -156,8 +156,12 @@ const PastDcaCard: React.FC<{ dca: DCAStats; openModal: (hash: string) => void }
   )
 }
 
-export const PastDcasTable: React.FC = () => {
-  const dcasData = useUserDcasData()
+export const PastDcasTable: React.FC<{ includeStatsLink?: boolean; censorable?: boolean }> = ({
+  includeStatsLink = false,
+  censorable = false,
+}) => {
+  const censored = useChartOptionsState((state) => state.censored)
+  const dcasData = useUserDcasData(censorable && censored)
   const [modalDcaHash, setModalDcaHash] = React.useState<string | null>(null)
   const hideTxModal = useCallback(() => setModalDcaHash(null), [])
   const openUserTxModal = useCallback((hash: string) => {
@@ -188,14 +192,21 @@ export const PastDcasTable: React.FC = () => {
           {dcasData != null && dcasData.length > 0 ? (
             <>
               {dcasData.map((dca) => (
-                <PastDcaCard dca={dca} key={dca.txHash} openModal={openUserTxModal} />
+                <PastDcaRow dca={dca} key={dca.txHash} openModal={openUserTxModal} censorable={censorable} />
               ))}
             </>
           ) : (
-            <Text className='row empty-row'>No Executed DCAs found</Text>
+            <Text className="row empty-row">No Executed DCAs found</Text>
           )}
         </div>
       </Table>
+      {includeStatsLink && (
+        <RowCenter>
+          <SummitButton as={Link} to="/stats">
+            Open Full Stats
+          </SummitButton>
+        </RowCenter>
+      )}
       <SummitPopUp
         open={modalDcaHash != null}
         callOnDismiss={hideTxModal}

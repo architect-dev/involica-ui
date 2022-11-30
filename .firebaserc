@@ -3,7 +3,7 @@
     "default": "involica-beta"
   },
   "targets": {
-    "summit-beta": {
+    "involica-beta": {
       "hosting": {
         "ftm": [
           "involica-ftm"

@@ -16,8 +16,7 @@ const StyledInputWrapper = styled(SelectorWrapperBase)`
   align-items: center;
 
   border-radius: 16px;
-  /* outline: 1.5px solid ${({ theme }) => transparentize(0.65, theme.colors.text)}; */
-  outline-offset: -1.5px;
+  outline: 1px solid ${({ theme }) => transparentize(0.75, theme.colors.text)};
   display: flex;
   flex-direction: column;
   align-items: flex-start;

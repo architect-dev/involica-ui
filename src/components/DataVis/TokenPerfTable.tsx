@@ -28,11 +28,13 @@ const StyledTable = styled.table`
 const StyledSecondRowTh = styled.th`
   height: 52px;
 `
-const ClickableTr = styled.tr<{ clickable: boolean, highlighted: boolean }>`
-  ${({ theme, highlighted }) => highlighted && css`
-    outline: 1px solid ${theme.colors.text};
-    outline-offset: -1px;
-  `}
+const ClickableTr = styled.tr<{ clickable: boolean; highlighted: boolean }>`
+  ${({ theme, highlighted }) =>
+    highlighted &&
+    css`
+      outline: 1px solid ${theme.colors.text};
+      outline-offset: -1px;
+    `}
   ${({ theme, clickable }) =>
     clickable &&
     pressableMixin({
@@ -49,8 +51,17 @@ const TokenRow: React.FC<{
   hasOuts?: boolean
   isAggregate?: boolean
   highlighted?: boolean
+  censorable?: boolean
   onClick?: () => void
-}> = ({ data, isTokenIn = false, hasOuts = false, isAggregate = false, highlighted = false, onClick }) => {
+}> = ({
+  data,
+  isTokenIn = false,
+  hasOuts = false,
+  isAggregate = false,
+  highlighted = false,
+  censorable = false,
+  onClick,
+}) => {
   return (
     <ClickableTr highlighted={highlighted} clickable={onClick != null} onClick={onClick}>
       <td>
@@ -61,7 +72,13 @@ const TokenRow: React.FC<{
       </td>
       <td>
         <Text small textAlign="right">
-          {isTokenIn ? <b>{data.trade.usdDisplay}</b> : data.trade.usdDisplay}
+          {isTokenIn ? (
+            <b>{censorable ? data.trade.censorableUsdDisplay : data.trade.usdDisplay}</b>
+          ) : censorable ? (
+            data.trade.censorableUsdDisplay
+          ) : (
+            data.trade.usdDisplay
+          )}
           <br />
           <Text fontSize="11px" italic textAlign="right">
             ({isAggregate && 'avg '}${data.trade.price.toFixed(2)})
@@ -72,7 +89,7 @@ const TokenRow: React.FC<{
         <>
           <td>
             <Text small bold textAlign="right">
-              <b>{data.current.usdDisplay}</b>
+              <b>{censorable ? data.current.censorableUsdDisplay : data.current.usdDisplay}</b>
               <br />
               <Text fontSize="11px" italic textAlign="right">
                 (${data.price.toFixed(2)})
@@ -80,12 +97,7 @@ const TokenRow: React.FC<{
             </Text>
           </td>
           <td>
-            <PerfIndicator
-              status={data.valueChange.status}
-              usdDisplay={data.valueChange.usdDisplay}
-              percDisplay={data.valueChange.percDisplay}
-              invertColors={isTokenIn}
-            />
+            <PerfIndicator {...data.valueChange} censorable={censorable} invertColors={isTokenIn} />
           </td>
         </>
       )}
@@ -104,9 +116,18 @@ export const TokenPerfTable: React.FC<{
   tokensOut?: TokenTradeData[]
   isAggregate?: boolean
   highlightedTokens?: string[]
+  censorable?: boolean
   onTokenInClick?: (token: string) => void
   onTokenOutClick?: (token: string) => void
-}> = ({ tokensIn, tokensOut, isAggregate, highlightedTokens = [], onTokenInClick, onTokenOutClick }) => {
+}> = ({
+  tokensIn,
+  tokensOut,
+  isAggregate,
+  highlightedTokens = [],
+  censorable = false,
+  onTokenInClick,
+  onTokenOutClick,
+}) => {
   const hasTokensIn = useMemo(() => tokensIn?.length > 0, [tokensIn?.length])
   return (
     <StyledTable>
@@ -131,11 +152,16 @@ export const TokenPerfTable: React.FC<{
               <TokenRow
                 key={tokenIn.address}
                 data={tokenIn}
+                censorable={censorable}
                 isTokenIn
                 hasOuts={tokensOut && tokensOut.length > 0}
                 highlighted={highlightedTokens.includes(tokenIn.address)}
                 isAggregate={isAggregate}
-                onClick={onTokenInClick == null ? null :() => onTokenInClick(highlightedTokens.includes(tokenIn.address) ? null : tokenIn.address)}
+                onClick={
+                  onTokenInClick == null
+                    ? null
+                    : () => onTokenInClick(highlightedTokens.includes(tokenIn.address) ? null : tokenIn.address)
+                }
               />
             ))}
           </tbody>
@@ -182,7 +208,12 @@ export const TokenPerfTable: React.FC<{
                 data={tokenOut}
                 isAggregate={isAggregate}
                 highlighted={highlightedTokens.includes(tokenOut.address)}
-                onClick={onTokenOutClick == null ? null : () => onTokenOutClick(highlightedTokens.includes(tokenOut.address) ? null : tokenOut.address)}
+                censorable={censorable}
+                onClick={
+                  onTokenOutClick == null
+                    ? null
+                    : () => onTokenOutClick(highlightedTokens.includes(tokenOut.address) ? null : tokenOut.address)
+                }
               />
             ))}
           </tbody>

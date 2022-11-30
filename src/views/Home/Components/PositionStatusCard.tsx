@@ -5,21 +5,15 @@ import { CellCol } from './styles'
 import { usePositionStatus } from 'state/hooks'
 import { SetAllowanceButton } from 'components/SetAllowanceModal'
 import { Link } from 'react-router-dom'
-import { TopUpFundsButton } from 'components/TopUpFundsModal'
-import { TimeUntilNextDca } from 'components/TimeUntilNextDca'
+import { TopUpFundsButton } from 'components/FundsManagement/TopUpFundsModal'
 import { ManagePositionButton } from 'components/ManagePositionModal'
 import { ManuallyExecuteDCAButton } from 'components/ManuallyExecuteDCAButton'
-import { DCAsRemaining, DCAsRemainingLabel } from 'components/DCAsRemaining'
 import { PositionStatusRecord, PositionStatus, StatusColor, StatusType, StatusString } from 'state/status'
 import { DataRow } from 'components/DataRow'
+import { ActiveStatusContent } from './ActiveStatusContent'
 
 const StatusAction: PositionStatusRecord<React.ReactNode> = {
-  [PositionStatus.Active]: (
-    <>
-      <DataRow t="Next DCA In:" v={<TimeUntilNextDca />} />
-      <DataRow t={<DCAsRemainingLabel />} v={<DCAsRemaining />} />
-    </>
-  ),
+  [PositionStatus.Active]: <ActiveStatusContent />,
   [PositionStatus.ActiveManualOnly]: <ManuallyExecuteDCAButton />,
 
   [PositionStatus.WarnPaused]: <ManagePositionButton unpauseOnly />,
@@ -58,10 +52,10 @@ export const PositionStatusCard: React.FC = () => {
   const status = usePositionStatus()
 
   return (
-    <Card title="Status" padding="24px" halfWidth>
+    <Card title="Position Status" padding="24px" halfWidth>
       <CellCol justifyContent="space-between">
         <DataRow
-          t="Position Status:"
+          t="Status:"
           v={
             <Text bold color={StatusColor[StatusType[status]]} textAlign="right">
               {StatusString[status]}

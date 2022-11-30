@@ -1,5 +1,4 @@
 import React from 'react'
-import { getChainSolidColor } from 'utils'
 import Svg from '../Svg'
 import { SvgProps } from '../types'
 
@@ -11,13 +10,12 @@ const getPath = (chain) => {
   return polygonPath
 }
 
-const Icon: React.FC<SvgProps & { chain?: number, white?: boolean }> = ({chain, white, ...props}) => {
+const Icon: React.FC<SvgProps & { chain?: number }> = ({chain, ...props}) => {
   if (chain == null) return null
   
-  const chainColor = getChainSolidColor(chain)
   return (
     <Svg viewBox="0 0 280 280" {...props}>
-      <path fill={white ? 'white' : chainColor} d={getPath(chain)} />
+      <path d={getPath(chain)} />
     </Svg>
   )
 }

@@ -1,6 +1,8 @@
 /* eslint-disable no-loop-func */
-import { useMemo } from 'react'
-import { useConfigurableIntervalDCA } from './hooks'
+import React, { useMemo } from 'react'
+import { AlertTriangle } from 'react-feather'
+import { bnDisplay, bn } from 'utils'
+import { useConfigurableIntervalDCA, useDcaTxPriceRange, useNativeTokenPublicData, useUserTreasury } from './hooks'
 
 export const suffix = (intervalDCA: number | null) => {
   if (intervalDCA == null) return '-'
@@ -45,4 +47,25 @@ export const useIntervalStrings = () => {
     }),
     [anyError, intervalDCA],
   )
+}
+
+export const useUserTreasuryGlanceData = () => {
+  const { nativeTokenData } = useNativeTokenPublicData()
+  const userTreasury = useUserTreasury()
+  const { minTxPrice } = useDcaTxPriceRange(true)
+
+  const userTreasuryUsd = useMemo(() => {
+    if (userTreasury == null || nativeTokenData?.price == null) return '-'
+    return `$${bnDisplay(bn(userTreasury).times(nativeTokenData.price), 18, 2)}`
+  }, [nativeTokenData?.price, userTreasury])
+
+  const dcasAtMinGas = useMemo(() => {
+    if (minTxPrice == null || userTreasury == null) return '-'
+    return Math.floor(bn(userTreasury).div(minTxPrice).toNumber())
+  }, [minTxPrice, userTreasury])
+
+  return {
+    userTreasuryUsd,
+    userTreasuryColor: dcasAtMinGas === 0 ? 'error' : dcasAtMinGas <= 3 ? 'warning' : 'text',
+  }
 }

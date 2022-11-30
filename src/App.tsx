@@ -10,6 +10,8 @@ import { ToastListener } from 'contexts/ToastsContext'
 import Background from 'components/Background'
 import { useFetchPublicData, useFetchUserData } from 'state/hooks'
 import useEagerConnect from 'hooks/useEagerConnect'
+import { TopUpFundsModal } from 'components/FundsManagement/TopUpFundsModal'
+import { WithdrawFundsModal } from 'components/FundsManagement/WithdrawFundsModal'
 
 const Home = lazy(() => import('./views/Home'))
 const Tutorial = lazy(() => import('./views/Tutorial'))
@@ -63,6 +65,10 @@ const App: React.FC = () => {
         </Suspense>
       </Menu>
       <ToastListener />
+
+      {/* App Wide Modals */}
+      <TopUpFundsModal/>
+      <WithdrawFundsModal/>
     </StyledRouter>
   )
 }

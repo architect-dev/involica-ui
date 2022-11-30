@@ -33,6 +33,7 @@ const DesktopVerticalText = styled(Text)<{ mobileInline: boolean }>`
 interface Props {
   status: ValueChangeStatus
   usdDisplay: React.ReactNode
+  censorableUsdDisplay: React.ReactNode
   percDisplay: React.ReactNode
   invertColors?: boolean
   mobileInline?: boolean
@@ -40,11 +41,13 @@ interface Props {
   textAlign?: any
   usdFontSize?: string
   percFontSize?: string
+  censorable?: boolean
 }
 
 export const PerfIndicator: React.FC<Props> = ({
   status,
   usdDisplay,
+  censorableUsdDisplay,
   percDisplay,
   invertColors,
   mobileInline,
@@ -52,6 +55,7 @@ export const PerfIndicator: React.FC<Props> = ({
   textAlign = 'end',
   usdFontSize = '12px',
   percFontSize = '11px',
+  censorable = false,
 }) => {
   const color = useMemo(() => (invertColors ? InvValueChangeStatusColor : ValueChangeStatusColor)[status], [
     invertColors,
@@ -62,7 +66,7 @@ export const PerfIndicator: React.FC<Props> = ({
       {ValueChangeStatusIcon[status]}
       <DesktopVerticalText mobileInline={mobileInline}>
         <Text fontSize={usdFontSize} color={color} textAlign={textAlign} bold>
-          {usdDisplay}
+          {censorable ? censorableUsdDisplay : usdDisplay}
         </Text>
         <Text fontSize={percFontSize} color={color} textAlign={textAlign} italic>
           ({percDisplay})

@@ -26,7 +26,7 @@ export const AllowanceCard: React.FC = () => {
   }, [amountDCA, tokenInData?.decimals, tokenInUserData?.allowance])
 
   return (
-    <Card title="Approval" padding="24px" halfWidth>
+    <Card title="Allowance" padding="24px" halfWidth>
       <CellCol>
         <DataRow t="Current Allowance:" v={`${allowance} ${tokenInData?.symbol}`} />
         <DataRow

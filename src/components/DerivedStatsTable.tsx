@@ -37,9 +37,17 @@ const ClickableCol = styled.div<{ highlighted?: boolean }>`
     })};
 `
 
-export const DerivedStatsTable: React.FC = () => {
-  const lifetimeStats = useUserLifetimeStats()
-  const { dataOption, setDataOption, focusedToken, setFocusedToken, dcasCountChart, setDcasCountChart } = useChartOptionsState()
+export const DerivedStatsTable: React.FC<{ censorable?: boolean }> = ({ censorable = false }) => {
+  const censored = useChartOptionsState((s) => s.censored)
+  const lifetimeStats = useUserLifetimeStats(censorable && censored)
+  const {
+    dataOption,
+    setDataOption,
+    focusedToken,
+    setFocusedToken,
+    dcasCountChart,
+    setDcasCountChart,
+  } = useChartOptionsState()
 
   const sortedInTokens = useMemo(() => {
     return orderBy(Object.values(lifetimeStats?.inTokens ?? []), ['trade.usd'], ['desc'])
@@ -67,10 +75,13 @@ export const DerivedStatsTable: React.FC = () => {
     }
   }, [setDcasCountChart, userDcasCountChartSelected])
 
-  const handleSetFocusedToken = useCallback((token: string) => {
-    setDataOption(ChartDataOption.User)
-    setFocusedToken(token)
-  }, [setDataOption, setFocusedToken])
+  const handleSetFocusedToken = useCallback(
+    (token: string) => {
+      setDataOption(ChartDataOption.User)
+      setFocusedToken(token)
+    },
+    [setDataOption, setFocusedToken],
+  )
 
   return (
     <Card title="Portfolio Stats" padding="24px">
@@ -81,14 +92,19 @@ export const DerivedStatsTable: React.FC = () => {
               className="row"
               px="6px"
               t="Current Portfolio Value:"
-              v={lifetimeStats?.totalOutFull?.current?.usdDisplay}
+              v={lifetimeStats?.totalOutFull?.current?.censorableUsdDisplay}
             />
-            <DataRow className="row" px="6px" t="Total Buy In:" v={lifetimeStats?.totalOutFull?.trade?.usdDisplay} />
+            <DataRow
+              className="row"
+              px="6px"
+              t="Total Buy In:"
+              v={lifetimeStats?.totalOutFull?.trade?.censorableUsdDisplay}
+            />
             <DataRow
               className="row"
               px="6px"
               t="Total PnL:"
-              v={<PerfIndicator {...lifetimeStats?.totalValueChange} gap="6px" />}
+              v={<PerfIndicator {...lifetimeStats?.totalValueChange} censorable gap="6px" />}
             />
           </ClickableCol>
           <ClickableCol highlighted={userDcasCountChartSelected} onClick={handleToggleUserDcasChart}>
@@ -98,7 +114,7 @@ export const DerivedStatsTable: React.FC = () => {
             <Text small italic pl="6px">
               Combined DCAs Sell Token Data:
             </Text>
-            <TokenPerfTable tokensIn={sortedInTokens} isAggregate />
+            <TokenPerfTable tokensIn={sortedInTokens} isAggregate censorable />
           </Column>
         </CellCol>
         <CellCol>
@@ -111,6 +127,7 @@ export const DerivedStatsTable: React.FC = () => {
             <TokenPerfTable
               tokensOut={sortedOutTokens}
               isAggregate
+              censorable
               highlightedTokens={[focusedToken]}
               onTokenOutClick={handleSetFocusedToken}
             />

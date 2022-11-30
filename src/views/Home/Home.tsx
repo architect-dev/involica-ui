@@ -33,11 +33,9 @@ const Home: React.FC = () => {
       <br />
       <CardsWrapper>
         <PositionStatusCard />
-        <FundsCard />
-        <PositionCard />
         <AllowanceCard />
-        <UpcomingExecutionsCard />
-        <PastDcasTable />
+        <PositionCard />
+        <PastDcasTable includeStatsLink />
       </CardsWrapper>
     </Page>
   )

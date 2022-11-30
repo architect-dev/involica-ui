@@ -3,7 +3,7 @@ import { Minus, TrendingDown, TrendingUp } from 'react-feather'
 
 export enum PositionLimitingFactor {
   None = 'None',
-  Funding = 'Funding',
+  Funding = 'Gas Funds',
   Allowance = 'Allowance',
   Balance = 'Balance',
 }

@@ -1,15 +1,32 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useNativeTokenFullData, useUserTreasury } from 'state/hooks'
 import { SummitButton, Text, RowCenter, SummitPopUp } from 'uikit'
-import { bn, bnDisplay, useShowHideModal } from 'utils'
-import TokenAndAmountSelector from './TokenAndAmountSelector'
+import { bn, bnDisplay } from 'utils'
+import TokenAndAmountSelector from '../TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useWithdrawTreasury } from 'hooks/useExecute'
-import { DataRow } from './DataRow'
+import { DataRow } from '../DataRow'
 import { validateFundingWithdrawal } from 'state/utils'
+import { useFundsManagementState } from './state'
 
-export const WithdrawFundsModal: React.FC<{
+export const WithdrawFundsButton: React.FC<{ buttonText?: string; onDismissParent?: () => void }> = ({
+  buttonText = 'Withdraw Funds',
+  onDismissParent = () => null,
+}) => {
+  const showWithdrawModal = useFundsManagementState((state) => state.showWithdrawModal)
+  const showHandler = useCallback(() => {
+    showWithdrawModal()
+    onDismissParent()
+  }, [onDismissParent, showWithdrawModal])
+  return (
+    <SummitButton width="120px" padding="0" onClick={showHandler}>
+      {buttonText}
+    </SummitButton>
+  )
+}
+
+export const WithdrawFundsModalContent: React.FC<{
   onDismiss?: () => void
 }> = ({ onDismiss }) => {
   const userTreasury = useUserTreasury()
@@ -26,10 +43,13 @@ export const WithdrawFundsModal: React.FC<{
   const [withdrawAmount, setWithdrawAmount] = useState<string>('')
   const [withdrawInvalidReason, setWithdrawInvalidReason] = useState<string | null>(null)
 
-  const handleSetFundingAmount = useCallback((val: string, max: string) => {
-    setWithdrawAmount(val)
-    setWithdrawInvalidReason(validateFundingWithdrawal(val, max, nativeTokenData))
-  }, [nativeTokenData])
+  const handleSetFundingAmount = useCallback(
+    (val: string, max: string) => {
+      setWithdrawAmount(val)
+      setWithdrawInvalidReason(validateFundingWithdrawal(val, max, nativeTokenData))
+    },
+    [nativeTokenData],
+  )
 
   const handleWithdrawTreasury = useCallback(() => {
     onWithdrawTreasury(withdrawAmount, nativeTokenData?.decimals)
@@ -40,9 +60,11 @@ export const WithdrawFundsModal: React.FC<{
       <DataRow
         t="Current Funding:"
         v={
-          <Text textAlign='right'>
-            <b>{userTreasuryDisplay} {getNativeTokenSymbol()}</b>
-            <br/>
+          <Text textAlign="right">
+            <b>
+              {userTreasuryDisplay} {getNativeTokenSymbol()}
+            </b>
+            <br />
             <i>{userTreasuryUsdDisplay}</i>
           </Text>
         }
@@ -78,16 +100,15 @@ export const WithdrawFundsModal: React.FC<{
   )
 }
 
-export const WithdrawFundsButton: React.FC<{ buttonText?: string }> = ({ buttonText = 'Withdraw Funds' }) => {
-  const [open, show, hide] = useShowHideModal()
+export const WithdrawFundsModal: React.FC = () => {
+  const { withdrawModalOpen, hideWithdrawModal } = useFundsManagementState()
   return (
     <SummitPopUp
-      open={open}
-      callOnDismiss={hide}
+      open={withdrawModalOpen}
+      callOnDismiss={hideWithdrawModal}
       modal
-      button={<SummitButton onClick={show}>{buttonText}</SummitButton>}
       popUpTitle="Withdraw Funds"
-      popUpContent={<WithdrawFundsModal />}
+      popUpContent={<WithdrawFundsModalContent />}
     />
   )
 }

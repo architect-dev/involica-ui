@@ -17,8 +17,8 @@ const Stats: React.FC = () => {
         <ChartOptionsRow />
         <PortfolioChart />
         <InvolicaStatsTable />
-        <DerivedStatsTable />
-        <PastDcasTable />
+        <DerivedStatsTable censorable />
+        <PastDcasTable censorable />
       </Column>
     </Page>
   )

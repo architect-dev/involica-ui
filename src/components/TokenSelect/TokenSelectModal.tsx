@@ -4,12 +4,12 @@ import { Column, Row, RowBetween, SummitButton, Text, TokenSymbolImage, useMatch
 import { AddressRecord, Token, UserTokenData } from 'state/types'
 import { transparentize } from 'polished'
 import styled, { css } from 'styled-components'
-import { pressableMixin } from 'uikit/util/styledMixins'
+import { grainyGradientMixin, pressableMixin } from 'uikit/util/styledMixins'
 import { bnDisplay, tryGetAddress } from 'utils'
 import { getIsStable } from 'config/tokens'
 import { Check } from 'react-feather'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
-import { selectorWrapperMixin } from 'uikit/widgets/Selector/styles'
+import { SelectorWrapperBase } from 'uikit/widgets/Selector/styles'
 
 export type ModalVariant = 'tokenIn' | 'tokenOut'
 
@@ -89,30 +89,42 @@ const HeaderRow = styled(RowBetween)`
   border-bottom: 1px solid ${({ theme }) => theme.colors.text};
 `
 
-export const TokenSearchInput = styled.input`
-  ${selectorWrapperMixin}
+const InputWrapper = styled(SelectorWrapperBase)`
+  margin-bottom: 12px;
+  border-radius: 16px;
+  width: 100%;
+  outline: 1px solid ${({ theme }) => transparentize(0.75, theme.colors.text)};
+  ${({ theme }) => grainyGradientMixin(theme.isDark)}
+`
 
+export const TokenSearchInput = styled.input`
+  isolation: isolate;
   min-height: 32px;
   height: 32px;
   max-height: 32px;
   border-radius: 16px;
-  margin-bottom: 12px;
 
+  background: none;
   display: flex;
   width: 100%;
   border: none;
   outline: none;
   color: ${({ theme }) => theme.colors.text};
+  ::placeholder {
+    color: ${({ theme }) => transparentize(0.5, theme.colors.text)};
+  }
   font-size: 12px;
   
   padding: 0 16px;
   white-space: nowrap;
   text-overflow: ellipsis;
+  z-index: 2;
   overflow: hidden;
 
   :focus {
     outline: none;
   }
+
 `
 
 const SearchBar: React.FC<{
@@ -130,17 +142,19 @@ const SearchBar: React.FC<{
     [setSearch],
   )
   return (
-    <TokenSearchInput
-      width="100%"
-      type="text"
-      id="token-search-input"
-      placeholder="Search by Name or Address"
-      value={search}
-      onChange={handleInput}
-      autoComplete="off"
-      spellCheck="false"
-      autoFocus={!isMobile}
-    />
+    <InputWrapper>
+      <TokenSearchInput
+        width="100%"
+        type="text"
+        id="token-search-input"
+        placeholder="Search by Name or Address"
+        value={search}
+        onChange={handleInput}
+        autoComplete="off"
+        spellCheck="false"
+        autoFocus={!isMobile}
+      />
+    </InputWrapper>
   )
 }
 

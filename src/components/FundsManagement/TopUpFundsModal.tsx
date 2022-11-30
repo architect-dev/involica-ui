@@ -1,15 +1,32 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDcaTxPriceRange, useNativeTokenFullData, useUserTreasury } from 'state/hooks'
 import { SummitButton, Text, RowCenter, SummitPopUp } from 'uikit'
-import { bn, bnDisplay, useShowHideModal } from 'utils'
-import TokenAndAmountSelector from './TokenAndAmountSelector'
+import { bn, bnDisplay } from 'utils'
+import TokenAndAmountSelector from '../TokenAndAmountSelector'
 import { ModalContentContainer } from 'uikit/widgets/Popup/SummitPopUp'
 import { getNativeTokenSymbol } from 'config/constants'
 import { useDepositTreasury } from 'hooks/useExecute'
-import { DataRow } from './DataRow'
+import { DataRow } from '../DataRow'
 import { validateFundingAmount } from 'state/utils'
+import { useFundsManagementState } from './state'
 
-export const TopUpFundsModal: React.FC<{
+export const TopUpFundsButton: React.FC<{ buttonText?: string; onDismissParent?: () => void }> = ({
+  buttonText = 'Withdraw Funds',
+  onDismissParent = () => null,
+}) => {
+  const showTopUpModal = useFundsManagementState((state) => state.showTopUpModal)
+  const showHandler = useCallback(() => {
+    showTopUpModal()
+    onDismissParent()
+  }, [onDismissParent, showTopUpModal])
+  return (
+    <SummitButton width="120px" padding="0" onClick={showHandler}>
+      {buttonText}
+    </SummitButton>
+  )
+}
+
+export const TopUpFundsModalContent: React.FC<{
   onDismiss?: () => void
 }> = ({ onDismiss }) => {
   const userTreasury = useUserTreasury()
@@ -42,10 +59,13 @@ export const TopUpFundsModal: React.FC<{
   const [fundingAmount, setFundingAmount] = useState<string>('')
   const [fundingInvalidReason, setFundingInvalidReason] = useState<string | null>(null)
 
-  const handleSetFundingAmount = useCallback((val: string, max: string) => {
-    setFundingAmount(val)
-    setFundingInvalidReason(validateFundingAmount(val, max, nativeTokenData))
-  }, [nativeTokenData])
+  const handleSetFundingAmount = useCallback(
+    (val: string, max: string) => {
+      setFundingAmount(val)
+      setFundingInvalidReason(validateFundingAmount(val, max, nativeTokenData))
+    },
+    [nativeTokenData],
+  )
 
   const handleDepositTreasury = useCallback(() => {
     onDepositTreasury(fundingAmount, nativeTokenData?.decimals)
@@ -121,16 +141,15 @@ export const TopUpFundsModal: React.FC<{
   )
 }
 
-export const TopUpFundsButton: React.FC<{ buttonText?: string }> = ({ buttonText = 'Top Up Funds' }) => {
-  const [open, show, hide] = useShowHideModal()
+export const TopUpFundsModal: React.FC = () => {
+  const { topUpModalOpen, hideTopUpModal } = useFundsManagementState()
   return (
     <SummitPopUp
-      open={open}
-      callOnDismiss={hide}
+      open={topUpModalOpen}
+      callOnDismiss={hideTopUpModal}
       modal
-      button={<SummitButton onClick={show}>{buttonText}</SummitButton>}
       popUpTitle="Top Up Funds"
-      popUpContent={<TopUpFundsModal />}
+      popUpContent={<TopUpFundsModalContent />}
     />
   )
 }

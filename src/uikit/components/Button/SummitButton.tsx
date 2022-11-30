@@ -48,10 +48,6 @@ const SummitButton = <E extends ElementType = 'button'>(props: ButtonProps<E>): 
     onClick()
   }, [isLoading, isLocked, isDisabled, onClick])
 
-  console.log({
-    variant
-  })
-
   return (
     <SummitStyledButton
       $isLoading={isLoading}

@@ -81,6 +81,7 @@ export interface DerivedTxsStats {
 export interface UsdDisplay {
   usd: number
   usdDisplay: string
+  censorableUsdDisplay: string
 }
 export interface PercDisplay {
   perc: number
@@ -188,27 +189,33 @@ export const useInvolicaDcasOrSnapshots = (dcas: boolean) => {
 const displayifyUsd = (usd: number | null): string => {
   return usd == null ? '-' : `$${usd.toFixed(2)}`
 }
-const getUsdDisplay = (usd: number | null): UsdDisplay => {
+const displayifyCensorableUsd = (usd: number | null, censored: boolean): string => {
+  // eslint-disable-next-line no-irregular-whitespace
+  return usd == null ? '-' : censored ? `$ █████` : `$${usd.toFixed(2)}`
+}
+const getUsdDisplay = (usd: number | null, censored: boolean): UsdDisplay => {
   return {
     usd,
     usdDisplay: displayifyUsd(usd),
+    censorableUsdDisplay: displayifyCensorableUsd(usd, censored),
   }
 }
-const incrementUsdDisplay = (usd: number | null, current: UsdDisplay): UsdDisplay => {
-  return getUsdDisplay(usd == null ? current.usd : current.usd + usd)
+const incrementUsdDisplay = (usd: number | null, current: UsdDisplay, censored: boolean): UsdDisplay => {
+  return getUsdDisplay(usd == null ? current.usd : current.usd + usd, censored)
 }
-const getPriceUsdDisplay = (amount: number | null, price: number | null): PriceUsdDisplay => {
+const getPriceUsdDisplay = (amount: number | null, price: number | null, censored: boolean): PriceUsdDisplay => {
   return {
     price,
-    ...getUsdDisplay(amount == null || price == null ? null : amount * price),
+    ...getUsdDisplay(amount == null || price == null ? null : amount * price, censored),
   }
 }
 const incrementPriceUsdDisplay = (
   amount: number | null,
   price: number | null,
   current: PriceUsdDisplay,
+  censored: boolean,
 ): PriceUsdDisplay => {
-  if (current == null) return getPriceUsdDisplay(amount, price)
+  if (current == null) return getPriceUsdDisplay(amount, price, censored)
 
   const usd = amount == null || price == null ? null : amount * price
   if (usd == null) return current
@@ -218,7 +225,7 @@ const incrementPriceUsdDisplay = (
 
   return {
     price: avgPrice,
-    ...incrementUsdDisplay(usd, current),
+    ...incrementUsdDisplay(usd, current, censored),
   }
 }
 
@@ -233,9 +240,9 @@ const getPercDisplay = (currentUsd: number | null, tradeUsd: number | null): Per
   }
 }
 
-const getValueChangeAndStatus = (current: UsdDisplay, trade: UsdDisplay): ValueChangeAndStatus => {
+const getValueChangeAndStatus = (current: UsdDisplay, trade: UsdDisplay, censored: boolean): ValueChangeAndStatus => {
   return {
-    ...getUsdDisplay(current.usd - trade.usd),
+    ...getUsdDisplay(current.usd - trade.usd, censored),
     ...getPercDisplay(current.usd, trade.usd),
     status: getValueChangeStatusFromUsds(current.usd, trade.usd),
   }
@@ -246,41 +253,47 @@ const getFreshOrUpdatedTokenTradeData = (
   amount: number,
   price: number,
   currentData: TokenTradeData | null,
+  censored: boolean,
 ): TokenTradeData => {
   if (currentData == null) {
-    const trade = getPriceUsdDisplay(amount, price)
-    const current = getPriceUsdDisplay(amount, token.price)
+    const trade = getPriceUsdDisplay(amount, price, censored)
+    const current = getPriceUsdDisplay(amount, token.price, censored)
     return {
       ...token,
 
       amount,
       trade,
       current,
-      valueChange: getValueChangeAndStatus(current, trade),
+      valueChange: getValueChangeAndStatus(current, trade, censored),
     }
   }
 
-  const trade = incrementPriceUsdDisplay(amount, price, currentData.trade)
-  const current = incrementPriceUsdDisplay(amount, token.price, currentData.current)
+  const trade = incrementPriceUsdDisplay(amount, price, currentData.trade, censored)
+  const current = incrementPriceUsdDisplay(amount, token.price, currentData.current, censored)
   return {
     ...currentData,
 
     amount: currentData.amount + amount,
     trade,
     current,
-    valueChange: getValueChangeAndStatus(current, trade),
+    valueChange: getValueChangeAndStatus(current, trade, censored),
   }
 }
 
-const getValueChangeAndStatusFromUsds = (currentUsd: number | null, tradeUsd: number | null): ValueChangeAndStatus => {
+const getValueChangeAndStatusFromUsds = (
+  currentUsd: number | null,
+  tradeUsd: number | null,
+  censored: boolean,
+): ValueChangeAndStatus => {
   return {
-    ...getUsdDisplay(currentUsd - tradeUsd),
+    ...getUsdDisplay(currentUsd - tradeUsd, censored),
     ...getPercDisplay(currentUsd, tradeUsd),
     status: getValueChangeStatusFromUsds(currentUsd, tradeUsd),
   }
 }
 
 export const useInvolicaLifetimeStats = () => {
+  const censored = false
   const involicaStats = useInvolicaStatsData()
   const tokensData = useInvolicaStore((state) => state.tokens)
 
@@ -295,16 +308,17 @@ export const useInvolicaLifetimeStats = () => {
         involicaStats.outAmounts[outIndex],
         tokensData[ethers.utils.getAddress(outToken)].price,
         null,
+        censored,
       )
     })
 
-    const totalOutTrade = getUsdDisplay(involicaStats.totalTradeAmountUsd)
+    const totalOutTrade = getUsdDisplay(involicaStats.totalTradeAmountUsd, censored)
     const totalOutCurrent = getUsdDisplay(
       Object.values(outTokens).reduce((total, token) => total + token.current.usd, 0),
+      censored,
     )
     const totalOutStatus = getValueChangeStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd)
 
-    
     return {
       dcasCount: involicaStats?.totalDcasCount,
       userCount: involicaStats?.totalUserCount,
@@ -315,13 +329,12 @@ export const useInvolicaLifetimeStats = () => {
         status: totalOutStatus,
       },
 
-      totalValueChange: getValueChangeAndStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd),
+      totalValueChange: getValueChangeAndStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd, censored),
     }
-  }, [involicaStats, tokensData])
-
+  }, [involicaStats, tokensData, censored])
 }
 
-export const useUserLifetimeStats = () => {
+export const useUserLifetimeStats = (censored = false) => {
   const dcas = useInvolicaUserDcasData()
   const tokensData = useInvolicaStore((state) => state.tokens)
 
@@ -338,6 +351,7 @@ export const useUserLifetimeStats = () => {
         dca.inAmount,
         dca.inPrice,
         inTokens[dca.inToken],
+        censored,
       )
       dca.outTokens.forEach((outToken, outIndex) => {
         outTokens[outToken] = getFreshOrUpdatedTokenTradeData(
@@ -345,13 +359,18 @@ export const useUserLifetimeStats = () => {
           dca.outAmounts[outIndex],
           dca.outPrices[outIndex],
           outTokens[outToken],
+          censored,
         )
       })
     })
 
-    const totalOutTrade = getUsdDisplay(Object.values(outTokens).reduce((total, token) => total + token.trade.usd, 0))
+    const totalOutTrade = getUsdDisplay(
+      Object.values(outTokens).reduce((total, token) => total + token.trade.usd, 0),
+      censored,
+    )
     const totalOutCurrent = getUsdDisplay(
       Object.values(outTokens).reduce((total, token) => total + token.current.usd, 0),
+      censored,
     )
     const totalOutStatus = getValueChangeStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd)
 
@@ -367,12 +386,12 @@ export const useUserLifetimeStats = () => {
         status: totalOutStatus,
       },
 
-      totalValueChange: getValueChangeAndStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd),
+      totalValueChange: getValueChangeAndStatusFromUsds(totalOutCurrent.usd, totalOutTrade.usd, censored),
     }
-  }, [dcas, tokensData])
+  }, [dcas, tokensData, censored])
 }
 
-export const useUserDcasData = () => {
+export const useUserDcasData = (censored = false) => {
   const dcas = useInvolicaUserDcasData()
   const tokensData = useInvolicaStore((state) => state.tokens)
 
@@ -387,11 +406,12 @@ export const useUserDcasData = () => {
             dca.outAmounts[outIndex],
             dca.outPrices[outIndex],
             null,
+            censored,
           ),
         )
         return {
           txHash: dca.txHash,
-          
+
           timestamp: dca.timestamp,
           timestampDisplay: timestampToDateTime(dca.timestamp),
 
@@ -400,17 +420,19 @@ export const useUserDcasData = () => {
             dca.inAmount,
             dca.inPrice,
             null,
+            censored,
           ),
           outTokens,
 
           totalValueChange: getValueChangeAndStatusFromUsds(
             outTokens.reduce((total, token) => total + token.current.usd, 0),
             outTokens.reduce((total, token) => total + token.trade.usd, 0),
+            censored,
           ),
         }
       },
     )
-  }, [dcas, tokensData])
+  }, [dcas, tokensData, censored])
 }
 
 export const useDailyTokenPrices = () => {
@@ -522,18 +544,17 @@ export const useInvolicaDCAChartData = (dcas: boolean, selectedToken: string | n
           dcasCount += (dcaOrSnapshot as InvolicaSnapshot).dcasCount
         }
 
-        dcaOrSnapshot.outTokens
-        .forEach((outToken, outTokenIndex) => {
-            // Only include token if its being tracked
-            if (runningPortfolioOuts[outToken] == null) return
+        dcaOrSnapshot.outTokens.forEach((outToken, outTokenIndex) => {
+          // Only include token if its being tracked
+          if (runningPortfolioOuts[outToken] == null) return
 
-            const amount = dcasOrSnapshots[i].outAmounts[outTokenIndex]
-            const price = dcas
-              ? dcasOrSnapshots[i].outPrices[outTokenIndex]
-              : parseFloat(dailyPrices[yesterdayTimestamp]?.[outToken] ?? '0')
-            runningPortfolioOuts[outToken] += amount
-            runningTradeUsd += amount * price
-          })
+          const amount = dcasOrSnapshots[i].outAmounts[outTokenIndex]
+          const price = dcas
+            ? dcasOrSnapshots[i].outPrices[outTokenIndex]
+            : parseFloat(dailyPrices[yesterdayTimestamp]?.[outToken] ?? '0')
+          runningPortfolioOuts[outToken] += amount
+          runningTradeUsd += amount * price
+        })
 
         if (includeDCAs) {
           timestamps.push(dcaOrSnapshot.timestamp)

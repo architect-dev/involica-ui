@@ -40,6 +40,7 @@ const ChainButton = styled.div<{ selected: boolean }>`
 const StyledChainIcon = styled(ChainIcon)`
     width: ${buttonHeight - 20}px;
     height: ${buttonHeight - 20}px;
+    fill: ${({ theme }) => theme.colors.text};
 `
 
 const SelectedChainButton = styled.div<{ selectedIndex: number, selectedChain: number }>`
@@ -86,7 +87,7 @@ const ChainSelector: React.FC = () => {
                 <ChainOption key={chain} chain={chain} selectedChain={selectedChain}/>
             ))}
             <SelectedChainButton selectedIndex={selectedIndex} selectedChain={selectedChain}>
-                <StyledChainIcon white chain={selectedChain}/>
+                <StyledChainIcon chain={selectedChain}/>
             </SelectedChainButton>
         </ToggleWrapper>
     )
