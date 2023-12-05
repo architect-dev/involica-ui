@@ -1,10 +1,4 @@
 {
-    "cSpell.words": [
-        "Backgrounded",
-        "decoratee",
-        "Inval",
-        "maintainance",
-        "strikethrough",
-        "unstaked"
-    ]
+	"cSpell.words": ["Inval", "simbathesailor"],
+	"editor.formatOnSave": true
 }

@@ -1,13 +1,13 @@
 import React from 'react'
-import { ToastContainer } from 'uikit'
-import useToast from 'hooks/useToast'
+import useToast from '@hooks/useToast'
+import { ToastContainer } from '@uikit'
 
 const ToastListener = () => {
-  const { toasts, remove } = useToast()
+	const { toasts, remove } = useToast()
 
-  const handleRemove = (id: string) => remove(id)
+	const handleRemove = (id: string) => remove(id)
 
-  return <ToastContainer toasts={toasts} onRemove={handleRemove} />
+	return <ToastContainer toasts={toasts} onRemove={handleRemove} />
 }
 
 export default ToastListener

@@ -1,43 +1,43 @@
 import { useEffect } from 'react'
-import useAuth from 'hooks/useAuth'
-import { connectorLocalStorageKey } from 'uikit/widgets/WalletModal/config'
-import { ConnectorNames } from 'uikit/widgets/WalletModal/types'
+import useAuth from '@hooks/useAuth'
+import { connectorLocalStorageKey } from '@uikit/widgets/WalletModal/config'
+import { ConnectorNames } from '@uikit/widgets/WalletModal/types'
 
 const _binanceChainListener = async () =>
-    new Promise<void>((resolve) =>
-        Object.defineProperty(window, 'BinanceChain', {
-            get() {
-                return this.bsc
-            },
-            set(bsc) {
-                this.bsc = bsc
+	new Promise<void>((resolve) =>
+		Object.defineProperty(window, 'BinanceChain', {
+			get() {
+				return this.bsc
+			},
+			set(bsc) {
+				this.bsc = bsc
 
-                resolve()
-            },
-        }),
-    )
+				resolve()
+			},
+		})
+	)
 
 const useEagerConnect = () => {
-    const { login } = useAuth()
+	const { login } = useAuth()
 
-    useEffect(() => {
-        const connectorId = window.localStorage.getItem(connectorLocalStorageKey) as ConnectorNames
+	useEffect(() => {
+		const connectorId = window.localStorage.getItem(connectorLocalStorageKey) as ConnectorNames
 
-        if (connectorId) {
-            const isConnectorBinanceChain = connectorId === ConnectorNames.BSC
-            const isBinanceChainDefined = Reflect.has(window, 'BinanceChain')
+		if (connectorId) {
+			const isConnectorBinanceChain = connectorId === ConnectorNames.BSC
+			const isBinanceChainDefined = Reflect.has(window, 'BinanceChain')
 
-            // Currently BSC extension doesn't always inject in time.
-            // We must check to see if it exists, and if not, wait for it before proceeding.
-            if (isConnectorBinanceChain && !isBinanceChainDefined) {
-                _binanceChainListener().then(() => login(connectorId))
+			// Currently BSC extension doesn't always inject in time.
+			// We must check to see if it exists, and if not, wait for it before proceeding.
+			if (isConnectorBinanceChain && !isBinanceChainDefined) {
+				_binanceChainListener().then(() => login(connectorId))
 
-                return
-            }
+				return
+			}
 
-            login(connectorId)
-        }
-    }, [login])
+			login(connectorId)
+		}
+	}, [login])
 }
 
 export default useEagerConnect

@@ -1,30 +1,18 @@
-import React, { useMemo } from 'react'
-import useTheme from 'hooks/useTheme'
-import { Menu as UikitMenu } from 'uikit'
+import React, { ReactNode, useMemo } from 'react'
+import useTheme from '@hooks/useTheme'
+import { Menu as UikitMenu } from '@uikit'
 import { getMenuItems } from './config'
-import useAuth from 'hooks/useAuth'
-import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import useAuth from '@hooks/useAuth'
+import useActiveWeb3React from '@hooks/useActiveWeb3React'
 
-const Menu = (props) => {
-  const { login, logout } = useAuth()
-  const { account } = useActiveWeb3React()
+export const Menu: React.FC<{ children: ReactNode }> = (props) => {
+	const { login, logout } = useAuth()
+	const { account } = useActiveWeb3React()
 
-  const { isDark, toggleTheme } = useTheme()
-  const menuLinks = useMemo(() => {
-    return getMenuItems()
-  }, [])
+	const { isDark, toggleTheme } = useTheme()
+	const menuLinks = useMemo(() => {
+		return getMenuItems()
+	}, [])
 
-  return (
-    <UikitMenu
-      account={account}
-      login={login}
-      logout={logout}
-      isDark={isDark}
-      toggleTheme={toggleTheme}
-      links={menuLinks}
-      {...props}
-    />
-  )
+	return <UikitMenu account={account} login={login} logout={logout} isDark={isDark} toggleTheme={toggleTheme} links={menuLinks} additionals={[]} {...props} />
 }
-
-export default Menu

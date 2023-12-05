@@ -1,139 +1,117 @@
 import { orderBy } from 'lodash'
 import { transparentize } from 'polished'
 import React, { useCallback, useMemo } from 'react'
-import { useUserLifetimeStats } from 'state/statsHooks'
+import { useUserLifetimeStats } from '@state/statsHooks'
 import styled, { css } from 'styled-components'
-import { Column, Text } from 'uikit'
-import { pressableMixin } from 'uikit/util/styledMixins'
-import { CellCol, CellRow } from 'views/Home/Components/styles'
-import { ChartDataOption, useChartOptionsState } from 'views/Stats/components/chartOptionsState'
+import { Column, Text } from '@uikit'
+import { pressableMixin } from '@uikit/util/styledMixins'
+import { CellCol, CellRow } from '@views/Home/Components/styles'
+import { ChartDataOption, useChartOptionsState } from '@views/Stats/components/chartOptionsState'
 import { Card } from './Card'
 import { DataRow } from '../uikit/components/DataRow'
 import { PerfIndicator } from './DataVis/PerfIndicator'
 import { TokenPerfTable } from './DataVis/TokenPerfTable'
 
 const ClickableCol = styled.div<{ highlighted?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
 
-  .row {
-    height: 48px;
-  }
+	.row {
+		height: 48px;
+	}
 
-  ${({ theme, highlighted }) =>
-    highlighted &&
-    css`
-      outline: 1px solid ${theme.colors.text};
-      outline-offset: -1px;
-    `}
+	${({ theme, highlighted }) =>
+		highlighted &&
+		css`
+			outline: 1px solid ${theme.colors.text};
+			outline-offset: -1px;
+		`}
 
-  ${({ theme }) =>
-    pressableMixin({
-      theme,
-      hoverStyles: css`
-        background-color: ${transparentize(0.85, theme.colors.text)} !important;
-      `,
-    })};
+	${({ theme }) =>
+		pressableMixin({
+			theme,
+			hoverStyles: css`
+				background-color: ${transparentize(0.85, theme.colors.text)} !important;
+			`,
+		})};
 `
 
 export const DerivedStatsTable: React.FC<{ censorable?: boolean }> = ({ censorable = false }) => {
-  const censored = useChartOptionsState((s) => s.censored)
-  const lifetimeStats = useUserLifetimeStats(censorable && censored)
-  const {
-    dataOption,
-    setDataOption,
-    focusedToken,
-    setFocusedToken,
-    dcasCountChart,
-    setDcasCountChart,
-  } = useChartOptionsState()
+	const censored = useChartOptionsState((s) => s.censored)
+	const lifetimeStats = useUserLifetimeStats(censorable && censored)
+	const { dataOption, setDataOption, focusedToken, setFocusedToken, dcasCountChart, setDcasCountChart } = useChartOptionsState()
 
-  const sortedInTokens = useMemo(() => {
-    return orderBy(Object.values(lifetimeStats?.inTokens ?? []), ['trade.usd'], ['desc'])
-  }, [lifetimeStats?.inTokens])
-  const sortedOutTokens = useMemo(() => {
-    return orderBy(Object.values(lifetimeStats?.outTokens ?? []), ['trade.usd'], ['desc'])
-  }, [lifetimeStats?.outTokens])
+	const sortedInTokens = useMemo(() => {
+		return orderBy(Object.values(lifetimeStats?.inTokens ?? []), ['trade.usd'], ['desc'])
+	}, [lifetimeStats?.inTokens])
+	const sortedOutTokens = useMemo(() => {
+		return orderBy(Object.values(lifetimeStats?.outTokens ?? []), ['trade.usd'], ['desc'])
+	}, [lifetimeStats?.outTokens])
 
-  const userTotalPerformanceSelected = useMemo(() => {
-    return dataOption === ChartDataOption.User && focusedToken == null && dcasCountChart === false
-  }, [dataOption, dcasCountChart, focusedToken])
-  const handleShowUserTotalPerformance = useCallback(() => {
-    setFocusedToken(null)
-    setDcasCountChart(ChartDataOption.User, false)
-  }, [setDcasCountChart, setFocusedToken])
+	const userTotalPerformanceSelected = useMemo(() => {
+		return dataOption === ChartDataOption.User && focusedToken == null && dcasCountChart === false
+	}, [dataOption, dcasCountChart, focusedToken])
+	const handleShowUserTotalPerformance = useCallback(() => {
+		setFocusedToken(null)
+		setDcasCountChart(ChartDataOption.User, false)
+	}, [setDcasCountChart, setFocusedToken])
 
-  const userDcasCountChartSelected = useMemo(() => {
-    return dcasCountChart && dataOption === ChartDataOption.User && focusedToken == null
-  }, [dcasCountChart, dataOption, focusedToken])
-  const handleToggleUserDcasChart = useCallback(() => {
-    if (userDcasCountChartSelected) {
-      setDcasCountChart(ChartDataOption.User, false)
-    } else {
-      setDcasCountChart(ChartDataOption.User, true)
-    }
-  }, [setDcasCountChart, userDcasCountChartSelected])
+	const userDcasCountChartSelected = useMemo(() => {
+		return dcasCountChart && dataOption === ChartDataOption.User && focusedToken == null
+	}, [dcasCountChart, dataOption, focusedToken])
+	const handleToggleUserDcasChart = useCallback(() => {
+		if (userDcasCountChartSelected) {
+			setDcasCountChart(ChartDataOption.User, false)
+		} else {
+			setDcasCountChart(ChartDataOption.User, true)
+		}
+	}, [setDcasCountChart, userDcasCountChartSelected])
 
-  const handleSetFocusedToken = useCallback(
-    (token: string) => {
-      setDataOption(ChartDataOption.User)
-      setFocusedToken(token)
-    },
-    [setDataOption, setFocusedToken],
-  )
+	const handleSetFocusedToken = useCallback(
+		(token: string) => {
+			setDataOption(ChartDataOption.User)
+			setFocusedToken(token)
+		},
+		[setDataOption, setFocusedToken]
+	)
 
-  return (
-    <Card title="Portfolio Stats" padding="24px">
-      <CellRow>
-        <CellCol>
-          <ClickableCol highlighted={userTotalPerformanceSelected} onClick={handleShowUserTotalPerformance}>
-            <DataRow
-              className="row"
-              px="6px"
-              t="Current Portfolio Value:"
-              v={lifetimeStats?.totalOutFull?.current?.censorableUsdDisplay}
-            />
-            <DataRow
-              className="row"
-              px="6px"
-              t="Total Buy In:"
-              v={lifetimeStats?.totalOutFull?.trade?.censorableUsdDisplay}
-            />
-            <DataRow
-              className="row"
-              px="6px"
-              t="Total PnL:"
-              v={<PerfIndicator {...lifetimeStats?.totalValueChange} censorable gap="6px" />}
-            />
-          </ClickableCol>
-          <ClickableCol highlighted={userDcasCountChartSelected} onClick={handleToggleUserDcasChart}>
-            <DataRow className="row" px="6px" t="Number of DCAs:" v={lifetimeStats?.dcasCount} />
-          </ClickableCol>
-          <Column width="100%" gap="4px">
-            <Text small italic pl="6px">
-              Combined DCAs Sell Token Data:
-            </Text>
-            <TokenPerfTable tokensIn={sortedInTokens} isAggregate censorable />
-          </Column>
-        </CellCol>
-        <CellCol>
-          <Column width="100%" gap="4px">
-            <Text small italic pl="6px">
-              Combined DCAs Buy Token Data:
-              <br />
-              <b>(Select a token to refine the chart above)</b>
-            </Text>
-            <TokenPerfTable
-              tokensOut={sortedOutTokens}
-              isAggregate
-              censorable
-              highlightedTokens={[focusedToken]}
-              onTokenOutClick={handleSetFocusedToken}
-            />
-          </Column>
-        </CellCol>
-      </CellRow>
-    </Card>
-  )
+	return (
+		<Card title='Portfolio Stats' padding='24px'>
+			<CellRow>
+				<CellCol>
+					<ClickableCol highlighted={userTotalPerformanceSelected} onClick={handleShowUserTotalPerformance}>
+						<DataRow className='row' px='6px' t='Current Portfolio Value:' v={lifetimeStats?.totalOutFull?.current?.censorableUsdDisplay} />
+						<DataRow className='row' px='6px' t='Total Buy In:' v={lifetimeStats?.totalOutFull?.trade?.censorableUsdDisplay} />
+						<DataRow className='row' px='6px' t='Total PnL:' v={<PerfIndicator {...lifetimeStats?.totalValueChange} censorable gap='6px' />} />
+					</ClickableCol>
+					<ClickableCol highlighted={userDcasCountChartSelected} onClick={handleToggleUserDcasChart}>
+						<DataRow className='row' px='6px' t='Number of DCAs:' v={lifetimeStats?.dcasCount} />
+					</ClickableCol>
+					<Column width='100%' gap='4px'>
+						<Text small italic pl='6px'>
+							Combined DCAs Sell Token Data:
+						</Text>
+						<TokenPerfTable tokensIn={sortedInTokens} isAggregate censorable />
+					</Column>
+				</CellCol>
+				<CellCol>
+					<Column width='100%' gap='4px'>
+						<Text small italic pl='6px'>
+							Combined DCAs Buy Token Data:
+							<br />
+							<b>(Select a token to refine the chart above)</b>
+						</Text>
+						<TokenPerfTable
+							tokensOut={sortedOutTokens}
+							isAggregate
+							censorable
+							highlightedTokens={focusedToken != null ? [focusedToken] : undefined}
+							onTokenOutClick={handleSetFocusedToken}
+						/>
+					</Column>
+				</CellCol>
+			</CellRow>
+		</Card>
+	)
 }

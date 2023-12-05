@@ -1,33 +1,32 @@
-import { isInvolicaRevertReason } from 'config/constants/revert'
-import { ToastsContext } from 'contexts/ToastsContext'
+import { isInvolicaRevertReason } from '@config/constants/revert'
+import { ToastsContext } from '@contexts/ToastsContext'
 import { useContext, useCallback } from 'react'
-import { Toast } from 'uikit/widgets/Toast'
+import { Toast } from '@uikit/widgets/Toast'
 
 type ToastSignature = (title: Toast['title'], description?: Toast['description']) => void
 
 const useToast = () => {
-  const toastContext = useContext(ToastsContext)
+	const toastContext = useContext(ToastsContext)
 
-  if (toastContext === undefined) {
-    throw new Error('Toasts context undefined')
-  }
+	if (toastContext === undefined) {
+		throw new Error('Toasts context undefined')
+	}
 
-  return toastContext
+	return toastContext
 }
 
 export default useToast
 
-
 export const useTransactionToasts = () => {
-  const { toastSuccess, toastError } = useToast()
+	const { toastSuccess, toastError } = useToast()
 
-  const transactionToastError: ToastSignature = useCallback(
-    (title: Toast['title'], description: Toast['description']) => {
-      const errorTitle = isInvolicaRevertReason(description) ? title : 'Wallet / Chain Error'
-      toastError(errorTitle, description.split('_').join(' '))
-    },
-    [toastError]
-  )
+	const transactionToastError: ToastSignature = useCallback(
+		(title: Toast['title'], description: Toast['description']) => {
+			const errorTitle = description && isInvolicaRevertReason(description) ? title : 'Wallet / Chain Error'
+			toastError(errorTitle, (description ?? '').split('_').join(' '))
+		},
+		[toastError]
+	)
 
-  return { toastSuccess, toastError: transactionToastError }
+	return { toastSuccess, toastError: transactionToastError }
 }
